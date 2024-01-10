@@ -4,6 +4,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import InitialPage from "./screens/InitialPage";
 import SignInPage from "./screens/SignInPage";
+import LogInPage from "./screens/LogInPage";
+import TeamPage from "./screens/TeamPage";
 
 const Stack = createNativeStackNavigator();
 
@@ -13,7 +15,8 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="InitialPage" component={InitialPage}></Stack.Screen>
         <Stack.Screen name="SignInPage" component={SignInPage}></Stack.Screen>
-        <Stack.Screen name="TeamPage" component={SignInPage}></Stack.Screen>
+        <Stack.Screen name="LogInPage" component={LogInPage}></Stack.Screen>
+        <Stack.Screen name="TeamPage" component={TeamPage}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
