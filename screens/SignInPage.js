@@ -16,6 +16,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase";
 import { Alert } from "react-native";
+import styles from "./css.js";
 
 export default function SignInPage() {
   const navigation = useNavigation();
@@ -82,44 +83,14 @@ export default function SignInPage() {
           secureTextEntry
         />
       </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleLogin} style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+      <View>
         <TouchableOpacity
           onPress={handleSignUp}
-          style={[styles.button, styles.buttonOutline]}
+          style={{ ...styles.button, backgroundColor: "#050026" }}
         >
-          <Text style={styles.buttonOutlineText}>Register</Text>
+          <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: "5%",
-    backgroundColor: "white",
-  },
-  head: {
-    marginTop: "18%",
-    flexDirection: "row",
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginLeft: "36%",
-  },
-  textBox: {
-    marginTop: "10%",
-  },
-  textInput: {
-    margin: "3%",
-    fontSize: 16,
-    borderBottomColor: "grey",
-    borderBottomWidth: 2,
-    paddingBottom: 10,
-  },
-});
