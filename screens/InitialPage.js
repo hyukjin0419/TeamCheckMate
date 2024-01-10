@@ -10,24 +10,21 @@ import {
   Dimensions,
 } from "react-native";
 
-//const WINDOW_WIDHT = Dimensions.get("window").width;      //반응형 디자인을 위해 스크린 사이즈를 구하였으나 사용할지는 의문.
-//const WINDOW_HEIGHT = Dimensions.get("window").height;
-
 export default function InitialPage() {
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
-      <StatusBar style={"dark"}></StatusBar>
+      <StatusBar style={"dark"} />
       <View style={styles.logoContainter}>
         <Image
           style={styles.logoImage}
-          source={require("./Images/logo.png")}
+          source={require("./images/logo.png")}
         ></Image>
       </View>
       <View style={styles.imgContainer}>
         <Image
           style={styles.logInImage}
-          source={require("./Images/LoginImages.gif")}
+          source={require("./images/LoginImages.gif")}
         ></Image>
         <Text style={styles.description}>
           무임승차를 방지하기 위한 최적의 방법
@@ -42,11 +39,6 @@ export default function InitialPage() {
         <TouchableOpacity onPress={() => navigation.navigate("SignInPage")}>
           <View style={styles.signInBtn}>
             <Text style={styles.signInText}>가입하기</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("TeamScreen")}>
-          <View style={styles.signInBtn}>
-            <Text style={styles.signInText}>팀프로젝트 화면</Text>
           </View>
         </TouchableOpacity>
       </View>
