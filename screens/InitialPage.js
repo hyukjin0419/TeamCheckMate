@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 400,
     alignSelf: "center",
-    marginBottom: "10%",
+    marginBottom: "11%",
   },
   BtnContainter: {
     flex: 1,
