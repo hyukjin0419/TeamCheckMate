@@ -55,17 +55,17 @@ export default function SignInPage() {
 
   return (
     <KeyboardAvoidingView style={styles.container}>
+      {/*head 부분*/}
       <View style={styles.head}>
-        <TouchableOpacity
-          style={styles.headBtn}
-          onPress={() => navigation.navigate("InitialPage")}
-        >
+        <TouchableOpacity onPress={() => navigation.navigate("InitialPage")}>
           <AntDesign name="left" size={20} color="black" />
         </TouchableOpacity>
         <Text style={styles.title}>가입하기</Text>
       </View>
 
+      {/*입력창*/}
       <View style={styles.textBox}>
+        {/*이메일 입력창*/}
         <TextInput
           placeholder="이메일"
           value={email}
@@ -73,6 +73,7 @@ export default function SignInPage() {
           style={styles.textInput}
           keyboardType="email-address"
         />
+        {/*이메일 입력창*/}
         <TextInput
           placeholder="비밀번호"
           value={password}
@@ -106,11 +107,10 @@ const styles = StyleSheet.create({
     marginTop: "18%",
     flexDirection: "row",
   },
-  headBtn: {},
   title: {
     fontWeight: "bold",
     fontSize: 16,
-    left: "630%",
+    marginLeft: "36%",
   },
   textBox: {
     marginTop: "10%",
@@ -122,7 +122,4 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     paddingBottom: 10,
   },
-  button: {
-    fontSize: 100,
-  }
 });
