@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/core";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   TextInput,
@@ -9,11 +9,49 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../firebase";
+import { Alert } from "react-native";
 
 export default function SignInPage() {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User signed in: ", user.email);
+        navigation.replace("InitialPage");
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  //회원가입 관련 함수
+  const handleSignUp = () => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredentials) => {
+        const user = userCredentials.user;
+        console.log("Registered with: " + user.email);
+      })
+      .catch((error) => Alert.alert(error.message));
+  };
+
+  //로그인 관련 함수
+  const handleLogin = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredentials) => {
+        const user = userCredentials.user;
+        console.log("Logged in with: " + user.email);
+      })
+      .catch((error) => Alert.alert(error.message));
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -42,6 +80,17 @@ export default function SignInPage() {
           style={styles.textInput}
           secureTextEntry
         />
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={handleLogin} style={styles.button}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleSignUp}
+          style={[styles.button, styles.buttonOutline]}
+        >
+          <Text style={styles.buttonOutlineText}>Register</Text>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
