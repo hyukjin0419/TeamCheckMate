@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/core";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { auth } from "../firebase";
 
@@ -10,14 +10,39 @@ export default function TeamPage() {
     auth
       .signOut()
       .then(() => {
-        navigation.replace("SignInPage");
+        navigation.replace("InitialPage");
       })
       .catch((error) => alert(error.message));
   };
 
   return (
-    <View>
-      <Text>TeamPage</Text>
-    </View>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={handleSignOut}>
+            <View style={styles.logInBtn}>
+              <Text style={styles.logInText}>로그아웃</Text>
+            </View>
+      </TouchableOpacity>
+     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logInBtn: {
+    backgroundColor: "#050026",
+    borderRadius: 9,
+    alignItems: "center",
+    paddingVertical: "5%",
+    marginBottom: "3%",
+  },
+  logInText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: 400,
+  },
+});
