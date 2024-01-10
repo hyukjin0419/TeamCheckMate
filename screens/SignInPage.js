@@ -122,4 +122,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     paddingBottom: 10,
   },
+  button: {
+    fontSize: 100,
+  }
 });
