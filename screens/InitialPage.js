@@ -9,9 +9,19 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { auth } from "../firebase";
 
 export default function InitialPage() {
   const navigation = useNavigation();
+
+  const handleSignOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        navigation.replace("SignInPage");
+      })
+      .catch((error) => alert(error.message));
+  };
   return (
     <View style={styles.container}>
       <StatusBar style={"dark"} />
@@ -31,7 +41,7 @@ export default function InitialPage() {
         </Text>
       </View>
       <View style={styles.BtnContainter}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("LogInPage")}>
           <View style={styles.logInBtn}>
             <Text style={styles.logInText}>로그인</Text>
           </View>
