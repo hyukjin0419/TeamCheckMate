@@ -9,21 +9,13 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { auth } from "../firebase";
+import commonStyles from "./css.js";
 
 export default function InitialPage() {
   const navigation = useNavigation();
 
-  const handleSignOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        navigation.replace("SignInPage");
-      })
-      .catch((error) => alert(error.message));
-  };
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.container}>
       <StatusBar style={"dark"} />
       <View style={styles.logoContainter}>
         <Image
@@ -41,15 +33,17 @@ export default function InitialPage() {
         </Text>
       </View>
       <View style={styles.BtnContainter}>
-        <TouchableOpacity onPress={() => navigation.navigate("LogInPage")}>
-          <View style={styles.logInBtn}>
-            <Text style={styles.logInText}>로그인</Text>
-          </View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("LogInPage")}
+          style={{ ...commonStyles.button, backgroundColor: "#050026" }}
+        >
+          <Text style={commonStyles.buttonText}>로그인</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("SignInPage")}>
-          <View style={styles.signInBtn}>
-            <Text style={styles.signInText}>가입하기</Text>
-          </View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SignInPage")}
+          style={commonStyles.subButton}
+        >
+          <Text style={commonStyles.subButtonText}>가입하기</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -57,11 +51,6 @@ export default function InitialPage() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: "5%",
-    backgroundColor: "white",
-  },
   logoContainter: {
     flex: 1.2,
     //backgroundColor: "teal",
@@ -92,34 +81,8 @@ const styles = StyleSheet.create({
   },
   BtnContainter: {
     flex: 1,
-    //backgroundColor: "red",
     alignContent: "center",
     justifyContent: "center",
-    marginBottom: "10%",
-  },
-  logInBtn: {
-    backgroundColor: "#050026",
-    borderRadius: 9,
-    alignItems: "center",
-    paddingVertical: "6%",
-    marginBottom: "3%",
-  },
-  logInText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: 400,
-  },
-  signInBtn: {
-    backgroundColor: "white",
-    borderRadius: 9,
-    alignItems: "center",
-    paddingVertical: "5.5%",
-    borderColor: "#050026",
-    borderWidth: 1,
-  },
-  signInText: {
-    color: "black",
-    fontSize: 18,
-    fontWeight: 400,
+    marginBottom: "8%",
   },
 });
