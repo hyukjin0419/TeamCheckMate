@@ -6,6 +6,7 @@ import InitialPage from "./screens/InitialPage";
 import SignInPage from "./screens/SignInPage";
 import LogInPage from "./screens/LogInPage";
 import TeamPage from "./screens/TeamPage";
+import UserInformationInputPage from "./screens/UserInformationInputPage";
 
 const Stack = createNativeStackNavigator();
 
@@ -13,6 +14,10 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="UserInformationInputPage"
+          component={UserInformationInputPage}
+        ></Stack.Screen>
         <Stack.Screen name="InitialPage" component={InitialPage}></Stack.Screen>
         <Stack.Screen name="SignInPage" component={SignInPage}></Stack.Screen>
         <Stack.Screen name="LogInPage" component={LogInPage}></Stack.Screen>
