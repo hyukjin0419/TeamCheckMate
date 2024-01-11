@@ -83,12 +83,23 @@ export default function SignInPage() {
           secureTextEntry
         />
       </View>
+      {/*버튼 Container*/}
       <View>
+        {/*가입하기 버튼*/}
         <TouchableOpacity
           onPress={handleSignUp}
           style={{ ...styles.button, backgroundColor: "#050026" }}
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>
+        </TouchableOpacity>
+        {/*건너뛰기 버튼
+        나중에 삭제해야함 -> test를 위해 추가해놓음
+        -> 백엔드쪽에서 어떻게 할건지 고민해봐야 함*/}
+        <TouchableOpacity
+          onPress={() => navigation.navigate("UserInformationInputPage")}
+          style={styles.subButton}
+        >
+          <Text style={styles.subButtonText}>건너뛰기</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

@@ -61,11 +61,20 @@ export default function UserInformationInputPage() {
           style={styles.textInput}
         />
       </View>
+      {/*버튼 Container*/}
       <View>
+        {/*가입하기 버튼*/}
         <TouchableOpacity
           style={{ ...styles.button, backgroundColor: "#050026" }}
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>
+        </TouchableOpacity>
+        {/*건너뛰기 버튼*/}
+        <TouchableOpacity
+          onPress={() => navigation.navigate("TeamPage")}
+          style={styles.subButton}
+        >
+          <Text style={styles.subButtonText}>건너뛰기</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

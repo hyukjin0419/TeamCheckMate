@@ -16,6 +16,7 @@ export default function InitialPage() {
 
   return (
     <View style={commonStyles.container}>
+      {/*로고 Container*/}
       <StatusBar style={"dark"} />
       <View style={styles.logoContainter}>
         <Image
@@ -23,22 +24,27 @@ export default function InitialPage() {
           source={require("./images/logo.png")}
         ></Image>
       </View>
+      {/*이미지 Container*/}
       <View style={styles.imgContainer}>
         <Image
           style={styles.logInImage}
           source={require("./images/LoginImages.gif")}
         ></Image>
+        {/*Description Container*/}
         <Text style={styles.description}>
           무임승차를 방지하기 위한 최적의 방법
         </Text>
       </View>
+      {/*버튼 Container*/}
       <View style={styles.BtnContainter}>
+        {/*로그인 버튼*/}
         <TouchableOpacity
           onPress={() => navigation.navigate("LogInPage")}
           style={{ ...commonStyles.button, backgroundColor: "#050026" }}
         >
           <Text style={commonStyles.buttonText}>로그인</Text>
         </TouchableOpacity>
+        {/*가입하기 버튼*/}
         <TouchableOpacity
           onPress={() => navigation.navigate("SignInPage")}
           style={commonStyles.subButton}
