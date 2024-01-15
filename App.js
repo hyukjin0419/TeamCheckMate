@@ -7,6 +7,7 @@ import SignInPage from "./screens/SignInPage";
 import LogInPage from "./screens/LogInPage";
 import TeamPage from "./screens/TeamPage";
 import UserInformationInputPage from "./screens/UserInformationInputPage";
+import AddMembers from "./screens/AddMembers";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,7 @@ export default function App() {
         <Stack.Screen name="SignInPage" component={SignInPage}></Stack.Screen>
         <Stack.Screen name="LogInPage" component={LogInPage}></Stack.Screen>
         <Stack.Screen name="TeamPage" component={TeamPage}></Stack.Screen>
+        <Stack.Screen name="AddMembers" component={AddMembers}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );

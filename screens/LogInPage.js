@@ -22,7 +22,7 @@ export default function LogInPage() {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -73,8 +73,8 @@ export default function LogInPage() {
           secureTextEntry
         />
       </View>
-      <View style={{...styles.button, backgroundColor: "#050026"}}>
-        <TouchableOpacity onPress={handleLogin} style={styles.logInBtn}>
+      <View>
+        <TouchableOpacity onPress={handleLogin} style={{...styles.button, backgroundColor: "#050026"}}>
           <Text style={{...styles.buttonText, color: "white"}}>Login</Text>
         </TouchableOpacity>
       </View>

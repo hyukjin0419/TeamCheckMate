@@ -73,6 +73,7 @@ export default function SignInPage() {
           onChangeText={(text) => setEmail(text)}
           style={styles.textInput}
           keyboardType="email-address"
+          autoCapitalize="noneaaa"
         />
         {/*이메일 입력창*/}
         <TextInput
