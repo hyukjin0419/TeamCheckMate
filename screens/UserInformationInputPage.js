@@ -10,13 +10,33 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import styles from "./css.js";
+import { db, doc, setDoc } from "../firebase.js";
 
-export default function UserInformationInputPage() {
+export default function UserInformationInputPage({ route }) {
   const navigation = useNavigation();
+  const email = route.params?.userEmail;
   const [name, setname] = useState("");
   const [school, setschool] = useState("");
   const [studentNumber, setstudentNumber] = useState("");
   const [phoneNumber, setphoneNumber] = useState("");
+
+  const addUser = async () => {
+    try {
+      const timestamp = new Date();
+      const docRef = await setDoc(doc(db, "user", email), {
+        email: email,
+        name: name,
+        school: school,
+        studentNumber: studentNumber,
+        phoneNumber: phoneNumber,
+        timestamp: timestamp,
+      });
+    } catch (e) {
+      console.error("Error adding user's Info: ", e);
+    }
+
+    navigation.navigate("TeamPage");
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -65,6 +85,7 @@ export default function UserInformationInputPage() {
       <View>
         {/*가입하기 버튼*/}
         <TouchableOpacity
+          onPress={() => addUser()}
           style={{ ...styles.button, backgroundColor: "#050026" }}
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>

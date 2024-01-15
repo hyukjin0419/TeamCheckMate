@@ -4,19 +4,15 @@ import {
   Text,
   TextInput,
   View,
-  StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { auth } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase.js";
 import { Alert } from "react-native";
 import styles from "./css.js";
+import { db, doc, setDoc } from "../firebase.js";
 
 export default function SignInPage() {
   const navigation = useNavigation();
@@ -27,7 +23,9 @@ export default function SignInPage() {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         console.log("User signed in: ", user.email);
-        navigation.replace("InitialPage");
+        navigation.replace("UserInformationInputPage", {
+          userEmail: user.email,
+        });
       }
     });
 
@@ -37,19 +35,16 @@ export default function SignInPage() {
   //회원가입 관련 함수
   const handleSignUp = () => {
     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredentials) => {
+      .then(async (userCredentials) => {
         const user = userCredentials.user;
         console.log("Registered with: " + user.email);
-      })
-      .catch((error) => Alert.alert(error.message));
-  };
-
-  //로그인 관련 함수
-  const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredentials) => {
-        const user = userCredentials.user;
-        console.log("Logged in with: " + user.email);
+        try {
+          const docRef = await setDoc(doc(db, "user", email), {
+            email: email,
+          });
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
       })
       .catch((error) => Alert.alert(error.message));
   };
