@@ -1,6 +1,7 @@
 //시작 화면
 import { useNavigation } from "@react-navigation/core";
 import { StatusBar } from "expo-status-bar";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,9 +11,21 @@ import {
   Dimensions,
 } from "react-native";
 import commonStyles from "./css.js";
+import { auth } from "../firebase.js";
 
 export default function InitialPage() {
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User signed in: ", user.email);
+        navigation.replace("TeamPage");
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
     <View style={commonStyles.container}>

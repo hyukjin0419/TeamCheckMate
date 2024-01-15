@@ -17,10 +17,11 @@ export default function TeamPage() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={handleSignOut}>
-            <View style={styles.logInBtn}>
-              <Text style={styles.logInText}>로그아웃</Text>
-            </View>
+      <TouchableOpacity onPress={handleSignOut} style={styles.logInBtn}>
+          <Text style={styles.logInText}>로그아웃</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate("AddMembers")} style={styles.logInBtn}>
+          <Text style={styles.logInText}>Add Members</Text>
       </TouchableOpacity>
      </View>
   );
