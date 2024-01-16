@@ -1,9 +1,20 @@
-import {View, Text, StyleSheet} from "react-native";
+import {View, Text, StyleSheet, Button} from "react-native";
+import { auth } from "../../firebase";
+import { signOut } from "firebase/auth";
 
 const SettingPage = () => {
+
+    const logOut = () => {
+        auth
+        .signOut()
+        .then(() => {
+            navigation.replace("InitialPage");
+          })
+          .catch((error) => alert(error.message));
+    }
     return(
         <View style={styles.container}>
-            <Text style={styles.text}>Setting Page</Text>
+            <Button title="Sign Out" onPress={logOut} style={styles.text} />
         </View>
     );
 };

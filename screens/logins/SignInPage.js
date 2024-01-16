@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/core";
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
+  AppState,
   Text,
   TextInput,
   View,
@@ -8,7 +9,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { auth } from "../../firebase.js";
 import { Alert } from "react-native";
 import styles from "../styles/css.js";
@@ -18,6 +19,50 @@ export default function SignInPage() {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const appState = useRef(AppState.currentState);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
+
+  const handleAppStateChange = async (nextAppState) => {
+    if (
+      appState.current.match(/inactive|background/) &&
+      nextAppState === "active"
+    ) {
+      const user = auth.currentUser;
+      if (user) {
+        await user.reload();
+        if (user.emailVerified) {
+          console.log("User signed in:", user.email);
+          navigation.replace("UserInformationInputPage");
+        }
+      }
+    }
+
+    appState.current = nextAppState;
+    setAppStateVisible(appState.current);
+    console.log("AppState", appState.current);
+  };
+
+  useEffect(() => {
+    const unsubscribeAuthStateChanged = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        await user.reload();
+        if (user.emailVerified) {
+          console.log("User signed in:", user.email);
+          navigation.replace("UserInformationInputPage");
+        }
+      }
+    });
+
+    AppState.addEventListener("change", handleAppStateChange);
+
+    return () => {
+      unsubscribeAuthStateChanged();
+      // Check if AppState.removeEventListener is defined before calling
+      if (AppState.removeEventListener) {
+        AppState.removeEventListener("change", handleAppStateChange);
+      }
+    };
+  }, [navigation]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -34,19 +79,32 @@ export default function SignInPage() {
 
   //회원가입 관련 함수
   const handleSignUp = () => {
-    createUserWithEmailAndPassword(auth, email, password)
+    try {
+      createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredentials) => {
         const user = userCredentials.user;
-        console.log("Registered with: " + user.email);
-        try {
-          const docRef = await setDoc(doc(db, "user", email), {
-            email: email,
-          });
-        } catch (e) {
-          console.error("Error adding document: ", e);
-        }
+        await sendEmailVerification(user)
+        .then(async () => {
+          alert('Verification email sent.');
+          console.log("Registered with: " + user.email);
+          try {
+            const docRef = await setDoc(doc(db, "user", email), {
+              email: email,
+            });
+          } catch (e) {
+            console.error("Error adding document: ", e);
+          }
+        })
+        
       })
-      .catch((error) => Alert.alert(error.message));
+    }
+    catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        alert("This account already exists");
+      } else {
+        console.error("Error creating user:", error);
+      }
+    }
   };
 
   return (
@@ -68,7 +126,7 @@ export default function SignInPage() {
           onChangeText={(text) => setEmail(text)}
           style={styles.textInput}
           keyboardType="email-address"
-          autoCapitalize="noneaaa"
+          autoCapitalize="none"
         />
         {/*이메일 입력창*/}
         <TextInput
