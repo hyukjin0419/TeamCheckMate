@@ -1,4 +1,4 @@
-
+import React, { useRef, useState, useEffect } from "react";
 import { AppState, Image } from "react-native";
 //useEffect: 함수를 사용하면 컴포넌트가 렌더링될 때와 업데이트 될 때 특정코드를 실행할 수 있다.
 import { NavigationContainer } from "@react-navigation/native";
@@ -6,7 +6,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 //Image 컴포넌트는 앱에서 이미지를 로드하고 표시하는 데 사용됩니다. 이미지 태그 안에 주소를 넣어서
 import { auth } from "./firebase";
-import { AppState, Image } from "react-native";
 import TeamPage from "./screens/components/Team/TeamPage";
 import InitialPage from "./screens/InitialPage";
 import SignInPage from "./screens/logins/SignInPage";
@@ -89,8 +88,7 @@ export default function App() {
     const unsubscribeAuthStateChanged = auth.onAuthStateChanged((user) => {
       if (user) {
         setIsLogIn(user.emailVerified);
-      }
-      else {
+      } else {
         setIsLogIn(false);
       }
     });
@@ -107,8 +105,7 @@ export default function App() {
               console.log("User signed in:", user.email);
               setIsLogIn(user.emailVerified);
               // Do something when the app comes to the foreground
-            }
-            else {
+            } else {
               setIsLogIn(false);
             }
           });
@@ -131,12 +128,14 @@ export default function App() {
     };
   }, []);
 
-
   //로그인 안되어 있을때 실행화면
   if (!isLogIn) {
     return (
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="InitialPage">
+        <Stack.Navigator
+          screenOptions={{ headerShown: false }}
+          initialRouteName="InitialPage"
+        >
           <Stack.Screen name="InitialPage" component={InitialPage} />
           <Stack.Screen name="LogInPage" component={LogInPage} />
           <Stack.Screen name="SignInPage" component={SignInPage} />
