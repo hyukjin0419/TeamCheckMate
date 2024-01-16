@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
+
+import { AppState, Image } from "react-native";
 //useEffect: 함수를 사용하면 컴포넌트가 렌더링될 때와 업데이트 될 때 특정코드를 실행할 수 있다.
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image } from "react-native";
 //Image 컴포넌트는 앱에서 이미지를 로드하고 표시하는 데 사용됩니다. 이미지 태그 안에 주소를 넣어서
 import { auth } from "./firebase";
+import { AppState, Image } from "react-native";
 import TeamPage from "./screens/components/Team/TeamPage";
 import InitialPage from "./screens/InitialPage";
 import SignInPage from "./screens/logins/SignInPage";
@@ -81,22 +82,61 @@ function SettingPageTab() {
 export default function App() {
   //로그인이 되었는지 저장하는 변수
   const [isLogIn, setIsLogIn] = useState(false);
+  const appState = useRef(AppState.currentState);
 
   //Firebase의 인증 상태 변경을 감시한다.
   useEffect(() => {
-    //onAuthStateChange 메서드는 사용자의 로인 상태가 변경될때마다 호출되는 콜백함수 등록.
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setIsLogIn(!!user); // 사용자가 존재하면 isLogIn을 true로 설정, 그렇지 않으면 false로 설정
+    const unsubscribeAuthStateChanged = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setIsLogIn(user.emailVerified);
+      }
+      else {
+        setIsLogIn(false);
+      }
     });
 
-    return unsubscribe; // 컴포넌트 언마운트 시 구독을 정리합니다.
+    const handleAppStateChange = (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        const user = auth.currentUser;
+        if (user) {
+          user.reload().then(() => {
+            if (user.emailVerified) {
+              console.log("User signed in:", user.email);
+              setIsLogIn(user.emailVerified);
+              // Do something when the app comes to the foreground
+            }
+            else {
+              setIsLogIn(false);
+            }
+          });
+        }
+      }
+
+      appState.current = nextAppState;
+      console.log("AppState", appState.current);
+    };
+
+    AppState.addEventListener("change", handleAppStateChange);
+
+    return () => {
+      unsubscribeAuthStateChanged();
+
+      // Check if AppState.removeEventListener is defined before calling
+      if (AppState.removeEventListener) {
+        AppState.removeEventListener("change", handleAppStateChange);
+      }
+    };
   }, []);
+
 
   //로그인 안되어 있을때 실행화면
   if (!isLogIn) {
     return (
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="InitialPage">
           <Stack.Screen name="InitialPage" component={InitialPage} />
           <Stack.Screen name="LogInPage" component={LogInPage} />
           <Stack.Screen name="SignInPage" component={SignInPage} />
