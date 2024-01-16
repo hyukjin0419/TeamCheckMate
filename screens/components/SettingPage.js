@@ -4,17 +4,9 @@ import { signOut } from "firebase/auth";
 
 const SettingPage = () => {
 
-    const logOut = () => {
-        auth
-        .signOut()
-        .then(() => {
-            navigation.replace("InitialPage");
-          })
-          .catch((error) => alert(error.message));
-    }
     return(
         <View style={styles.container}>
-            <Button title="Sign Out" onPress={logOut} style={styles.text} />
+            <Button title="Sign Out" onPress={() =>  signOut(auth)} style={styles.text} />
         </View>
     );
 };

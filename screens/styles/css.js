@@ -31,7 +31,6 @@ const commonStyles = StyleSheet.create({
   },
   //버튼 기본 디자인
   button: {
-    borderWidth: 1,
     borderRadius: 9,
     alignItems: "center",
     paddingVertical: "5%",

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image } from "react-native";
+import { AppState, Image } from "react-native";
 
 import TeamPage from "./screens/components/Team/TeamPage";
 import InitialPage from "./screens/InitialPage";
@@ -69,20 +69,60 @@ function SettingPageTab() {
 
 export default function App() {
   const [isLogIn, setIsLogIn] = useState(false);
+  const appState = useRef(AppState.currentState);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setIsLogIn(!!user); // 사용자가 존재하면 isLogIn을 true로 설정, 그렇지 않으면 false로 설정
+    const unsubscribeAuthStateChanged = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setIsLogIn(user.emailVerified);
+      }
+      else {
+        setIsLogIn(false);
+      }
     });
 
-    return unsubscribe; // 컴포넌트 언마운트 시 구독을 정리합니다.
+    const handleAppStateChange = (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        const user = auth.currentUser;
+        if (user) {
+          user.reload().then(() => {
+            if (user.emailVerified) {
+              console.log("User signed in:", user.email);
+              setIsLogIn(user.emailVerified);
+              // Do something when the app comes to the foreground
+            }
+            else {
+              setIsLogIn(false);
+            }
+          });
+        }
+      }
+
+      appState.current = nextAppState;
+      console.log("AppState", appState.current);
+    };
+
+    AppState.addEventListener("change", handleAppStateChange);
+
+    return () => {
+      unsubscribeAuthStateChanged();
+
+      // Check if AppState.removeEventListener is defined before calling
+      if (AppState.removeEventListener) {
+        AppState.removeEventListener("change", handleAppStateChange);
+      }
+    };
   }, []);
+
 
   //로그인 안되어 있을때 실행화면
   if (!isLogIn) {
     return (
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="InitialPage">
           <Stack.Screen name="InitialPage" component={InitialPage} />
           <Stack.Screen name="LogInPage" component={LogInPage} />
           <Stack.Screen name="SignInPage" component={SignInPage} />

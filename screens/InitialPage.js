@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import commonStyles from "./styles/css.js";
 import { auth } from "../firebase.js";
+import { signOut } from "firebase/auth";
 
 export default function InitialPage() {
   const navigation = useNavigation();
@@ -19,7 +20,9 @@ export default function InitialPage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log("User signed in: ", user.email);
+        if(user.emailVerified) {
+          console.log("User signed in: ", user.email);
+        }
       }
     });
 

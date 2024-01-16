@@ -13,6 +13,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { auth } from "../../firebase";
 import { Alert } from "react-native";
@@ -26,7 +27,13 @@ export default function LogInPage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log("User signed in: ", user.email);
+        if(user.emailVerified) {
+          console.log("User signed in: ", user.email);
+        }
+        else {
+          alert("Email not verified");
+          signOut(auth);
+        }
       }
     });
 
@@ -40,7 +47,11 @@ export default function LogInPage() {
         const user = userCredentials.user;
         console.log("Logged in with: " + user.email);
       })
-      .catch((error) => Alert.alert(error.message));
+      .catch((error) => {
+        if(error.code === "auth/invalid-credential") {
+          alert("You have entered the wrong email or password");
+        }
+      });
   };
 
   return (
