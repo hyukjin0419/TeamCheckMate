@@ -70,11 +70,14 @@ export default TeamPage = () => {
     <View style={styles.container}>
       <StatusBar style={"dark"}></StatusBar>
       <View style={styles.addBtnContainter}>
+        {/* 팀 추가에 점근할 수 있는 버튼 */}
         <TouchableOpacity style={styles.addBtnContainter} onPress={handlePress}>
           <Image
-            style={styles.addBtn}
+            style={styles.addOrCloseBtn}
             source={require("../../images/ClassAddBtn.png")}
           ></Image>
+
+          {/* 모달 뷰 */}
           <Modal
             style={styles.modalView}
             animationType="fade"
@@ -82,19 +85,24 @@ export default TeamPage = () => {
             visible={showModal}
           >
             <TouchableWithoutFeedback onPress={handlePress}>
+              {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
               <View style={styles.modalView}>
                 <View style={styles.addBtnContainter}>
+                  {/* 엑스 버튼 */}
                   <TouchableOpacity
                     style={styles.addBtnContainter}
                     onPress={handlePress}
                   >
                     <Image
-                      style={styles.addBtn}
+                      style={styles.addOrCloseBtn}
                       source={require("../../images/CloseClassAddBtn.png")}
                     ></Image>
                   </TouchableOpacity>
                 </View>
+
+                {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
                 <View style={styles.TwoBtnContainer} onPress={handlePress}>
+                  {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
                   <TouchableOpacity
                     onPress={() => {
                       navigation.navigate("TeamAddPage"), setShowModal(false);
@@ -104,6 +112,7 @@ export default TeamPage = () => {
                       <Text>팀 등록</Text>
                     </View>
                   </TouchableOpacity>
+                  {/* 팀 참여하기 버튼: 팀 참여하기 페이지로 넘어가는 버튼 */}
                   <TouchableOpacity
                     onPress={() => {
                       navigation.navigate("TeamJoinPage"), setShowModal(false);
@@ -114,6 +123,7 @@ export default TeamPage = () => {
                     </View>
                   </TouchableOpacity>
                 </View>
+                {/* 버튼 위치 맞추기 위한 style */}
                 <View flex={1}></View>
                 <View height="10%"></View>
               </View>
@@ -121,6 +131,8 @@ export default TeamPage = () => {
           </Modal>
         </TouchableOpacity>
       </View>
+
+      {/* 팀 파일 렌더링하는 코드 */}
       <View style={styles.classContainer}>
         {
           <FlatList
@@ -132,7 +144,6 @@ export default TeamPage = () => {
                 title={item.title}
                 id={item.id}
                 fileColor={item.fileImage}
-                deleteTeamItem={deleteTeamItem}
                 getTeamList={getTeamList}
               ></TeamItem>
             )}
@@ -167,7 +178,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     marginBottom: "2%",
   },
-  addBtn: {
+  addOrCloseBtn: {
     width: 40,
     height: 40,
     marginRight: "2%",
