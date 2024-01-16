@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import commonStyles from "./css.js";
+import commonStyles from "./styles/css.js";
 import { auth } from "../firebase.js";
 
 export default function InitialPage() {
@@ -20,7 +20,6 @@ export default function InitialPage() {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         console.log("User signed in: ", user.email);
-        navigation.replace("TeamPage");
       }
     });
 
