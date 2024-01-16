@@ -19,28 +19,14 @@ export default function SignInPage() {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setname] = useState("");
+  const [school, setschool] = useState("");
+  const [studentNumber, setstudentNumber] = useState("");
+  const [phoneNumber, setphoneNumber] = useState("");
   const appState = useRef(AppState.currentState);
+  const [disableBtn, setDisableBtn] = useState(true);
+  const [signInButtonColor, setSignInButtonColor] = useState("#D9D9D9");
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
-
-  const handleAppStateChange = async (nextAppState) => {
-    if (
-      appState.current.match(/inactive|background/) &&
-      nextAppState === "active"
-    ) {
-      const user = auth.currentUser;
-      if (user) {
-        await user.reload();
-        if (user.emailVerified) {
-          console.log("User signed in:", user.email);
-          navigation.replace("UserInformationInputPage");
-        }
-      }
-    }
-
-    appState.current = nextAppState;
-    setAppStateVisible(appState.current);
-    console.log("AppState", appState.current);
-  };
 
   useEffect(() => {
     const unsubscribeAuthStateChanged = auth.onAuthStateChanged(async (user) => {
@@ -48,34 +34,42 @@ export default function SignInPage() {
         await user.reload();
         if (user.emailVerified) {
           console.log("User signed in:", user.email);
-          navigation.replace("UserInformationInputPage");
         }
       }
     });
-
+  
+    const handleAppStateChange = async (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        const user = auth.currentUser;
+        if (user) {
+          await user.reload();
+          if (user.emailVerified) {
+            console.log("User signed in:", user.email);
+            alert("You have successfully signed in");
+          }
+        }
+      }
+  
+      appState.current = nextAppState;
+      setAppStateVisible(appState.current);
+      console.log("AppState", appState.current);
+    };
+  
     AppState.addEventListener("change", handleAppStateChange);
-
+  
     return () => {
       unsubscribeAuthStateChanged();
+  
       // Check if AppState.removeEventListener is defined before calling
       if (AppState.removeEventListener) {
         AppState.removeEventListener("change", handleAppStateChange);
       }
     };
   }, [navigation]);
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        console.log("User signed in: ", user.email);
-        navigation.replace("UserInformationInputPage", {
-          userEmail: user.email,
-        });
-      }
-    });
-
-    return unsubscribe;
-  }, []);
+  
 
   //회원가입 관련 함수
   const handleSignUp = () => {
@@ -88,8 +82,14 @@ export default function SignInPage() {
           alert('Verification email sent.');
           console.log("Registered with: " + user.email);
           try {
+            const timestamp = new Date();
             const docRef = await setDoc(doc(db, "user", email), {
               email: email,
+              name: name,
+              school: school,
+              studentNumber: studentNumber,
+              phoneNumber: phoneNumber,
+              timestamp: timestamp,
             });
           } catch (e) {
             console.error("Error adding document: ", e);
@@ -107,6 +107,30 @@ export default function SignInPage() {
     }
   };
 
+  const emailRequired = (text) => {
+    setEmail(text);
+    if(!email.trim() || !password.trim()) {
+      setDisableBtn(true);
+      setSignInButtonColor("#D9D9D9");
+    }
+    else {
+      setDisableBtn(false);
+      setSignInButtonColor("#050026");
+    }
+  }
+
+  const passwordRequired = (text) => {
+    setPassword(text);
+    if(!email.trim() || !password.trim()) {
+      setDisableBtn(true);
+      setSignInButtonColor("#D9D9D9");
+    }
+    else {
+      setDisableBtn(false);
+      setSignInButtonColor("#050026");
+    }
+  }
+
   return (
     <KeyboardAvoidingView style={styles.container}>
       {/*head 부분*/}
@@ -123,18 +147,47 @@ export default function SignInPage() {
         <TextInput
           placeholder="이메일"
           value={email}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={(text) => emailRequired(text)}
           style={styles.textInput}
           keyboardType="email-address"
           autoCapitalize="none"
+          
         />
         {/*이메일 입력창*/}
         <TextInput
           placeholder="비밀번호"
           value={password}
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={(text) => passwordRequired(text)}
           style={styles.textInput}
           secureTextEntry
+        />
+        {/*이름 입력창*/}
+        <TextInput
+          placeholder="이름"
+          value={name}
+          onChangeText={(text) => setname(text)}
+          style={styles.textInput}
+        />
+        {/*학교 입력창*/}
+        <TextInput
+          placeholder="학교"
+          value={school}
+          onChangeText={(text) => setschool(text)}
+          style={styles.textInput}
+        />
+        {/*학번 입력창*/}
+        <TextInput
+          placeholder="학번"
+          value={studentNumber}
+          onChangeText={(text) => setstudentNumber(text)}
+          style={styles.textInput}
+        />
+        {/*전화번호 입력창*/}
+        <TextInput
+          placeholder="전화번호"
+          value={phoneNumber}
+          onChangeText={(text) => setphoneNumber(text)}
+          style={styles.textInput}
         />
       </View>
       {/*버튼 Container*/}
@@ -142,18 +195,10 @@ export default function SignInPage() {
         {/*가입하기 버튼*/}
         <TouchableOpacity
           onPress={handleSignUp}
-          style={{ ...styles.button, backgroundColor: "#050026" }}
+          disabled={disableBtn}
+          style={{ ...styles.button, backgroundColor: signInButtonColor, marginTop: 20 }}
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>
-        </TouchableOpacity>
-        {/*건너뛰기 버튼
-        나중에 삭제해야함 -> test를 위해 추가해놓음
-        -> 백엔드쪽에서 어떻게 할건지 고민해봐야 함*/}
-        <TouchableOpacity
-          onPress={() => navigation.navigate("UserInformationInputPage")}
-          style={styles.subButton}
-        >
-          <Text style={styles.subButtonText}>건너뛰기</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
