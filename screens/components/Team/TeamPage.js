@@ -43,7 +43,7 @@ export default TeamPage = () => {
 
   const [teamList, setTeamList] = useState([]);
 
-  // read data
+  // firestorage에서 team 가져오기
   const getTeamList = async () => {
     const querySnapshot = await getDocs(collection(db, "team"));
     setTeamList(
