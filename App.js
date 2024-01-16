@@ -1,5 +1,4 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import InitialPage from "./screens/InitialPage";
@@ -8,6 +7,7 @@ import LogInPage from "./screens/LogInPage";
 import TeamPage from "./screens/TeamPage";
 import UserInformationInputPage from "./screens/UserInformationInputPage";
 import AddMembers from "./screens/AddMembers";
+
 
 const Stack = createNativeStackNavigator();
 
