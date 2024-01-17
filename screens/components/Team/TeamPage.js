@@ -31,20 +31,9 @@ const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamPage = () => {
-  // 로그인한 사용자의 이메일 가져오기
-  const [email, setEmail] = useState("");
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setEmail(user.email);
-        console.log("현재 로그인된 사용자의 이메일:" + email);
-      } else {
-        console.log("사용자가 로그인되어 있지 않습니다.");
-      }
-    });
+  const user = auth.currentUser;
+  console.log("이걸로도 갖올 수 있는겨?" + user.email);
 
-    return unsubscribe;
-  }, []);
   const navigation = useNavigation();
 
   const [showModal, setShowModal] = useState(false);
@@ -62,14 +51,17 @@ export default TeamPage = () => {
   // firestorage에서 team 가져오기
   const getTeamList = async () => {
     try {
-      const list = [];
       const querySnapshot1 = await getDocs(
         query(collection(db, "team"), orderBy("timestamp", "desc"))
       );
 
-      const userDocRef = doc(db, "user", email);
+      const userDocRef = doc(db, "user", user.email);
       const userTeamCollectionRef = collection(userDocRef, "teamList");
       const querySnapshot2 = await getDocs(query(userTeamCollectionRef));
+      const list = [];
+      querySnapshot2.forEach((doc2) => {
+        console.log("TeamID in querySnapshot2:", doc2.data().teamID);
+      });
 
       querySnapshot1.forEach((doc) => {
         const isDuplicated = querySnapshot2.docs.some(
@@ -80,7 +72,7 @@ export default TeamPage = () => {
             id: doc.id,
             ...doc.data(),
           });
-          console.log("성공??: " + doc.id, doc.data());
+          console.log("성공: " + doc.id, doc.data());
         }
       });
       setTeamList(list);
