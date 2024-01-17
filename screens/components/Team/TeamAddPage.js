@@ -14,13 +14,34 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
-import { db, collection, addDoc } from "../../../firebase";
+import {
+  db,
+  collection,
+  addDoc,
+  auth,
+  doc,
+  onAuthStateChanged,
+} from "../../../firebase";
 import Modal from "react-native-modal";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-const ClassAddPage = ({ navigation }) => {
+export default TeamAddPage = ({ navigation }) => {
+  // 로그인한 사용자의 이메일 가져오기
+  const [email, setEmail] = useState("");
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setEmail(user.email);
+        console.log("현재 로그인된 사용자의 이메일:", email);
+      } else {
+        console.log("사용자가 로그인되어 있지 않습니다.");
+      }
+    });
+
+    return unsubscribe;
+  }, []);
   //색상 선택 모달창 띄우기/숨기기 (초기값: 숨기기)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const openModal = () => {
@@ -65,21 +86,25 @@ const ClassAddPage = ({ navigation }) => {
 
   const addTeamItem = async () => {
     try {
-      const docRef = await addDoc(collection(db, "team"), {
+      const timestamp = new Date();
+      const teamDocRef = await addDoc(collection(db, "team"), {
         title: textInputValue,
         fileImage: colorConfirmed,
+        timestamp: timestamp,
       });
-      console.log(
-        "Document written with ID: ",
-        docRef.id,
-        "title:",
-        textInputValue,
-        "fileImage:",
-        colorConfirmed
-      );
+      console.log("Document written with ID: ", teamDocRef.id);
+      const userDocRef = doc(db, "user", email);
+      addTeamIdtoUser(userDocRef, teamDocRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
+  };
+
+  const addTeamIdtoUser = async (userDocRef, teamDocRefID) => {
+    const teamListCollectionRef = collection(userDocRef, "teamList");
+    await addDoc(teamListCollectionRef, {
+      teamID: teamDocRefID,
+    });
   };
 
   confirmBtnPressed = () => {
@@ -342,8 +367,6 @@ const ClassAddPage = ({ navigation }) => {
     </TouchableWithoutFeedback>
   );
 };
-
-export default ClassAddPage;
 
 const styles = StyleSheet.create({
   container: {

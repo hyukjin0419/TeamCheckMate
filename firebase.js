@@ -3,6 +3,7 @@ import {
   getAuth,
   getReactNativePersistence,
   initializeAuth,
+  onAuthStateChanged,
 } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
@@ -55,4 +56,5 @@ export {
   setDoc,
   updateDoc,
   deleteDoc,
+  onAuthStateChanged,
 };
