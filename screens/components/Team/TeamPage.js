@@ -37,7 +37,7 @@ export default TeamPage = () => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setEmail(user.email);
-        console.log("현재 로그인된 사용자의 이메일:", email);
+        console.log("현재 로그인된 사용자의 이메일:" + email);
       } else {
         console.log("사용자가 로그인되어 있지 않습니다.");
       }
