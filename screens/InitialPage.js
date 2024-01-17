@@ -1,6 +1,7 @@
 //시작 화면
 import { useNavigation } from "@react-navigation/core";
 import { StatusBar } from "expo-status-bar";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,21 +10,28 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { auth } from "../firebase";
+import commonStyles from "./styles/css.js";
+import { auth } from "../firebase.js";
+import { signOut } from "firebase/auth";
 
 export default function InitialPage() {
   const navigation = useNavigation();
 
-  const handleSignOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        navigation.replace("SignInPage");
-      })
-      .catch((error) => alert(error.message));
-  };
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        if(user.emailVerified) {
+          console.log("User signed in: ", user.email);
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.container}>
+      {/*로고 Container*/}
       <StatusBar style={"dark"} />
       <View style={styles.logoContainter}>
         <Image
@@ -31,25 +39,32 @@ export default function InitialPage() {
           source={require("./images/logo.png")}
         ></Image>
       </View>
+      {/*이미지 Container*/}
       <View style={styles.imgContainer}>
         <Image
           style={styles.logInImage}
           source={require("./images/LoginImages.gif")}
         ></Image>
+        {/*Description Container*/}
         <Text style={styles.description}>
           무임승차를 방지하기 위한 최적의 방법
         </Text>
       </View>
+      {/*버튼 Container*/}
       <View style={styles.BtnContainter}>
-        <TouchableOpacity onPress={() => navigation.navigate("LogInPage")}>
-          <View style={styles.logInBtn}>
-            <Text style={styles.logInText}>로그인</Text>
-          </View>
+        {/*로그인 버튼*/}
+        <TouchableOpacity
+          onPress={() => navigation.navigate("LogInPage")}
+          style={{ ...commonStyles.button, backgroundColor: "#050026" }}
+        >
+          <Text style={commonStyles.buttonText}>로그인</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("SignInPage")}>
-          <View style={styles.signInBtn}>
-            <Text style={styles.signInText}>가입하기</Text>
-          </View>
+        {/*가입하기 버튼*/}
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SignInPage")}
+          style={commonStyles.subButton}
+        >
+          <Text style={commonStyles.subButtonText}>가입하기</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -57,11 +72,6 @@ export default function InitialPage() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: "5%",
-    backgroundColor: "white",
-  },
   logoContainter: {
     flex: 1.2,
     //backgroundColor: "teal",
@@ -92,34 +102,8 @@ const styles = StyleSheet.create({
   },
   BtnContainter: {
     flex: 1,
-    //backgroundColor: "red",
     alignContent: "center",
     justifyContent: "center",
-    marginBottom: "10%",
-  },
-  logInBtn: {
-    backgroundColor: "#050026",
-    borderRadius: 9,
-    alignItems: "center",
-    paddingVertical: "6%",
-    marginBottom: "3%",
-  },
-  logInText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: 400,
-  },
-  signInBtn: {
-    backgroundColor: "white",
-    borderRadius: 9,
-    alignItems: "center",
-    paddingVertical: "5.5%",
-    borderColor: "#050026",
-    borderWidth: 1,
-  },
-  signInText: {
-    color: "black",
-    fontSize: 18,
-    fontWeight: 400,
+    marginBottom: "8%",
   },
 });

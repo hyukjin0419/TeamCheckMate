@@ -13,10 +13,11 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import { Alert } from "react-native";
-import styles from "./css";
+import styles from "../styles/css";
 
 export default function LogInPage() {
   const navigation = useNavigation();
@@ -26,8 +27,13 @@ export default function LogInPage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log("User signed in: ", user.email);
-        navigation.replace("TeamPage");
+        if(user.emailVerified) {
+          console.log("User signed in: ", user.email);
+        }
+        else {
+          alert("Email not verified");
+          signOut(auth);
+        }
       }
     });
 
@@ -41,7 +47,11 @@ export default function LogInPage() {
         const user = userCredentials.user;
         console.log("Logged in with: " + user.email);
       })
-      .catch((error) => Alert.alert(error.message));
+      .catch((error) => {
+        if(error.code === "auth/invalid-credential") {
+          alert("You have entered the wrong email or password");
+        }
+      });
   };
 
   return (
@@ -73,9 +83,12 @@ export default function LogInPage() {
           secureTextEntry
         />
       </View>
-      <View style={{...styles.button, backgroundColor: "#050026"}}>
-        <TouchableOpacity onPress={handleLogin} style={styles.logInBtn}>
-          <Text style={{...styles.buttonText, color: "white"}}>Login</Text>
+      <View>
+        <TouchableOpacity
+          onPress={handleLogin}
+          style={{ ...styles.button, backgroundColor: "#050026" }}
+        >
+          <Text style={{ ...styles.buttonText, color: "white" }}>Login</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
