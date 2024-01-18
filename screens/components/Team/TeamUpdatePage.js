@@ -1,5 +1,5 @@
-//수업 등록 화면
-import React, { useState, useEffect } from "react";
+//팀 수정 화면
+import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -14,46 +14,49 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
-import { db, collection, addDoc, auth, doc } from "../../../firebase";
+import {
+  db,
+  collection,
+  addDoc,
+  auth,
+  doc,
+  updateDoc,
+} from "../../../firebase";
 import Modal from "react-native-modal";
+import { useNavigation } from "@react-navigation/core";
 
+//반응형 디자인을 위한 스크린의 높이, 넓이 구하는 코드
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default TeamAddPage = ({ navigation }) => {
-  //회원정보 가져오기
-  const user = auth.currentUser;
-  const email = user.email;
+export default TeamUpdatePage = ({ route }) => {
+  const navigation = useNavigation();
+  //아이템 모달창에서 선택시 불러오는 정보
+  const { title, fileColor, id } = route.params;
 
-  //색상 선택  띄우기/숨기기 (초기값: 숨기기)
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const openModal = () => {
-    setIsModalVisible(!isModalVisible);
-  };
+  //기존 색상 저장
+  const [selectedColor, setSelectedColor] = useState(fileColor);
 
-  // 색상 옵션 (확정된 색상 아님) (초기값: 기본 색상)
-  const [selectedColor, setSelectedColor] = useState(color.colors1[0]);
+  // 팔레트서 색상 수정 선택 (확정색상 x)
   const handleColorSelect = (color) => {
     setSelectedColor(color);
   };
 
-  //확인버튼 누른 후 확정된 색상
-  const [colorConfirmed, setColorConfirmed] = useState(color.colors1[0]);
+  /* 확인버튼 누른 후 확정된 색상 */
+  const [colorConfirmed, setColorConfirmed] = useState(fileColor);
 
-  //모달에서 색상 선택 후 확인 누르면 색상 변경 -> 모달 close
+  /*모달에서 색상 선택 후 확인 버튼 터치 시 수정 색상 확정, 모달 close */
   const confirmColor = () => {
     console.log(selectedColor);
     setColorConfirmed(selectedColor);
-    openModal();
+    handleModalPress();
   };
 
-  //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
+  const [textInputValue, setTextInputValue] = useState(title);
+
+  /* 문자 입력 혹은 색상 변경 시 확인 버튼 활성화 (조건 수정 필요) */
   const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
   const [buttonDisabled, setButtonDisabled] = useState(true);
-  const [textInputValue, setTextInputValue] = useState("");
-
-  //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
-
   const onTextInputChange = (text) => {
     setTextInputValue(text);
     if (text.length > 0) {
@@ -65,38 +68,29 @@ export default TeamAddPage = ({ navigation }) => {
     }
   };
 
-  const addTeamItem = async () => {
-    try {
-      const timestamp = new Date();
-      const teamDocRef = await addDoc(collection(db, "team"), {
-        title: textInputValue,
-        fileImage: colorConfirmed,
-        timestamp: timestamp,
-      });
-      console.log("Document written with ID: ", teamDocRef.id);
-      const userDocRef = doc(db, "user", email);
-      addTeamIdtoUser(userDocRef, teamDocRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
+  /* 색상 선택 모달창 띄우기/숨기기 (초기값: 숨기기) */
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const handleModalPress = () => {
+    setIsModalVisible(!isModalVisible);
   };
 
-  const addTeamIdtoUser = async (userDocRef, teamDocRefID) => {
-    const teamListCollectionRef = collection(userDocRef, "teamList");
-    await addDoc(teamListCollectionRef, {
-      teamID: teamDocRefID,
+  /* 팀이름, 색상 firebase에 업데이트 */
+  const updateTeam = async () => {
+    const updateTimeStamp = new Date();
+    const teamDocRef = doc(db, "team", id);
+    await updateDoc(teamDocRef, {
+      title: textInputValue,
+      fileImage: colorConfirmed,
+      updateTime: updateTimeStamp,
     });
   };
+  console.log("id:" + id);
 
-  confirmBtnPressed = () => {
-    addTeamItem();
-  };
-
+  /* TeamAddPage와 구성은 동일 */
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <StatusBar style={"dark"}></StatusBar>
-        {/* 뒤로가기 버튼, 팀 등록 헤더와 확인버튼 컨테이너 */}
         <View style={styles.headerContainer}>
           <View style={styles.backBtn}>
             <TouchableOpacity
@@ -108,27 +102,21 @@ export default TeamAddPage = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerText}>팀 등록</Text>
+            <Text style={styles.headerText}>팀 수정</Text>
           </View>
           <TouchableOpacity
             disabled={buttonDisabled}
             style={styles.confirmBtn}
             onPress={() => {
-              confirmBtnPressed();
+              updateTeam();
+              navigation.navigate("TeamPage");
             }}
           >
-            <Text
-              style={{ ...styles.headerText, color: confirmBtnColor }}
-              onPress={() => {
-                confirmBtnPressed();
-                navigation.navigate("TeamPage");
-              }}
-            >
+            <Text style={{ ...styles.headerText, color: confirmBtnColor }}>
               확인
             </Text>
           </TouchableOpacity>
         </View>
-        {/* 팀 이름 입력란과 색상 선택 버튼*/}
         <View
           style={{
             ...styles.colorTextInputContainer,
@@ -137,15 +125,14 @@ export default TeamAddPage = ({ navigation }) => {
         >
           <View flex={1}>
             <TextInput
-              placeholder="팀 이름"
+              placeholder={title}
               value={textInputValue}
               returnKeyType="done"
               onChangeText={onTextInputChange}
-              style={{ ...styles.colorTextInput, color: colorConfirmed }}
+              style={styles.colorTextInput}
             ></TextInput>
           </View>
-          {/* 색상 선택 버튼 */}
-          <TouchableWithoutFeedback onPress={openModal}>
+          <TouchableWithoutFeedback onPress={handleModalPress}>
             <View style={styles.circleContainer}>
               <View
                 style={{ ...styles.circle, backgroundColor: colorConfirmed }}
@@ -158,39 +145,29 @@ export default TeamAddPage = ({ navigation }) => {
           </TouchableWithoutFeedback>
         </View>
         <View style={styles.descriptionContainter}>
-          <Text style={{ ...styles.description, color: colorConfirmed }}>
-            색상을 변경할 수 있습니다
-          </Text>
+          <Text style={styles.description}>색상을 변경할 수 있습니다</Text>
         </View>
-        {/* 색상 선택 버튼 */}
         <View>
-          {/* 색상 팔레트 모달창 회색 배경 */}
           <Modal
             animationType="fade"
             visible={isModalVisible}
             transparent={true}
           >
             <View style={styles.modalBackground}>
-              {/* 색상 팔레트 swipeable 모달창 */}
               <Modal
                 onSwipeComplete={() => setIsModalVisible(false)}
                 swipeDirection={"down"}
                 animationType="slide"
                 visible={isModalVisible}
-                onBackdropPress={openModal}
-                backdropOpacity={0.2}
+                onBackdropPress={handleModalPress}
+                backdropOpacity={0}
                 transparent={true}
               >
                 <View style={styles.modalView}>
-                  {/* 색상 팔레트 모달창 내 색상, 확인버튼 컨테이너 */}
                   <View style={styles.modalItemContainter}>
-                    {/* 모달창 상위 부분 회색 막대기 */}
                     <View style={styles.modalVector}></View>
-                    {/* 모달창 내 색상 옵션 컨테이너 */}
                     <View style={styles.colorContainer}>
-                      {/* 6x6 색상 옵션 컨테이너 (rowColorsContainer 하나당 색상 6개씩 총 6줄) */}
                       <View style={styles.modalColorsContainer}>
-                        {/* 팔레트 첫 번째 줄 */}
                         {color.colors1.map((color, index) => (
                           <TouchableWithoutFeedback
                             key={index}

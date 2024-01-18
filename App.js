@@ -8,11 +8,12 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { auth } from "./firebase";
 import TeamPage from "./screens/components/Team/TeamPage";
 import InitialPage from "./screens/InitialPage";
-import SignInPage from "./screens/logins/SignInPage";
+import SignInPage from "./screens/logins/SignUpPage";
 import LogInPage from "./screens/logins/LogInPage";
 import AddMembers from "./screens/logins/AddMembers";
 import TeamAddPage from "./screens/components/Team/TeamAddPage";
 import TeamJoinPage from "./screens/components/Team/TeamJoinPage";
+import TeamUpdatePage from "./screens/components/Team/TeamUpdatePage";
 import SettingPage from "./screens/components/SettingPage";
 import PersonalPage from "./screens/components/PersonalPage";
 import GuidancePage from "./screens/components/GuidancePage";
@@ -49,6 +50,7 @@ function TeamPageTab() {
     <TeamStack.Navigator screenOptions={{ headerShown: false }}>
       <TeamStack.Screen name="TeamPage" component={TeamPage} />
       <TeamStack.Screen name="TeamAddPage" component={TeamAddPage} />
+      <TeamStack.Screen name="TeamUpdatePage" component={TeamUpdatePage} />
       <TeamStack.Screen name="TeamJoinPage" component={TeamJoinPage} />
     </TeamStack.Navigator>
   );

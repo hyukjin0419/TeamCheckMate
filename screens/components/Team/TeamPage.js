@@ -31,24 +31,19 @@ const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamPage = () => {
+  const navigation = useNavigation();
+  //회원정보 가져오기
   const user = auth.currentUser;
   console.log("이걸로도 갖올 수 있는겨?" + user.email);
-
-  const navigation = useNavigation();
-
+  //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
   const [showModal, setShowModal] = useState(false);
-
   const handlePress = () => {
-    if (showModal) {
-      setShowModal(false);
-    } else {
-      setShowModal(true);
-    }
+    setShowModal(!showModal);
   };
 
   const [teamList, setTeamList] = useState([]);
 
-  // firestorage에서 team 가져오기
+  // firestorage에서 team 비교하여 내 팀 가져와 리스트에 저장하기
   const getTeamList = async () => {
     try {
       const querySnapshot1 = await getDocs(
@@ -81,11 +76,13 @@ export default TeamPage = () => {
     }
   };
 
+  //팀 삭제 코드
   const deleteTeamItem = async (id) => {
     await deleteDoc(doc(db, "team", id));
     getTeamList();
   };
 
+  //TeamPage에 들어올 시 getTeamList 함수 작동 (새로고침 함수)
   useFocusEffect(
     React.useCallback(() => {
       getTeamList();
@@ -159,6 +156,7 @@ export default TeamPage = () => {
       </View>
 
       {/* 팀 파일 렌더링하는 코드 */}
+      {/* 저장된 팀 리스트를 TeamItem페이지로 보내어서 생성하여 생성된 TeamIteam들을 TeamPage화면에 렌더링*/}
       <View style={styles.classContainer}>
         {
           <FlatList
@@ -170,7 +168,8 @@ export default TeamPage = () => {
                 title={item.title}
                 id={item.id}
                 fileColor={item.fileImage}
-                getTeamList={getTeamList}
+                deleteTeamItem={deleteTeamItem}
+                //getTeamList={getTeamList}
               ></TeamItem>
             )}
             keyExtractor={(item) => item.id}
