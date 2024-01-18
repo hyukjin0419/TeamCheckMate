@@ -118,12 +118,11 @@ export default function SignInPage() {
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPasswordValid = password.length >= 6;
 
-    setSignInButtonColor(!(isEmailValid && isPasswordValid));
     if (isEmailValid && isPasswordValid) {
-      setSignInButtonColor(true);
+      setDisableBtn(false);
       setSignInButtonColor("#050026");
     } else {
-      setSignInButtonColor(false);
+      setDisableBtn(true);
       setSignInButtonColor("#D9D9D9");
     }
   }, [email, password]);
