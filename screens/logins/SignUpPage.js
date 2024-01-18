@@ -65,7 +65,7 @@ export default function SignInPage() {
       //여기 무슨뜻인지..?
       appState.current = nextAppState;
       setAppStateVisible(appState.current);
-      console.log("AppState: " + appState.current);
+      // console.log("AppState: " + appState.current);
     };
 
     AppState.addEventListener("change", handleAppStateChange);

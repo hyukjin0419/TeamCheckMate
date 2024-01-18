@@ -8,7 +8,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { auth } from "./firebase";
 import TeamPage from "./screens/components/Team/TeamPage";
 import InitialPage from "./screens/InitialPage";
-import SignInPage from "./screens/logins/SignInPage";
+import SignInPage from "./screens/logins/SignUpPage";
 import LogInPage from "./screens/logins/LogInPage";
 import AddMembers from "./screens/logins/AddMembers";
 import TeamAddPage from "./screens/components/Team/TeamAddPage";
