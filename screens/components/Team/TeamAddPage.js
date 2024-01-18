@@ -14,64 +14,45 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
-import {
-  db,
-  collection,
-  addDoc,
-  auth,
-  doc,
-  onAuthStateChanged,
-} from "../../../firebase";
+import { db, collection, addDoc, auth, doc } from "../../../firebase";
 import Modal from "react-native-modal";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamAddPage = ({ navigation }) => {
-  // 로그인한 사용자의 이메일 가져오기
-  const [email, setEmail] = useState("");
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setEmail(user.email);
-        console.log("현재 로그인된 사용자의 이메일:", email);
-      } else {
-        console.log("사용자가 로그인되어 있지 않습니다.");
-      }
-    });
+  //회원정보 가져오기
+  const user = auth.currentUser;
+  const email = user.email;
 
-    return unsubscribe;
-  }, []);
-  //색상 선택 모달창 띄우기/숨기기 (초기값: 숨기기)
+  //색상 선택  띄우기/숨기기 (초기값: 숨기기)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const openModal = () => {
-    setIsModalVisible(true);
+    setIsModalVisible(!isModalVisible);
   };
-  const onPressModalClose = () => {
-    setIsModalVisible(false);
-  };
-  //색상 옵션 (초기값: 어두운 남색(기본 색상))
+
+  // 색상 옵션 (확정된 색상 아님) (초기값: 기본 색상)
   const [selectedColor, setSelectedColor] = useState(color.colors1[0]);
   const handleColorSelect = (color) => {
     setSelectedColor(color);
   };
 
-  const [colorConfirmed, setColorConfirmed] = useState(color.colors1[0]); //확인버튼 누른 후 확정된 색상
+  //확인버튼 누른 후 확정된 색상
+  const [colorConfirmed, setColorConfirmed] = useState(color.colors1[0]);
 
   //모달에서 색상 선택 후 확인 누르면 색상 변경 -> 모달 close
   const confirmColor = () => {
     console.log(selectedColor);
     setColorConfirmed(selectedColor);
-    onPressModalClose();
+    openModal();
   };
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated); //확인 버튼 색상 초기값 (회색)
-  const [buttonDisabled, setButtonDisabled] = useState(true); //확인 버튼 상태 초기값 (비활성화 상태)
 
-  //const [teamName, setTeamName] = useState("");
-
-  //문자 입력시 확인버튼 활성화, 색상 변경
-
+  //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
   const [textInputValue, setTextInputValue] = useState("");
+
+  //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
 
   const onTextInputChange = (text) => {
     setTextInputValue(text);
@@ -115,6 +96,7 @@ export default TeamAddPage = ({ navigation }) => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <StatusBar style={"dark"}></StatusBar>
+        {/* 뒤로가기 버튼, 팀 등록 헤더와 확인버튼 컨테이너 */}
         <View style={styles.headerContainer}>
           <View style={styles.backBtn}>
             <TouchableOpacity
@@ -146,6 +128,7 @@ export default TeamAddPage = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
         </View>
+        {/* 팀 이름 입력란과 색상 선택 버튼*/}
         <View
           style={{
             ...styles.colorTextInputContainer,
@@ -161,6 +144,7 @@ export default TeamAddPage = ({ navigation }) => {
               style={{ ...styles.colorTextInput, color: colorConfirmed }}
             ></TextInput>
           </View>
+          {/* 색상 선택 버튼 */}
           <TouchableWithoutFeedback onPress={openModal}>
             <View style={styles.circleContainer}>
               <View
@@ -178,27 +162,35 @@ export default TeamAddPage = ({ navigation }) => {
             색상을 변경할 수 있습니다
           </Text>
         </View>
+        {/* 색상 선택 버튼 */}
         <View>
+          {/* 색상 팔레트 모달창 회색 배경 */}
           <Modal
             animationType="fade"
             visible={isModalVisible}
             transparent={true}
           >
             <View style={styles.modalBackground}>
+              {/* 색상 팔레트 swipeable 모달창 */}
               <Modal
                 onSwipeComplete={() => setIsModalVisible(false)}
                 swipeDirection={"down"}
                 animationType="slide"
                 visible={isModalVisible}
-                onBackdropPress={onPressModalClose}
-                backdropOpacity={0}
+                onBackdropPress={openModal}
+                backdropOpacity={0.2}
                 transparent={true}
               >
                 <View style={styles.modalView}>
+                  {/* 색상 팔레트 모달창 내 색상, 확인버튼 컨테이너 */}
                   <View style={styles.modalItemContainter}>
+                    {/* 모달창 상위 부분 회색 막대기 */}
                     <View style={styles.modalVector}></View>
+                    {/* 모달창 내 색상 옵션 컨테이너 */}
                     <View style={styles.colorContainer}>
+                      {/* 6x6 색상 옵션 컨테이너 (rowColorsContainer 하나당 색상 6개씩 총 6줄) */}
                       <View style={styles.modalColorsContainer}>
+                        {/* 팔레트 첫 번째 줄 */}
                         {color.colors1.map((color, index) => (
                           <TouchableWithoutFeedback
                             key={index}
