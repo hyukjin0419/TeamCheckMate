@@ -8,12 +8,14 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
+import { useNavigation } from "@react-navigation/core";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 const TeamItem = (props) => {
+  const navigation = useNavigation();
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
@@ -173,7 +175,7 @@ const TeamItem = (props) => {
                       {
                         /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
                       }
-                      navigation.navigate("TeamRevisePage", {
+                      navigation.navigate("TeamUpdatePage", {
                         title: title,
                         fileColor: fileColor,
                         id: props.id,
