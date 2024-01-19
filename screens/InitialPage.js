@@ -10,8 +10,9 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import commonStyles from "./css.js";
+import commonStyles from "./styles/css.js";
 import { auth } from "../firebase.js";
+import { signOut } from "firebase/auth";
 
 export default function InitialPage() {
   const navigation = useNavigation();
@@ -19,8 +20,9 @@ export default function InitialPage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log("User signed in: ", user.email);
-        navigation.replace("TeamPage");
+        if(user.emailVerified) {
+          console.log("User signed in: ", user.email);
+        }
       }
     });
 
@@ -29,6 +31,7 @@ export default function InitialPage() {
 
   return (
     <View style={commonStyles.container}>
+      {/*로고 Container*/}
       <StatusBar style={"dark"} />
       <View style={styles.logoContainter}>
         <Image
@@ -36,22 +39,27 @@ export default function InitialPage() {
           source={require("./images/logo.png")}
         ></Image>
       </View>
+      {/*이미지 Container*/}
       <View style={styles.imgContainer}>
         <Image
           style={styles.logInImage}
           source={require("./images/LoginImages.gif")}
         ></Image>
+        {/*Description Container*/}
         <Text style={styles.description}>
           무임승차를 방지하기 위한 최적의 방법
         </Text>
       </View>
+      {/*버튼 Container*/}
       <View style={styles.BtnContainter}>
+        {/*로그인 버튼*/}
         <TouchableOpacity
           onPress={() => navigation.navigate("LogInPage")}
           style={{ ...commonStyles.button, backgroundColor: "#050026" }}
         >
           <Text style={commonStyles.buttonText}>로그인</Text>
         </TouchableOpacity>
+        {/*가입하기 버튼*/}
         <TouchableOpacity
           onPress={() => navigation.navigate("SignInPage")}
           style={commonStyles.subButton}

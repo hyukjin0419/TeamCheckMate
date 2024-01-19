@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/core";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
-import { auth } from "../firebase";
+import { auth } from "../../../firebase";
 
 export default function TeamPage() {
   const navigation = useNavigation();
@@ -18,12 +18,15 @@ export default function TeamPage() {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handleSignOut} style={styles.logInBtn}>
-          <Text style={styles.logInText}>로그아웃</Text>
+        <Text style={styles.logInText}>로그아웃</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("AddMembers")} style={styles.logInBtn}>
-          <Text style={styles.logInText}>Add Members</Text>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("AddMembers")}
+        style={styles.logInBtn}
+      >
+        <Text style={styles.logInText}>Add Members</Text>
       </TouchableOpacity>
-     </View>
+    </View>
   );
 }
 

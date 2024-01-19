@@ -1,6 +1,23 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, getReactNativePersistence, initializeAuth } from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  getAuth,
+  getReactNativePersistence,
+  initializeAuth,
+  onAuthStateChanged,
+} from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  getFirestore, //get db
+  collection, //Collection
+  doc, //문서
+  addDoc, //C
+  getDocs, //R
+  updateDoc, //U
+  deleteDoc, //D
+  setDoc,
+  orderBy,
+  query,
+} from "firebase/firestore";
 //import { getDatabase } from "firebase/database";
 // Uncomment the line below if you need to use Firebase Analytics
 // import { getAnalytics } from "firebase/analytics";
@@ -19,10 +36,25 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage)
+const db = getFirestore(app);
+// const auth = getAuth(app);
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
 });
 //const database = getDatabase(app);
 // Uncomment the line below if you need to use Firebase Analytics
 // const analytics = getAnalytics(app);
-
+export {
+  app,
+  db,
+  auth,
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  onAuthStateChanged,
+};
