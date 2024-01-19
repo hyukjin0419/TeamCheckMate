@@ -14,10 +14,12 @@ import AddMembers from "./screens/logins/AddMembers";
 import TeamAddPage from "./screens/components/Team/TeamAddPage";
 import TeamJoinPage from "./screens/components/Team/TeamJoinPage";
 import TeamUpdatePage from "./screens/components/Team/TeamUpdatePage";
+import AssignmentPage from "./screens/components/AssignmentPage";
 import SettingPage from "./screens/components/SettingPage";
 import PersonalPage from "./screens/components/PersonalPage";
 import GuidancePage from "./screens/components/GuidancePage";
 import SchedulePage from "./screens/components/SchedulePage";
+import TeamMemberAddPage from "./screens/components/Team/TeamMemberAddPage";
 
 const Stack = createNativeStackNavigator();
 // - 스택 형태로 화면 전환을 관리한다
@@ -52,6 +54,11 @@ function TeamPageTab() {
       <TeamStack.Screen name="TeamAddPage" component={TeamAddPage} />
       <TeamStack.Screen name="TeamUpdatePage" component={TeamUpdatePage} />
       <TeamStack.Screen name="TeamJoinPage" component={TeamJoinPage} />
+      <TeamStack.Screen
+        name="TeamMemberAddPage"
+        component={TeamMemberAddPage}
+      />
+      <TeamStack.Screen name="AssignmentPage" component={AssignmentPage} />
     </TeamStack.Navigator>
   );
 }

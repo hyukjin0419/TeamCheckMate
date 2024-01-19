@@ -120,8 +120,8 @@ export default TeamAddPage = ({ navigation }) => {
             <Text
               style={{ ...styles.headerText, color: confirmBtnColor }}
               onPress={() => {
-                confirmBtnPressed();
-                navigation.navigate("TeamPage");
+                // confirmBtnPressed();
+                navigation.navigate("TeamMemberAddPage");
               }}
             >
               확인
