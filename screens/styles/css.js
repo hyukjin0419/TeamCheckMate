@@ -24,6 +24,7 @@ const commonStyles = StyleSheet.create({
   //로그인 화면에서 쓰이는 textInput
   textInput: {
     margin: "3%",
+    marginTop: "5%",
     fontSize: 16,
     borderBottomColor: "grey",
     borderBottomWidth: 2,
@@ -31,6 +32,7 @@ const commonStyles = StyleSheet.create({
   },
   //버튼 기본 디자인
   button: {
+    marginTop: "4%",
     borderRadius: 9,
     alignItems: "center",
     paddingVertical: "5%",

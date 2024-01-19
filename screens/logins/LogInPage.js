@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Button
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import {
@@ -90,6 +91,7 @@ export default function LogInPage() {
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>Login</Text>
         </TouchableOpacity>
+        <Button title="Skjsldjf" onPress={() => navigation.navigate("AddMembers")} />
       </View>
     </KeyboardAvoidingView>
   );

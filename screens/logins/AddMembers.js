@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/core";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Text,
   TextInput,
@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Image,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import styles from "../styles/css";
 import * as MailComposer from "expo-mail-composer";
 
@@ -19,20 +19,26 @@ export default function AddMembers() {
   const [emailInputs, setEmailInputs] = useState([""]);
   const [isAvailable, setIsAvailable] = useState(false);
   const [disableBtn, setDisableBtn] = useState(true);
+  const newEmailInputRef = useRef(null);
 
   const [sendBtnColor, setSendBtnColor] = useState("#D9D9D9");
+  const [selectedInput, setSelectedInput] = useState(null)
 
   const addEmailInput = () => {
     // Add new input into array
     setEmailInputs([...emailInputs, ""]);
+    setSelectedInput(emailInputs.length);
+    // if (newEmailInputRef.current) {
+    //   newEmailInputRef.current.focus();
+    // }
+  
   };
 
-  const removeEmailInput = () => {
+  const removeEmailInput = (index) => {
     const tempEmailInputs = [...emailInputs];
     // prevent user from deleting the last input line
     if (tempEmailInputs.length > 1) {
-      // -1 means end of the array
-      tempEmailInputs.splice(-1, 1);
+      tempEmailInputs.splice(index, 1);
       setEmailInputs(tempEmailInputs);
     }
   };
@@ -62,9 +68,12 @@ export default function AddMembers() {
       const isMailAvailable = await MailComposer.isAvailableAsync();
       setIsAvailable(isMailAvailable);
     }
+    if (selectedInput === emailInputs.length - 1 && newEmailInputRef.current) {
+      newEmailInputRef.current.focus();
+    }
 
     checkAvailability();
-  }, []);
+  }, [selectedInput, emailInputs]);
 
   const sendEmail = () => {
     MailComposer.composeAsync({
@@ -73,6 +82,14 @@ export default function AddMembers() {
       recipients: emailInputs,
     });
   };
+
+  const isFocused = (index) => {
+    setSelectedInput(index);
+  }
+
+  const isBlur = () => {
+    setSelectedInput(null);
+  }
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -90,26 +107,26 @@ export default function AddMembers() {
       </View>
 
       {emailInputs.map((email, index) => (
-        <View key={index} style={s.textBox}>
+        <View key={index} style={{...s.textBox, flexDirection: "row", justifyContent: "space-between"}}>
           <TextInput
+          ref={(inputRef) => (index === emailInputs.length - 1 ? (newEmailInputRef.current = inputRef) : null)}
             placeholder="이메일"
             autoCapitalize="none"
             autoCorrect={false}
             value={email}
             onChangeText={(text) => updateEmailInput(text, index)}
-            style={styles.textInput}
+            style={{...styles.textInput, width: "85%", borderBottomColor: selectedInput !== index ? "#999999" : "#050026", color: selectedInput !== index ? "#999999" : "#050026"}}
+            onFocus={() => isFocused(index)}
+            onBlur={isBlur}
             keyboardType="email-address"
           />
+          <TouchableOpacity onPress={() => removeEmailInput(index)}>
+            <FontAwesome5 style={{marginTop: "50%", marginRight: "2%", color: selectedInput !== index ? "#999999" : "#050026"}} name="trash" size={24} color="black" />
+          </TouchableOpacity>
         </View>
       ))}
       <View>
         <TouchableOpacity style={s.addBtn} onPress={addEmailInput}>
-          <Image
-            style={s.addBtnSize}
-            source={require("../images/ClassAddBtn.png")}
-          ></Image>
-        </TouchableOpacity>
-        <TouchableOpacity style={s.addBtn} onPress={removeEmailInput}>
           <Image
             style={s.addBtnSize}
             source={require("../images/ClassAddBtn.png")}
@@ -129,7 +146,7 @@ const s = StyleSheet.create({
   titleSend: {
     fontWeight: "bold",
     fontSize: 16,
-    marginLeft: "40%",
+    marginLeft: "45%",
   },
   addBtn: {
     justifyContent: "center",

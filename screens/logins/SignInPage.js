@@ -27,6 +27,9 @@ export default function SignInPage() {
   const [disableBtn, setDisableBtn] = useState(true);
   const [signInButtonColor, setSignInButtonColor] = useState("#D9D9D9");
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   useEffect(() => {
     const unsubscribeAuthStateChanged = auth.onAuthStateChanged(async (user) => {
@@ -48,7 +51,6 @@ export default function SignInPage() {
           await user.reload();
           if (user.emailVerified) {
             console.log("User signed in:", user.email);
-            alert("You have successfully signed in");
           }
         }
       }
@@ -73,13 +75,13 @@ export default function SignInPage() {
 
   //회원가입 관련 함수
   const handleSignUp = () => {
-    try {
       createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredentials) => {
         const user = userCredentials.user;
         await sendEmailVerification(user)
         .then(async () => {
           alert('Verification email sent.');
+          setShowSignIn(true);
           console.log("Registered with: " + user.email);
           try {
             const timestamp = new Date();
@@ -97,19 +99,18 @@ export default function SignInPage() {
         })
         
       })
-    }
-    catch (error) {
+    .catch ((error) => {
       if (error.code === "auth/email-already-in-use") {
         alert("This account already exists");
       } else {
         console.error("Error creating user:", error);
       }
-    }
+    })
   };
 
   const emailRequired = (text) => {
     setEmail(text);
-    if(!email.trim() || !password.trim()) {
+    if(!text.trim() || !password.trim()) {
       setDisableBtn(true);
       setSignInButtonColor("#D9D9D9");
     }
@@ -121,7 +122,7 @@ export default function SignInPage() {
 
   const passwordRequired = (text) => {
     setPassword(text);
-    if(!email.trim() || !password.trim()) {
+    if(!email.trim() || !text.trim()) {
       setDisableBtn(true);
       setSignInButtonColor("#D9D9D9");
     }
@@ -145,22 +146,38 @@ export default function SignInPage() {
       <View style={styles.textBox}>
         {/*이메일 입력창*/}
         <TextInput
-          placeholder="이메일"
+          placeholder=" 이메일"
           value={email}
           onChangeText={(text) => emailRequired(text)}
+          onFocus={() => setIsEmailFocused(true)}
+          onBlur={() => setIsEmailFocused(false)}
           style={styles.textInput}
           keyboardType="email-address"
           autoCapitalize="none"
           
         />
+        {/* if email value is empty and it is not focused */}
+        {!isEmailFocused && !email.trim() && (
+          // create a text value and position the red asterisk to the email TextInput
+          <Text style={{ color: 'red', position: 'absolute', marginLeft: "2%", marginTop: "4%" }}>*</Text>
+        )}
+        
         {/*이메일 입력창*/}
         <TextInput
-          placeholder="비밀번호"
+          placeholder=" 비밀번호"
           value={password}
           onChangeText={(text) => passwordRequired(text)}
+          onFocus={() => setIsPasswordFocused(true)}
+          onBlur={() => setIsPasswordFocused(false)}
           style={styles.textInput}
           secureTextEntry
         />
+        {/* if password value is empty and it is not focused */}
+        {!isPasswordFocused && !password.trim() && (
+          // create a text value and position the red asterisk to the password TextInput
+          <Text style={{ color: 'red', position: 'absolute', marginLeft: "2%", marginTop: "20%" }}>*</Text>
+        )}
+
         {/*이름 입력창*/}
         <TextInput
           placeholder="이름"
@@ -196,7 +213,7 @@ export default function SignInPage() {
         <TouchableOpacity
           onPress={handleSignUp}
           disabled={disableBtn}
-          style={{ ...styles.button, backgroundColor: signInButtonColor, marginTop: 20 }}
+          style={{ ...styles.button, backgroundColor: signInButtonColor }}
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>
         </TouchableOpacity>
@@ -204,3 +221,4 @@ export default function SignInPage() {
     </KeyboardAvoidingView>
   );
 }
+
