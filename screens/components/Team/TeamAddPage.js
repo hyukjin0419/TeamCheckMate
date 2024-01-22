@@ -16,11 +16,13 @@ import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
 import { db, collection, addDoc, auth, doc } from "../../../firebase";
 import Modal from "react-native-modal";
+import { useNavigation } from "@react-navigation/core";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default TeamAddPage = ({ navigation }) => {
+export default TeamAddPage = () => {
+  const navigation = useNavigation();
   //회원정보 가져오기
   const user = auth.currentUser;
   const email = user.email;
@@ -53,7 +55,6 @@ export default TeamAddPage = ({ navigation }) => {
   const [textInputValue, setTextInputValue] = useState("");
 
   //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
-
   const onTextInputChange = (text) => {
     setTextInputValue(text);
     if (text.length > 0) {
@@ -76,6 +77,10 @@ export default TeamAddPage = ({ navigation }) => {
       console.log("Document written with ID: ", teamDocRef.id);
       const userDocRef = doc(db, "user", email);
       addTeamIdtoUser(userDocRef, teamDocRef.id);
+
+      navigation.navigate("TeamMemberAddPage", {
+        teamID: teamDocRef.id,
+      });
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -119,9 +124,8 @@ export default TeamAddPage = ({ navigation }) => {
           >
             <Text
               style={{ ...styles.headerText, color: confirmBtnColor }}
-              onPress={() => {
-                // confirmBtnPressed();
-                navigation.navigate("TeamMemberAddPage");
+              onPress={async () => {
+                await confirmBtnPressed();
               }}
             >
               확인
