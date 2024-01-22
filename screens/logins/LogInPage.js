@@ -55,7 +55,7 @@ export default function LogInPage({ route }) {
           alert("You have entered the wrong email or password");
         }
         else {
-          alert("Please input a valid email and password");
+          alert(error.message);
         }
       });
   };

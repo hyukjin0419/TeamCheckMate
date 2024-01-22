@@ -107,6 +107,7 @@ export default function App() {
       } else {
         setIsLogIn(false);
         setLogUserIn(false);
+        setLoginSuccess(false);
       }
     });
 
@@ -167,7 +168,7 @@ export default function App() {
           initialRouteName="InitialPage"
         >
           <Stack.Screen name="InitialPage" component={InitialPage} />
-          <Stack.Screen name="LogInPage" component={LogInPage} initialParams={{ logInSuccess: handleLoginSuccess }} />
+          <Stack.Screen name="LogInPage" component={LogInPage} initialParams={{ handleLoginSuccess: handleLoginSuccess }} />
           <Stack.Screen name="SignInPage" component={SignInPage} />
           <Stack.Screen name="AddMembers" component={AddMembers} />
         </Stack.Navigator>
