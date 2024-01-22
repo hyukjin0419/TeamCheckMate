@@ -33,9 +33,11 @@ import {
   auth,
 } from "../../../firebase";
 
-export default function AddMembers() {
+export default function AddMembers({ route }) {
   const navigation = useNavigation();
-
+  //TeamAddPage에서 풀러오는 TeamID
+  const { teamID } = route.params;
+  const [teamCode, setTeamCode] = useState(teamID);
   //파이어베이스에서 가져온 이메일 배열
   const [userEmailArray, setUserEmailArray] = useState([]);
   //검색창에 입력되는 이메일
@@ -64,6 +66,8 @@ export default function AddMembers() {
   //2.처음 화면 렌더링시 파이어 베이스에서 이메일 가져오기
   useEffect(() => {
     getUsers();
+    setTeamCode(teamID);
+    console.log(teamID);
   }, []);
 
   //3.검색어 상태 바뀔때마다 실행
@@ -109,11 +113,17 @@ export default function AddMembers() {
   };
 
   const sendEmail = () => {
+    const bodyText = `
+    안녕하세요, 사용자가 발송한 Check Team Mate의 팀 초대코드입니다.
+    팀 등록 페이지에서 팀 초대코드를 입력해주세요.
+
+    팀 초대코드: ${teamCode}
+  `;
     const recipientEmails = addedUserEmailArray.map((item) => item.id);
     MailComposer.composeAsync({
       recipients: recipientEmails,
       subject: "[Check Team Mate_초대코드 발송]",
-      body: "안녕하세요 user가 발송한 Check Team Mate의 팀 초대코드입니다. 팀등록페이지에서 팀 초대코드를 입력해주세요.",
+      body: bodyText,
     });
   };
   return (

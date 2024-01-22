@@ -31,7 +31,7 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamUpdatePage = ({ route }) => {
   const navigation = useNavigation();
-  //아이템 모달창에서 선택시 불러오는 정보
+  //TeamItem에서 불러오는 정보
   const { title, fileColor, id } = route.params;
 
   //기존 색상 저장
