@@ -31,7 +31,11 @@ import {
 
 export default function AddMembers() {
   const navigation = useNavigation();
-
+  //검색중? or Not
+  const [isSearching, setIsSearching] = useState(false);
+  const changeSearchingState = () => {
+    setIsSearching(!setIsSearching);
+  };
   /*
   1. 파이어 베이스에서 이메일 가져와서 저장하기
   2. 검색창 및 사용자 목록화면 구현
@@ -49,6 +53,7 @@ export default function AddMembers() {
   const [userEmailArray, setUserEmailArray] = useState([]);
   const [searchEmail, setSearchEmail] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
+  const [addedUserEmailArray, setAddedUserEmailArray] = useState([]);
 
   //1. 파이어 베이스에서 이메일 가져오는 함수
   const getUsers = async () => {
@@ -61,12 +66,12 @@ export default function AddMembers() {
     });
     setUserEmailArray(list);
   };
-  //처음 화면 렌더링시 파이어 베이스에서 이메일 가져오기
+  //2.처음 화면 렌더링시 파이어 베이스에서 이메일 가져오기
   useEffect(() => {
     getUsers();
   }, []);
 
-  //검색어 상태 바뀔때마다 실행
+  //3.검색어 상태 바뀔때마다 실행
   useEffect(() => {
     //fileter() -> 배열의 각 요소에 대해 주어진 함수를 호출하고, 함수의 반환 값이 'true'인요소들만 모아서 새로운 배열을 생성한다.
     //삼항 연산자 사용. 'searchEmail'이 비어 있지 않은 경우에만 필터링 수행
@@ -77,11 +82,25 @@ export default function AddMembers() {
             (user) => user.id.includes(searchEmail) && user.id !== ""
           )
         : [];
-
     setFilteredResults(newFilteredResults);
   }, [searchEmail]);
   // console.log(filteredResults);
 
+  //4. 검색 후 이메일 누를시 그 이메일 발송이메일에 추가
+  const addEmail = (props) => {
+    const isDuplicate = addedUserEmailArray.some((item) => item.id === props);
+
+    if (!isDuplicate) {
+      // 중복이 아닐 때만 추가
+      addedUserEmailArray.push({
+        id: props,
+      });
+      console.log("이메일 추가 성공");
+    } else {
+      console.log("이미 추가된 이메일입니다.");
+    }
+    console.log("현재 추가된: ", addedUserEmailArray);
+  };
   return (
     <KeyboardAvoidingView style={s.container}>
       {/* 헤더부분 */}
@@ -97,41 +116,62 @@ export default function AddMembers() {
           <Text style={{ ...s.titleSend }}>보내기</Text>
         </TouchableOpacity>
       </View>
-      <View>
-        {/* 검색창 */}
-        <View style={s.searchContainer}>
-          <Image
-            style={s.glass}
-            source={require("../../images/icons/glass_grey.png")}
-          />
-          <TextInput
-            value={searchEmail}
-            onChangeText={(text) => setSearchEmail(text)}
-            placeholder="초대할 팀 메이트의 이메일을 입력해주세요!"
-            style={s.textInput}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            returnKeyType="next"
-          />
-        </View>
-        <Pressable>
-          <View style={s.subBtn}>
-            <Text style={s.subBtnText}>건너뛰기</Text>
-          </View>
-        </Pressable>
-        {filteredResults.length > 0 && (
-          <FlatList
-            data={filteredResults}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <View>
-                <Text>{item.id}</Text>
-              </View>
-            )}
-          />
-        )}
+
+      {/* 검색창 */}
+      <View style={s.searchContainer}>
+        <Image
+          style={s.glass}
+          source={require("../../images/icons/glass_grey.png")}
+        />
+        <TextInput
+          value={searchEmail}
+          onChangeText={(text) => {
+            setSearchEmail(text);
+            setIsSearching(text.trim() !== "");
+          }}
+          placeholder="초대할 팀 메이트의 이메일을 입력해주세요!"
+          style={s.textInput}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          returnKeyType="next"
+        />
       </View>
-      <View></View>
+      {isSearching ? (
+        /* 검색된 emailContainer */
+        filteredResults.length > 0 && (
+          <View style={s.emailContainer}>
+            <FlatList
+              data={filteredResults}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => addEmail(item.id)}>
+                  <Text style={s.emailText}>{item.id}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        )
+      ) : (
+        /* 건너뛰기 버튼 */
+        <View>
+          <Pressable>
+            <View style={s.subBtn}>
+              <Text style={s.subBtnText}>건너뛰기</Text>
+            </View>
+          </Pressable>
+          <View style={s.emailContainer}>
+            <FlatList
+              data={addedUserEmailArray}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => addEmail(item.id)}>
+                  <Text style={s.emailText}>{item.id}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -158,36 +198,54 @@ const s = StyleSheet.create({
     flexDirection: "row",
     marginBottom: "2%",
   },
+  //검색창 컨테이너
   searchContainer: {
     flexDirection: "row",
-    height: "22%",
+    height: 50,
     backgroundColor: "#EFEFEF",
     borderRadius: 24,
     marginTop: "5%",
   },
+  //돋보기
   glass: {
     alignSelf: "center",
     marginLeft: "5%",
   },
+  //검색창 입력
   textInput: {
     flex: 0.9,
     alignSelf: "center",
     marginLeft: "3%",
   },
+  //건너뛰기 버튼 컨테이너
   subBtn: {
     borderBottomWidth: 1,
     borderBottomColor: "black",
     paddingBottom: 5,
     alignSelf: "center",
     width: 50,
-    marginTop: "6%",
+    marginTop: 20,
   },
+  //건너뛰기 버튼 Text
   subBtnText: {
     alignSelf: "center",
-    marginTop: "5%",
     fontSize: 12,
     borderBottomColor: "black",
   },
+  //이메일 리스트 컨테이너
+  emailContainer: {
+    zIndex: 1,
+    backgroundColor: "#EFEFEF",
+    borderRadius: 24,
+    marginTop: "5%",
+  },
+  emailPressed: {
+    backgroundColor: "red",
+  },
+  //이메일 리스트 컨테이너 안 이메일 Text
+  emailText: {
+    padding: 15,
+    justifyContent: "center",
+    marginLeft: "3%",
+  },
 });
-
-//
