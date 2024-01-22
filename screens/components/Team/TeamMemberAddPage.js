@@ -30,40 +30,34 @@ import {
   orderBy,
   query,
   db,
+  auth,
 } from "../../../firebase";
 
 export default function AddMembers() {
   const navigation = useNavigation();
+
+  //파이어베이스에서 가져온 이메일 배열
+  const [userEmailArray, setUserEmailArray] = useState([]);
+  //검색창에 입력되는 이메일
+  const [searchEmail, setSearchEmail] = useState("");
+  //입력되는 이메일과 파이어베이스에서 가져온 이메일 비교를 위한 배열
+  const [filteredResults, setFilteredResults] = useState([]);
   //검색중? or Not
   const [isSearching, setIsSearching] = useState(false);
-
-  /*
-  1. 파이어 베이스에서 이메일 가져와서 저장하기
-  2. 검색창 및 사용자 목록화면 구현
-    - 일단 사용자 전체목록화면을 구현
-    - 이제 입력받은 사용자를 찾아야 함
-      - 현재 파베에서 불러온 이메일이 배열안에 객체로 저장되어 있음.
-      - 새로운 배열을 생성
-      - searchEmail의 값이 변할때마다 filter함수를 사용하여 list를 업데이트
-      - 업데이트한 list와
-  3. 초대 발송 기능 추가
-    - 헐 이거 어캐함?
-  4. 시큐리티 고려사항 -> 권한이 없는 사용자가 다른 사용자의 정보에 접근하지 못하도록 보호..?
-  */
-
-  const [userEmailArray, setUserEmailArray] = useState([]);
-  const [searchEmail, setSearchEmail] = useState("");
-  const [filteredResults, setFilteredResults] = useState([]);
+  //사용자가 이메일 선택시 선택한 이메일 새로운 배열에 저장하기 위한 배열
   const [addedUserEmailArray, setAddedUserEmailArray] = useState([]);
+  //현재 로그인되 유저 정보
+  const user = auth.currentUser;
 
-  //1. 파이어 베이스에서 이메일 가져오는 함수
+  //1. 파이어 베이스에서 이메일 가져오는 함수 (자신의 이메일은 가져오지 x)
   const getUsers = async () => {
     const list = [];
     const querySnapshot = await getDocs(collection(db, "user"));
     querySnapshot.forEach((doc) => {
-      list.push({
-        id: doc.id,
-      });
+      if (doc.id !== user.email)
+        list.push({
+          id: doc.id,
+        });
     });
     setUserEmailArray(list);
   };
@@ -104,6 +98,7 @@ export default function AddMembers() {
     console.log("현재 추가된: ", addedUserEmailArray);
   };
 
+  //5. x 버튼 누를시 해당 이메일 배열에서 삭제
   const removeEmail = (emailId) => {
     // 해당 이메일을 addedUserEmailArray에서 제거
     const updatedArray = addedUserEmailArray.filter(
@@ -113,7 +108,16 @@ export default function AddMembers() {
     console.log("이메일 제거 성공");
   };
 
+  const sendEmail = () => {
+    const recipientEmails = addedUserEmailArray.map((item) => item.id);
+    MailComposer.composeAsync({
+      recipients: recipientEmails,
+      subject: "[Check Team Mate_초대코드 발송]",
+      body: "안녕하세요 user가 발송한 Check Team Mate의 팀 초대코드입니다. 팀등록페이지에서 팀 초대코드를 입력해주세요.",
+    });
+  };
   return (
+    // 이메일 입력중 나머지 화면 누르면 키보드 및 검색창 내리기
     <TouchableWithoutFeedback
       onPress={() => {
         Keyboard.dismiss();
@@ -130,13 +134,12 @@ export default function AddMembers() {
             <AntDesign name="left" size={20} color="black" />
           </TouchableOpacity>
           <Text style={s.title}>팀 메이트 초대</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={sendEmail}>
             <Text style={{ ...s.titleSend }}>보내기</Text>
           </TouchableOpacity>
         </View>
 
         {/* 검색창 */}
-
         <View>
           <View style={s.searchContainer}>
             <Image
@@ -161,6 +164,7 @@ export default function AddMembers() {
             />
           </View>
 
+          {/* 검색중일때 이메일 매치해서 보여주기 */}
           {isSearching ? (
             /* 검색된 emailContainer */
             filteredResults.length > 0 && (
@@ -177,7 +181,7 @@ export default function AddMembers() {
               </View>
             )
           ) : (
-            /* 건너뛰기 버튼 */
+            /* 건너뛰기 버튼 및 새로운 배열에 추가된 이메일들 -> 초대할 이메일*/
             <View>
               <Pressable>
                 <View style={s.subBtn}>
@@ -194,7 +198,7 @@ export default function AddMembers() {
                       renderItem={({ item }) => (
                         <View style={s.emailAddedContainer}>
                           <Text style={s.emailAddedText}>{item.id}</Text>
-
+                          {/* 삭제 버튼 */}
                           <TouchableOpacity
                             style={s.xIcon}
                             onPress={() => removeEmail(item.id)}
