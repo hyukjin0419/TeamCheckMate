@@ -15,7 +15,7 @@ import { onAuthStateChanged, signInWithCredential, signOut } from "firebase/auth
 
 export default function UserInfoInputPage({ route }) {
   const navigation = useNavigation();
-  const { userEmail, onUploadSuccess } = route.params;
+  const { userEmail, onUploadSuccess, moveBack } = route.params;
   const [name, setname] = useState("");
   const [school, setschool] = useState("");
   const [studentNumber, setstudentNumber] = useState("");
@@ -36,6 +36,7 @@ export default function UserInfoInputPage({ route }) {
                 hasSignedUp: logIn,
                 timestamp: timestamp,
             });
+            //Set this value to true and pass it to App.js
             onUploadSuccess(true);
         } catch (e) {
             console.error("Error adding document: ", e);
@@ -43,11 +44,35 @@ export default function UserInfoInputPage({ route }) {
         }
   };
 
+  //If user presses skip button, set all non mandatory values to be blank
+  const skipInput = async () => {
+    try {
+        const timestamp = new Date();
+        const docRef = await setDoc(doc(db, "user", userEmail), {
+            email: userEmail,
+            name: "",
+            school: "",
+            studentNumber: "",
+            phoneNumber: "",
+            hasSignedUp: logIn,
+            timestamp: timestamp,
+        });
+        onUploadSuccess(true);
+    } catch (e) {
+        console.error("Error adding document: ", e);
+        setLogIn(false);
+    }
+  }
+
+  const previousPage = () => {
+    signOut(auth);
+  }
+
   return (
     <KeyboardAvoidingView style={styles.container}>
       {/*head 부분*/}
       <View style={styles.head}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={previousPage}>
           <AntDesign name="left" size={20} color="black" />
         </TouchableOpacity>
         <Text style={styles.title}>가입하기</Text>
@@ -93,6 +118,13 @@ export default function UserInfoInputPage({ route }) {
           style={{ ...styles.button, backgroundColor: "#050026" }}
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>
+        </TouchableOpacity>
+        {/*가입하기 버튼*/}
+        <TouchableOpacity
+          onPress={skipInput}
+          style={styles.subButton}
+        >
+          <Text style={styles.subButtonText}>건너뛰기</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

@@ -19,10 +19,11 @@ import { auth } from "../../firebase";
 import { Alert } from "react-native";
 import styles from "../styles/css";
 
-export default function LogInPage() {
+export default function LogInPage({ route }) {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const loginSuccess = route.params || false
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -34,7 +35,7 @@ export default function LogInPage() {
           alert("Email not verified");
           signOut(auth);
         }
-      }
+      } 
     });
 
     return unsubscribe;
@@ -46,10 +47,15 @@ export default function LogInPage() {
       .then((userCredentials) => {
         const user = userCredentials.user;
         console.log("Logged in with: " + user.email);
+        //Set handleLoginSuccess function to be true and bring it over to App.js
+        route.params.handleLoginSuccess(true);
       })
       .catch((error) => {
         if(error.code === "auth/invalid-credential") {
           alert("You have entered the wrong email or password");
+        }
+        else {
+          alert("Please input a valid email and password");
         }
       });
   };

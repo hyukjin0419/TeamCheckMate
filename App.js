@@ -94,25 +94,11 @@ export default function App() {
   const [isLogIn, setIsLogIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const appState = useRef(AppState.currentState);
-  const [isSignedUp, setIsSignedUp] = useState(false);
   const [logUserIn, setLogUserIn] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   //Firebase의 인증 상태 변경을 감시한다.
   useEffect(() => {
-    const user = auth.currentUser;
-    if(user){
-      const userDocRef = doc(db, "user", user.email);
-        const userDocSnapshot =  getDoc(userDocRef);
-        if (userDocSnapshot.exists()) {
-          const userData = userDocSnapshot.data();
-          const hasSignedUp = userData.hasSignedUp;
-          console.log("adskjfhaslfhalsjfhasldfj", hasSignedUp);
-          setIsSignedUp(true);
-        }
-        else {
-          setIsSignedUp(false);
-        }
-    }
 
     const unsubscribeAuthStateChanged = auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -159,11 +145,18 @@ export default function App() {
     };
   }, []);
 
-  const handleUploadSuccess = (value) => {
+  //If user inputs information or skips it, set conditions to be true
+  const handleUploadSuccess = () => {
     // Update state or perform any action needed when upload is successful
-    console.log("Upload success!", value);
     setLogUserIn(true);
+    setLoginSuccess(true)
   };
+
+  //If user logs in then set conditions to be true
+  const handleLoginSuccess = () => {
+    setLoginSuccess(true);
+    setLogUserIn(true);
+  }
 
   //로그인 안되어 있을때 실행화면
   if (!isLogIn) {
@@ -174,7 +167,7 @@ export default function App() {
           initialRouteName="InitialPage"
         >
           <Stack.Screen name="InitialPage" component={InitialPage} />
-          <Stack.Screen name="LogInPage" component={LogInPage} />
+          <Stack.Screen name="LogInPage" component={LogInPage} initialParams={{ logInSuccess: handleLoginSuccess }} />
           <Stack.Screen name="SignInPage" component={SignInPage} />
           <Stack.Screen name="AddMembers" component={AddMembers} />
         </Stack.Navigator>
@@ -182,7 +175,7 @@ export default function App() {
     );
   } else {
     //로그인 되었을 때 실행화면
-    if(!isSignedUp && !logUserIn) {
+    if(!logUserIn && !loginSuccess) {
       return (
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -191,7 +184,7 @@ export default function App() {
         </ NavigationContainer>
       );
     }
-    else {
+    else if(loginSuccess || logUserIn) {
       return (
         <NavigationContainer>
           {/* 탭 네비게이션을 설정하는 컴포넌트 */}

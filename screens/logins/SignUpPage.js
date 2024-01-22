@@ -21,9 +21,6 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
-  const [showSignIn, setShowSignIn] = useState(false);
-  const [tempEmail, setTempEmail] = useState("");
-  const [tempPassword, setTempPassword] = useState("");
 
 
   useEffect(() => {
