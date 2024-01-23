@@ -16,10 +16,10 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 const TeamItem = (props) => {
   const navigation = useNavigation();
+  console.log("teamID:", props.id);
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
-
   //터치시 팀 삭제하는 함수
   const deleteItem = () => {
     props.deleteTeamItem(props.id);
@@ -121,7 +121,15 @@ const TeamItem = (props) => {
   };
 
   return (
-    <TouchableOpacity onPress={() => navigation.navigate("AssignmentPage")}>
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate("AssignmentPage", {
+          title: title,
+          fileColor: fileColor,
+          teamid: props.id,
+        });
+      }}
+    >
       <ImageBackground style={styles.file} source={imageSource}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{title}</Text>

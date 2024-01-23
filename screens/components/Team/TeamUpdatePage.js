@@ -98,7 +98,7 @@ export default TeamUpdatePage = ({ route }) => {
                 navigation.navigate("TeamPage");
               }}
             >
-              <AntDesign name="left" size={30} color="black" />
+              <AntDesign name="left" size={20} color="black" />
             </TouchableOpacity>
           </View>
           <View style={styles.headerTitleContainer}>
@@ -149,7 +149,8 @@ export default TeamUpdatePage = ({ route }) => {
         </View>
         <View>
           <Modal
-            animationType="fade"
+            animationIn="fadeIn"
+            animationInTiming={300}
             visible={isModalVisible}
             transparent={true}
           >
@@ -453,7 +454,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     marginTop: "5%",
-    flex: 0.13,
+    flex: 0.15,
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",

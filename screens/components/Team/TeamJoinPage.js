@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     marginTop: "5%",
-    flex: 0.13,
+    flex: 0.15,
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
