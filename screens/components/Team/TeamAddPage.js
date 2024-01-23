@@ -42,6 +42,9 @@ export default TeamAddPage = () => {
   //확인버튼 누른 후 확정된 색상
   const [colorConfirmed, setColorConfirmed] = useState(color.colors1[0]);
 
+  //팀생성시 확인 버튼 한번 누르면, 다음부터는 안눌릴 수 있도록 하기 위한 변수
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
+
   //모달에서 색상 선택 후 확인 누르면 색상 변경 -> 모달 close
   const confirmColor = () => {
     console.log(selectedColor);
@@ -68,6 +71,10 @@ export default TeamAddPage = () => {
 
   const addTeamItem = async () => {
     try {
+      if (isButtonClicked) {
+        return;
+      }
+      setIsButtonClicked(true);
       const timestamp = new Date();
       const teamDocRef = await addDoc(collection(db, "team"), {
         title: textInputValue,
@@ -93,10 +100,6 @@ export default TeamAddPage = () => {
     });
   };
 
-  confirmBtnPressed = () => {
-    addTeamItem();
-  };
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
@@ -119,15 +122,10 @@ export default TeamAddPage = () => {
             disabled={buttonDisabled}
             style={styles.confirmBtn}
             onPress={() => {
-              confirmBtnPressed();
+              addTeamItem();
             }}
           >
-            <Text
-              style={{ ...styles.headerText, color: confirmBtnColor }}
-              onPress={async () => {
-                await confirmBtnPressed();
-              }}
-            >
+            <Text style={{ ...styles.headerText, color: confirmBtnColor }}>
               확인
             </Text>
           </TouchableOpacity>
