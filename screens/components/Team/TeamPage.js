@@ -79,6 +79,7 @@ export default TeamPage = () => {
   //팀 삭제 코드
   const deleteTeamItem = async (id) => {
     await deleteDoc(doc(db, "team", id));
+    await deleteDoc(doc(doc(db, "user", user.email), "teamList", id));
     getTeamList();
   };
 
