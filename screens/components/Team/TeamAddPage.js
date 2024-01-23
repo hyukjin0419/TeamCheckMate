@@ -21,7 +21,7 @@ import { useNavigation } from "@react-navigation/core";
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default TeamAddPage = () => {
+export default TeamAddPage_origin = () => {
   const navigation = useNavigation();
   //회원정보 가져오기
   const user = auth.currentUser;
@@ -168,7 +168,8 @@ export default TeamAddPage = () => {
         <View>
           {/* 색상 팔레트 모달창 회색 배경 */}
           <Modal
-            animationType="fade"
+            useNativeDriver={true}
+            // animationType="fade"
             visible={isModalVisible}
             transparent={true}
           >

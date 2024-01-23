@@ -16,10 +16,10 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 const TeamItem = (props) => {
   const navigation = useNavigation();
-  console.log("teamID:", props.id);
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
+
   //터치시 팀 삭제하는 함수
   const deleteItem = () => {
     props.deleteTeamItem(props.id);
@@ -121,15 +121,7 @@ const TeamItem = (props) => {
   };
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate("AssignmentPage", {
-          title: title,
-          fileColor: fileColor,
-          teamid: props.id,
-        });
-      }}
-    >
+    <TouchableOpacity onPress={() => navigation.navigate("AssignmentPage")}>
       <ImageBackground style={styles.file} source={imageSource}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{title}</Text>
@@ -147,19 +139,21 @@ const TeamItem = (props) => {
           style={styles.modal}
           visible={TeamOptionModalVisible}
           transparent={true}
-          // animationType="fade"
+          animationType="fade"
         >
           {/* 모달창 회색 배경 */}
           <View style={styles.background}>
             {/* 팀 설정 모달창 */}
             <Modal
+              onSwipeComplete={() => SetTeamOptionModalVisible(false)}
               swipeDirection={"down"}
               animationType="slide"
               visible={TeamOptionModalVisible}
+              //모달이 아닌 영역을 터치하면 창을 닫자!
               onBackdropPress={handleTeamOptionPress}
+              //모달 뒷배경 투명도를 0으로 설정
               backdropOpacity={0}
               transparent={true}
-              onSwipeComplete={() => SetTeamOptionModalVisible(false)}
             >
               {/* 팀 설정 모달창 */}
               <View style={styles.modalView}>
@@ -207,6 +201,7 @@ const TeamItem = (props) => {
                 </View>
               </View>
             </Modal>
+            <View></View>
           </View>
         </Modal>
       </ImageBackground>
