@@ -16,6 +16,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
 import { db, collection, addDoc, auth, doc, setDoc } from "../../../firebase";
 import Modal from "react-native-modal";
+import s from "../../styles/css";
 import { useNavigation } from "@react-navigation/core";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -102,11 +103,11 @@ export default TeamAddPage_origin = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
+      <View style={s.container}>
         <StatusBar style={"dark"}></StatusBar>
         {/* 뒤로가기 버튼, 팀 등록 헤더와 확인버튼 컨테이너 */}
-        <View style={styles.headerContainer}>
-          <View style={styles.backBtn}>
+        <View style={s.headContainer}>
+          <View style={s.headBtn}>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("TeamPage");
@@ -115,9 +116,23 @@ export default TeamAddPage_origin = () => {
               <AntDesign name="left" size={20} color="black" />
             </TouchableOpacity>
           </View>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerText}>팀 등록</Text>
-          </View>
+
+          <Text style={s.title}>팀 등록</Text>
+
+          <TouchableOpacity
+            disabled={buttonDisabled}
+            style={s.titleRightBtn}
+            onPress={() => {
+              addTeamItem();
+            }}
+          >
+            <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
+              확인
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View>
           <TouchableOpacity
             disabled={buttonDisabled}
             style={styles.confirmBtn}

@@ -16,7 +16,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../../firebase.js";
 import { Alert } from "react-native";
-import styles from "../styles/css.js";
+import s from "../styles/css.js";
 import { db, doc, setDoc } from "../../firebase.js";
 import { color } from "../styles/colors.js";
 
@@ -91,23 +91,27 @@ export default function SignInPage({ route }) {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView style={s.container}>
       {/*head 부분*/}
-      <View style={styles.head}>
-        <TouchableOpacity onPress={() => navigation.navigate("InitialPage")}>
+      <View style={s.headContainer}>
+        <TouchableOpacity
+          style={s.headBtn}
+          onPress={() => navigation.navigate("InitialPage")}
+        >
           <AntDesign name="left" size={20} color="black" />
         </TouchableOpacity>
-        <Text style={styles.title}>가입하기</Text>
+        <Text style={s.title}>가입하기</Text>
+        <View style={s.titleRightBtn}></View>
       </View>
 
       {/*입력창*/}
-      <View style={styles.textBox}>
+      <View style={s.textBox}>
         {/*이메일 입력창*/}
         <TextInput
           placeholder=" 이메일"
           value={email}
           onChangeText={(text) => setEmail(text)}
-          style={styles.textInput}
+          style={s.textInput}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -117,7 +121,7 @@ export default function SignInPage({ route }) {
           placeholder=" 비밀번호"
           value={password}
           onChangeText={(text) => setPassword(text)}
-          style={styles.textInput}
+          style={s.textInput}
           secureTextEntry
         />
       </View>
@@ -126,9 +130,9 @@ export default function SignInPage({ route }) {
         {/*가입하기 버튼*/}
         <TouchableOpacity
           onPress={handleSignUp}
-          style={{ ...styles.button, backgroundColor: color.activated }}
+          style={{ ...s.button, backgroundColor: color.activated }}
         >
-          <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>
+          <Text style={{ ...s.buttonText, color: "white" }}>가입하기</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

@@ -17,7 +17,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../../firebase";
 import { Alert } from "react-native";
-import styles from "../styles/css";
+import s from "../styles/css";
 import { color } from "../styles/colors";
 
 export default function LogInPage({ route }) {
@@ -60,40 +60,41 @@ export default function LogInPage({ route }) {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
-      <View style={styles.head}>
+    <KeyboardAvoidingView style={s.container}>
+      <View style={s.headContainer}>
         <TouchableOpacity
-          style={styles.headBtn}
+          style={s.headBtn}
           onPress={() => navigation.navigate("InitialPage")}
         >
           <AntDesign name="left" size={20} color="black" />
         </TouchableOpacity>
-        <Text style={styles.title}>로그인</Text>
+        <Text style={s.title}>로그인</Text>
+        <View style={s.titleRightBtn}></View>
       </View>
 
-      <View style={styles.textBox}>
+      <View style={s.textBox}>
         <TextInput
           placeholder="이메일"
           autoCapitalize="none"
           value={email}
           onChangeText={(text) => setEmail(text)}
-          style={styles.textInput}
+          style={s.textInput}
           keyboardType="email-address"
         />
         <TextInput
           placeholder="비밀번호"
           value={password}
           onChangeText={(text) => setPassword(text)}
-          style={styles.textInput}
+          style={s.textInput}
           secureTextEntry
         />
       </View>
       <View>
         <TouchableOpacity
           onPress={handleLogin}
-          style={{ ...styles.button, backgroundColor: color.activated }}
+          style={{ ...s.button, backgroundColor: color.activated }}
         >
-          <Text style={{ ...styles.buttonText, color: "white" }}>Login</Text>
+          <Text style={{ ...s.buttonText, color: "white" }}>Login</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
