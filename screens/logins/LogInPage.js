@@ -32,7 +32,7 @@ export default function LogInPage({ route }) {
           console.log("User signed in: ", user.email);
         }
         else {
-          alert("인증되지 않은 이메일입니다");
+          Alert.alert("인증되지 않은 이메일입니다");
           signOut(auth);
         }
       } 
@@ -52,10 +52,10 @@ export default function LogInPage({ route }) {
       })
       .catch((error) => {
         if(error.code === "auth/invalid-credential") {
-          alert("잘못된 이메일이나 비밀번호 입력했습니다");
+          Alert.alert("잘못된 이메일이나 비밀번호 입력했습니다");
         }
         else {
-          alert("유효한 이메일과 비밀번호를 입력해 주세요");
+          Alert.alert("유효한 이메일과 비밀번호를 입력해 주세요");
         }
       });
   };

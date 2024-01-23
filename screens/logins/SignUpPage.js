@@ -15,7 +15,7 @@ import { Alert } from "react-native";
 import styles from "../styles/css.js";
 import { db, doc, setDoc } from "../../firebase.js";
 
-export default function SignInPage() {
+export default function SignInPage({ route }) {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,16 +72,17 @@ export default function SignInPage() {
         const user = userCredentials.user;
         await sendEmailVerification(user)
         .then(async () => {
-          alert('인증 이메일이 전송되었습니다');
+          Alert.alert('인증 이메일이 전송되었습니다');
           console.log("Registered with: " + user.email);
+          route.params?.handleSignUp(false);
         })
         
       })
     .catch ((error) => {
       if (error.code === "auth/email-already-in-use") {
-        alert("이 계정은 이미 존재합니다");
+        Alert.alert("이 계정은 이미 존재합니다");
       } else {
-        alert("이메일과 비밀번호 입력해 주세요");
+        Alert.alert("이메일과 비밀번호 입력해 주세요");
       }
     })
   };

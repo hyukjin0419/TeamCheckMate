@@ -95,6 +95,7 @@ export default function App() {
   const appState = useRef(AppState.currentState);
   const [logUserIn, setLogUserIn] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [loginCheck, setLoginCheck] = useState(true);
 
   //Firebase의 인증 상태 변경을 감시한다.
   useEffect(() => {
@@ -103,10 +104,12 @@ export default function App() {
       if (user) {
         setUserEmail(user.email)
         setIsLogIn(user.emailVerified);
+        setLoginCheck(false);
       } else {
         setIsLogIn(false);
         setLogUserIn(false);
         setLoginSuccess(false);
+        setLoginCheck(true);
       }
     });
 
@@ -150,12 +153,18 @@ export default function App() {
     // Update state or perform any action needed when upload is successful
     setLogUserIn(true);
     setLoginSuccess(true)
+    setLoginCheck(false);
   };
 
   //If user logs in then set conditions to be true
   const handleLoginSuccess = () => {
     setLoginSuccess(true);
     setLogUserIn(true);
+    setLoginCheck(false);
+  }
+
+  const handleSignUp = () => {
+    setLoginCheck(true);
   }
 
   //로그인 안되어 있을때 실행화면
@@ -168,13 +177,13 @@ export default function App() {
         >
           <Stack.Screen name="InitialPage" component={InitialPage} />
           <Stack.Screen name="LogInPage" component={LogInPage} initialParams={{ handleLoginSuccess: handleLoginSuccess }} />
-          <Stack.Screen name="SignInPage" component={SignInPage} />
+          <Stack.Screen name="SignInPage" component={SignInPage} initialParams={{ handleSignUp: handleSignUp }} />
         </Stack.Navigator>
       </NavigationContainer>
     );
   } else {
     //로그인 되었을 때 실행화면
-    if(!logUserIn && !loginSuccess) {
+    if(!logUserIn && !loginSuccess && loginCheck) {
       return (
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -183,7 +192,7 @@ export default function App() {
         </ NavigationContainer>
       );
     }
-    else if(loginSuccess || logUserIn) {
+    else if(loginSuccess || logUserIn || !loginCheck) {
       return (
         <NavigationContainer>
           {/* 탭 네비게이션을 설정하는 컴포넌트 */}
