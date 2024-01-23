@@ -12,6 +12,7 @@ import {
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import styles from "../../styles/css";
 import * as MailComposer from "expo-mail-composer";
+import { color } from "../../styles/colors";
 
 export default function AddMembers() {
   const navigation = useNavigation();
@@ -21,7 +22,7 @@ export default function AddMembers() {
   const [disableBtn, setDisableBtn] = useState(true);
   const newEmailInputRef = useRef(null);
 
-  const [sendBtnColor, setSendBtnColor] = useState("#D9D9D9");
+  const [sendBtnColor, setSendBtnColor] = useState(color.deactivated);
   const [selectedInput, setSelectedInput] = useState(null);
 
   //이메일 추가하기
@@ -60,10 +61,10 @@ export default function AddMembers() {
       )
     ) {
       setDisableBtn(false);
-      setSendBtnColor("#050026");
+      setSendBtnColor(color.activated);
     } else {
       setDisableBtn(true);
-      setSendBtnColor("#D9D9D9");
+      setSendBtnColor(color.deactivated);
     }
   };
 
@@ -138,8 +139,8 @@ export default function AddMembers() {
               ...styles.textInput,
               width: "85%",
               borderBottomColor:
-                selectedInput !== index ? "#999999" : "#050026",
-              color: selectedInput !== index ? "#999999" : "#050026",
+                selectedInput !== index ? "#999999" : color.activated,
+              color: selectedInput !== index ? "#999999" : color.activated,
             }}
             onFocus={() => isFocused(index)}
             onBlur={isBlur}
@@ -150,7 +151,7 @@ export default function AddMembers() {
               style={{
                 marginTop: "50%",
                 marginRight: "2%",
-                color: selectedInput !== index ? "#999999" : "#050026",
+                color: selectedInput !== index ? "#999999" : color.activated,
               }}
               name="trash"
               size={24}

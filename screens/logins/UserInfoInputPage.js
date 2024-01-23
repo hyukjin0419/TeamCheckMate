@@ -11,7 +11,12 @@ import { AntDesign } from "@expo/vector-icons";
 import { Alert } from "react-native";
 import styles from "../styles/css.js";
 import { auth, db, doc, setDoc } from "../../firebase.js";
-import { onAuthStateChanged, signInWithCredential, signOut } from "firebase/auth";
+import {
+  onAuthStateChanged,
+  signInWithCredential,
+  signOut,
+} from "firebase/auth";
+import { color } from "../styles/colors.js";
 
 export default function UserInfoInputPage({ route }) {
   const navigation = useNavigation();
@@ -22,51 +27,50 @@ export default function UserInfoInputPage({ route }) {
   const [phoneNumber, setphoneNumber] = useState("");
   const [logIn, setLogIn] = useState(true);
 
-
   //회원가입 관련 함수
   const uploadInformation = async () => {
-        try {
-            const timestamp = new Date();
-            const docRef = await setDoc(doc(db, "user", userEmail), {
-                email: userEmail,
-                name: name,
-                school: school,
-                studentNumber: studentNumber,
-                phoneNumber: phoneNumber,
-                hasSignedUp: logIn,
-                timestamp: timestamp,
-            });
-            //Set this value to true and pass it to App.js
-            onUploadSuccess(true);
-        } catch (e) {
-            console.error("문서 추가 중 오류 발생: ", e);
-            setLogIn(false);
-        }
+    try {
+      const timestamp = new Date();
+      const docRef = await setDoc(doc(db, "user", userEmail), {
+        email: userEmail,
+        name: name,
+        school: school,
+        studentNumber: studentNumber,
+        phoneNumber: phoneNumber,
+        hasSignedUp: logIn,
+        timestamp: timestamp,
+      });
+      //Set this value to true and pass it to App.js
+      onUploadSuccess(true);
+    } catch (e) {
+      console.error("문서 추가 중 오류 발생: ", e);
+      setLogIn(false);
+    }
   };
 
   //If user presses skip button, set all non mandatory values to be blank
   const skipInput = async () => {
     try {
-        const timestamp = new Date();
-        const docRef = await setDoc(doc(db, "user", userEmail), {
-            email: userEmail,
-            name: "",
-            school: "",
-            studentNumber: "",
-            phoneNumber: "",
-            hasSignedUp: logIn,
-            timestamp: timestamp,
-        });
-        onUploadSuccess(true);
+      const timestamp = new Date();
+      const docRef = await setDoc(doc(db, "user", userEmail), {
+        email: userEmail,
+        name: "",
+        school: "",
+        studentNumber: "",
+        phoneNumber: "",
+        hasSignedUp: logIn,
+        timestamp: timestamp,
+      });
+      onUploadSuccess(true);
     } catch (e) {
-        console.error("문서 추가 중 오류 발생: ", e);
-        setLogIn(false);
+      console.error("문서 추가 중 오류 발생: ", e);
+      setLogIn(false);
     }
-  }
+  };
 
   const previousPage = () => {
     signOut(auth);
-  }
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -80,7 +84,6 @@ export default function UserInfoInputPage({ route }) {
 
       {/*입력창*/}
       <View style={styles.textBox}>
-
         {/*이름 입력창*/}
         <TextInput
           placeholder="이름"
@@ -115,19 +118,15 @@ export default function UserInfoInputPage({ route }) {
         {/*가입하기 버튼*/}
         <TouchableOpacity
           onPress={uploadInformation}
-          style={{ ...styles.button, backgroundColor: "#050026" }}
+          style={{ ...styles.button, backgroundColor: color.activated }}
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>
         </TouchableOpacity>
         {/*가입하기 버튼*/}
-        <TouchableOpacity
-          onPress={skipInput}
-          style={styles.subButton}
-        >
+        <TouchableOpacity onPress={skipInput} style={styles.subButton}>
           <Text style={styles.subButtonText}>건너뛰기</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 }
-

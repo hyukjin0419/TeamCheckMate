@@ -13,6 +13,7 @@ import {
 import commonStyles from "./styles/css.js";
 import { auth } from "../firebase.js";
 import { signOut } from "firebase/auth";
+import { color } from "./styles/colors.js";
 
 export default function InitialPage() {
   const navigation = useNavigation();
@@ -20,7 +21,7 @@ export default function InitialPage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        if(user.emailVerified) {
+        if (user.emailVerified) {
           console.log("User signed in: ", user.email);
         }
       }
@@ -55,7 +56,7 @@ export default function InitialPage() {
         {/*로그인 버튼*/}
         <TouchableOpacity
           onPress={() => navigation.navigate("LogInPage")}
-          style={{ ...commonStyles.button, backgroundColor: "#050026" }}
+          style={{ ...commonStyles.button, backgroundColor: color.activated }}
         >
           <Text style={commonStyles.buttonText}>로그인</Text>
         </TouchableOpacity>
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     width: 115,
   },
   description: {
-    color: "#050026",
+    color: color.activated,
     fontSize: 16,
     fontWeight: 400,
     alignSelf: "center",
