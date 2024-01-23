@@ -79,6 +79,7 @@ export default TeamPage = () => {
   //팀 삭제 코드
   const deleteTeamItem = async (id) => {
     await deleteDoc(doc(db, "team", id));
+    await deleteDoc(doc(doc(db, "user", user.email), "teamList", id));
     getTeamList();
   };
 
@@ -103,9 +104,11 @@ export default TeamPage = () => {
           {/* 모달 뷰 */}
           <Modal
             style={styles.modalView}
-            animationType="fade"
+            // animationType="fade"
             transparent={true}
             visible={showModal}
+            animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
+            animationOutTiming={20}
           >
             <TouchableWithoutFeedback onPress={handlePress}>
               {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
@@ -161,6 +164,7 @@ export default TeamPage = () => {
         {
           <FlatList
             numColumns={2}
+            showsVerticalScrollIndicator={false}
             data={teamList}
             contentContainerStyle={styles.teamListContainer}
             renderItem={({ item }) => (

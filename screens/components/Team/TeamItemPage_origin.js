@@ -9,7 +9,6 @@ import {
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/core";
-import { color } from "../../styles/colors";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -17,10 +16,10 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 const TeamItem = (props) => {
   const navigation = useNavigation();
-  console.log("teamID:", props.id);
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
+
   //터치시 팀 삭제하는 함수
   const deleteItem = () => {
     props.deleteTeamItem(props.id);
@@ -122,15 +121,7 @@ const TeamItem = (props) => {
   };
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.navigate("AssignmentPage", {
-          title: title,
-          fileColor: fileColor,
-          teamid: props.id,
-        });
-      }}
-    >
+    <TouchableOpacity onPress={() => navigation.navigate("AssignmentPage")}>
       <ImageBackground style={styles.file} source={imageSource}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{title}</Text>
@@ -148,19 +139,21 @@ const TeamItem = (props) => {
           style={styles.modal}
           visible={TeamOptionModalVisible}
           transparent={true}
-          // animationType="fade"
+          animationType="fade"
         >
           {/* 모달창 회색 배경 */}
           <View style={styles.background}>
             {/* 팀 설정 모달창 */}
             <Modal
+              onSwipeComplete={() => SetTeamOptionModalVisible(false)}
               swipeDirection={"down"}
               animationType="slide"
               visible={TeamOptionModalVisible}
+              //모달이 아닌 영역을 터치하면 창을 닫자!
               onBackdropPress={handleTeamOptionPress}
+              //모달 뒷배경 투명도를 0으로 설정
               backdropOpacity={0}
               transparent={true}
-              onSwipeComplete={() => SetTeamOptionModalVisible(false)}
             >
               {/* 팀 설정 모달창 */}
               <View style={styles.modalView}>
@@ -194,7 +187,7 @@ const TeamItem = (props) => {
                         SetTeamOptionModalVisible(false);
                       }}
                     >
-                      <Text style={styles.teamReviseText}>수정</Text>
+                      <Text style={styles.teamReviseText}>팀 수정</Text>
                     </TouchableOpacity>
                     {/* 팀 삭제 버튼 */}
                     <TouchableOpacity
@@ -202,12 +195,13 @@ const TeamItem = (props) => {
                       onPress={deleteItem}
                     >
                       {/* 터치 시 팀 삭제 */}
-                      <Text style={styles.teamDeleteText}>삭제</Text>
+                      <Text style={styles.teamDeleteText}>팀 삭제</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
               </View>
             </Modal>
+            <View></View>
           </View>
         </Modal>
       </ImageBackground>
@@ -229,24 +223,24 @@ const styles = StyleSheet.create({
   teamReviseBtn: {
     width: WINDOW_WIDHT * 0.4,
     height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: color.activated,
+    backgroundColor: "#050026",
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   teamReviseText: {
-    color: "white",
+    color: "#D9D9D9",
   },
   teamDeleteBtn: {
     width: WINDOW_WIDHT * 0.4,
     height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: color.deletegrey,
+    backgroundColor: "#EFEFEF",
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   teamDeleteText: {
-    color: color.redpink,
+    color: "#FF2868",
   },
   modal: {
     flex: 1,
@@ -254,7 +248,7 @@ const styles = StyleSheet.create({
   modalVector: {
     height: 5,
     width: 50,
-    backgroundColor: color.deactivated,
+    backgroundColor: "#D9D9D9",
     borderRadius: 10,
     marginTop: 10,
   },

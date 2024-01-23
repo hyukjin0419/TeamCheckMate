@@ -14,13 +14,15 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
-import { db, collection, addDoc, auth, doc } from "../../../firebase";
+import { db, collection, addDoc, auth, doc, setDoc } from "../../../firebase";
 import Modal from "react-native-modal";
+import { useNavigation } from "@react-navigation/core";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default TeamAddPage = ({ navigation }) => {
+export default TeamAddPage_origin = () => {
+  const navigation = useNavigation();
   //회원정보 가져오기
   const user = auth.currentUser;
   const email = user.email;
@@ -40,6 +42,9 @@ export default TeamAddPage = ({ navigation }) => {
   //확인버튼 누른 후 확정된 색상
   const [colorConfirmed, setColorConfirmed] = useState(color.colors1[0]);
 
+  //팀생성시 확인 버튼 한번 누르면, 다음부터는 안눌릴 수 있도록 하기 위한 변수
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
+
   //모달에서 색상 선택 후 확인 누르면 색상 변경 -> 모달 close
   const confirmColor = () => {
     console.log(selectedColor);
@@ -53,7 +58,6 @@ export default TeamAddPage = ({ navigation }) => {
   const [textInputValue, setTextInputValue] = useState("");
 
   //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
-
   const onTextInputChange = (text) => {
     setTextInputValue(text);
     if (text.length > 0) {
@@ -67,6 +71,10 @@ export default TeamAddPage = ({ navigation }) => {
 
   const addTeamItem = async () => {
     try {
+      if (isButtonClicked) {
+        return;
+      }
+      setIsButtonClicked(true);
       const timestamp = new Date();
       const teamDocRef = await addDoc(collection(db, "team"), {
         title: textInputValue,
@@ -76,6 +84,10 @@ export default TeamAddPage = ({ navigation }) => {
       console.log("Document written with ID: ", teamDocRef.id);
       const userDocRef = doc(db, "user", email);
       addTeamIdtoUser(userDocRef, teamDocRef.id);
+
+      navigation.navigate("TeamMemberAddPage", {
+        teamID: teamDocRef.id,
+      });
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -83,13 +95,9 @@ export default TeamAddPage = ({ navigation }) => {
 
   const addTeamIdtoUser = async (userDocRef, teamDocRefID) => {
     const teamListCollectionRef = collection(userDocRef, "teamList");
-    await addDoc(teamListCollectionRef, {
+    await setDoc(doc(teamListCollectionRef, teamDocRefID), {
       teamID: teamDocRefID,
     });
-  };
-
-  confirmBtnPressed = () => {
-    addTeamItem();
   };
 
   return (
@@ -104,7 +112,7 @@ export default TeamAddPage = ({ navigation }) => {
                 navigation.navigate("TeamPage");
               }}
             >
-              <AntDesign name="left" size={30} color="black" />
+              <AntDesign name="left" size={20} color="black" />
             </TouchableOpacity>
           </View>
           <View style={styles.headerTitleContainer}>
@@ -114,16 +122,10 @@ export default TeamAddPage = ({ navigation }) => {
             disabled={buttonDisabled}
             style={styles.confirmBtn}
             onPress={() => {
-              confirmBtnPressed();
+              addTeamItem();
             }}
           >
-            <Text
-              style={{ ...styles.headerText, color: confirmBtnColor }}
-              onPress={() => {
-                confirmBtnPressed();
-                navigation.navigate("TeamPage");
-              }}
-            >
+            <Text style={{ ...styles.headerText, color: confirmBtnColor }}>
               확인
             </Text>
           </TouchableOpacity>
@@ -141,7 +143,7 @@ export default TeamAddPage = ({ navigation }) => {
               value={textInputValue}
               returnKeyType="done"
               onChangeText={onTextInputChange}
-              style={{ ...styles.colorTextInput, color: colorConfirmed }}
+              style={styles.colorTextInput}
             ></TextInput>
           </View>
           {/* 색상 선택 버튼 */}
@@ -158,15 +160,14 @@ export default TeamAddPage = ({ navigation }) => {
           </TouchableWithoutFeedback>
         </View>
         <View style={styles.descriptionContainter}>
-          <Text style={{ ...styles.description, color: colorConfirmed }}>
-            색상을 변경할 수 있습니다
-          </Text>
+          <Text style={styles.description}>색상을 변경할 수 있습니다</Text>
         </View>
         {/* 색상 선택 버튼 */}
         <View>
           {/* 색상 팔레트 모달창 회색 배경 */}
           <Modal
-            animationType="fade"
+            useNativeDriver={true}
+            // animationType="fade"
             visible={isModalVisible}
             transparent={true}
           >
@@ -421,7 +422,7 @@ const styles = StyleSheet.create({
   modalVector: {
     height: 5,
     width: 50,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: color.deactivated,
     borderRadius: 10,
     marginTop: 10,
   },

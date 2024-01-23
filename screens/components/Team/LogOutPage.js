@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/core";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { auth } from "../../../firebase";
+import { color } from "../../styles/colors";
 
 export default function TeamPage() {
   const navigation = useNavigation();
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logInBtn: {
-    backgroundColor: "#050026",
+    backgroundColor: color.activated,
     borderRadius: 9,
     alignItems: "center",
     paddingVertical: "5%",

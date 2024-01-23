@@ -31,7 +31,7 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamUpdatePage = ({ route }) => {
   const navigation = useNavigation();
-  //아이템 모달창에서 선택시 불러오는 정보
+  //TeamItem에서 불러오는 정보
   const { title, fileColor, id } = route.params;
 
   //기존 색상 저장
@@ -42,19 +42,24 @@ export default TeamUpdatePage = ({ route }) => {
     setSelectedColor(color);
   };
 
-  /* 확인버튼 누른 후 확정된 색상 */
+  {
+    /* 확인버튼 누른 후 확정된 색상 */
+  }
   const [colorConfirmed, setColorConfirmed] = useState(fileColor);
-
-  /*모달에서 색상 선택 후 확인 버튼 터치 시 수정 색상 확정, 모달 close */
+  {
+    /*모달에서 색상 선택 후 확인버튼 터치 시 색상 확정, 확인버튼 활성화 -> 모달 close */
+  }
   const confirmColor = () => {
     console.log(selectedColor);
     setColorConfirmed(selectedColor);
+    setButtonDisabled(false);
+    setConfirmBtnColor(color.activated);
     handleModalPress();
   };
 
   const [textInputValue, setTextInputValue] = useState(title);
 
-  /* 문자 입력 혹은 색상 변경 시 확인 버튼 활성화 (조건 수정 필요) */
+  /* 문자 입력 시 확인 버튼 활성화  */
   const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const onTextInputChange = (text) => {
@@ -98,7 +103,7 @@ export default TeamUpdatePage = ({ route }) => {
                 navigation.navigate("TeamPage");
               }}
             >
-              <AntDesign name="left" size={30} color="black" />
+              <AntDesign name="left" size={20} color="black" />
             </TouchableOpacity>
           </View>
           <View style={styles.headerTitleContainer}>
@@ -149,7 +154,8 @@ export default TeamUpdatePage = ({ route }) => {
         </View>
         <View>
           <Modal
-            animationType="fade"
+            animationIn="fadeIn"
+            animationInTiming={300}
             visible={isModalVisible}
             transparent={true}
           >
@@ -398,7 +404,7 @@ const styles = StyleSheet.create({
   modalVector: {
     height: 5,
     width: 50,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: color.deactivated,
     borderRadius: 10,
     marginTop: 10,
   },
@@ -453,7 +459,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     marginTop: "5%",
-    flex: 0.13,
+    flex: 0.15,
     alignItems: "center",
     justifyContent: "space-between",
     flexDirection: "row",
