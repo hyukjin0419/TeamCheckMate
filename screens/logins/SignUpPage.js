@@ -72,16 +72,16 @@ export default function SignInPage() {
         const user = userCredentials.user;
         await sendEmailVerification(user)
         .then(async () => {
-          alert('Verification email sent.');
+          alert('인증 이메일이 전송되었습니다');
           console.log("Registered with: " + user.email);
         })
         
       })
     .catch ((error) => {
       if (error.code === "auth/email-already-in-use") {
-        alert("This account already exists");
+        alert("이 계정은 이미 존재합니다");
       } else {
-        alert("Please enter your email and password");
+        alert("이메일과 비밀번호 입력해 주세요");
       }
     })
   };

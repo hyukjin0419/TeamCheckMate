@@ -39,7 +39,7 @@ export default function UserInfoInputPage({ route }) {
             //Set this value to true and pass it to App.js
             onUploadSuccess(true);
         } catch (e) {
-            console.error("Error adding document: ", e);
+            console.error("문서 추가 중 오류 발생: ", e);
             setLogIn(false);
         }
   };
@@ -59,7 +59,7 @@ export default function UserInfoInputPage({ route }) {
         });
         onUploadSuccess(true);
     } catch (e) {
-        console.error("Error adding document: ", e);
+        console.error("문서 추가 중 오류 발생: ", e);
         setLogIn(false);
     }
   }
