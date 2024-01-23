@@ -5,7 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 //Image 컴포넌트는 앱에서 이미지를 로드하고 표시하는 데 사용됩니다. 이미지 태그 안에 주소를 넣어서
-import { auth } from "./firebase";
+import { auth, db, doc } from "./firebase";
 import TeamPage from "./screens/components/Team/TeamPage";
 import InitialPage from "./screens/InitialPage";
 import SignInPage from "./screens/logins/SignUpPage";
@@ -19,6 +19,8 @@ import PersonalPage from "./screens/components/PersonalPage";
 import GuidancePage from "./screens/components/GuidancePage";
 import SchedulePage from "./screens/components/SchedulePage";
 import TeamMemberAddPage from "./screens/components/Team/TeamMemberAddPage";
+import UserInfoInputPage from "./screens/logins/UserInfoInputPage";
+import { getDoc } from "firebase/firestore";
 
 const Stack = createNativeStackNavigator();
 // - 스택 형태로 화면 전환을 관리한다
@@ -33,7 +35,7 @@ const PersonalStack = createNativeStackNavigator(); //개인화면 탭
 const TeamStack = createNativeStackNavigator(); //팀 화면 탭
 const ScheduleStack = createNativeStackNavigator(); //스케줄 탭
 const GuidanceStack = createNativeStackNavigator(); //길라잡이 탭
-const SettingStack = createNativeStackNavigator(); //설정 탭
+const SettingStack = createNativeStackNavigator(); //설정 
 
 //네비게이션은 NavigationContainer -> Stack.Navigator -> stack.Screen순으로 정의된다.
 //NavigationContainer: 전체 네비게이션 트리를 감싸는 래퍼 역항르 수행. 일반적으로 앱 최상위 컴포넌트에서 사용
@@ -89,15 +91,22 @@ function SettingPageTab() {
 export default function App() {
   //로그인이 되었는지 저장하는 변수
   const [isLogIn, setIsLogIn] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
   const appState = useRef(AppState.currentState);
+  const [logUserIn, setLogUserIn] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   //Firebase의 인증 상태 변경을 감시한다.
   useEffect(() => {
-    const unsubscribeAuthStateChanged = auth.onAuthStateChanged((user) => {
+
+    const unsubscribeAuthStateChanged = auth.onAuthStateChanged(async (user) => {
       if (user) {
+        setUserEmail(user.email)
         setIsLogIn(user.emailVerified);
       } else {
         setIsLogIn(false);
+        setLogUserIn(false);
+        setLoginSuccess(false);
       }
     });
 
@@ -136,6 +145,19 @@ export default function App() {
     };
   }, []);
 
+  //If user inputs information or skips it, set conditions to be true
+  const handleUploadSuccess = () => {
+    // Update state or perform any action needed when upload is successful
+    setLogUserIn(true);
+    setLoginSuccess(true)
+  };
+
+  //If user logs in then set conditions to be true
+  const handleLoginSuccess = () => {
+    setLoginSuccess(true);
+    setLogUserIn(true);
+  }
+
   //로그인 안되어 있을때 실행화면
   if (!isLogIn) {
     return (
@@ -145,70 +167,82 @@ export default function App() {
           initialRouteName="InitialPage"
         >
           <Stack.Screen name="InitialPage" component={InitialPage} />
-          <Stack.Screen name="LogInPage" component={LogInPage} />
+          <Stack.Screen name="LogInPage" component={LogInPage} initialParams={{ handleLoginSuccess: handleLoginSuccess }} />
           <Stack.Screen name="SignInPage" component={SignInPage} />
         </Stack.Navigator>
       </NavigationContainer>
     );
   } else {
     //로그인 되었을 때 실행화면
-    return (
-      <NavigationContainer>
-        {/* 탭 네비게이션을 설정하는 컴포넌트 */}
-        <Tab.Navigator
-          // screenListeners: 탭 내 각 화면에 대한 옵션을 정의한다. 아이콘, 스타일, 라벨등을 설정할 수 있다.
-          //route는 현재 화면의 정보를 담고있는 객체이다. 이 객체를 통해 현재 화면에 정보에 접근할 수 있다.
-          screenOptions={({ route }) => ({
-            //탭 바에 표시될 아이콘을 설정한다.
-            //현재 선택된 탭일 때와 아닐 때 아이콘을 다르게 지정할 수 있다.
-            tabBarIcon: ({ focused, color, size }) => {
-              let iconAddress;
-
-              if (route.name === "개인") {
-                //focused는 현재 탭이 활성화 된 상태인지 여부를 나타내는 불리언 값
-                //require("...")는 현재 탭이 (비)활성화 되었을 때 상요할 이미지의 경로를 나타낸다.
-                iconAddress = focused
-                  ? require("./screens/images/PersonalIconSelected.png")
-                  : require("./screens/images/PersonalIconUnselected.png");
-              } else if (route.name === "팀") {
-                iconAddress = focused
-                  ? require("./screens/images/TeamIconSelected.png")
-                  : require("./screens/images/TeamIconUnselected.png");
-              } else if (route.name === "시간표") {
-                iconAddress = focused
-                  ? require("./screens/images/ScheduleIconSelected.png")
-                  : require("./screens/images/ScheduleIconUnselected.png");
-              } else if (route.name === "길라잡이") {
-                iconAddress = focused
-                  ? require("./screens/images/GuidanceIconSelected.png")
-                  : require("./screens/images/GuidanceIconUnselected.png");
-              } else if (route.name === "설정") {
-                iconAddress = focused
-                  ? require("./screens/images/SettingIconSelected.png")
-                  : require("./screens/images/SettingIconUnselected.png");
-              }
-
-              return (
-                <Image source={iconAddress} style={{ width: 25, height: 25 }} />
-              );
-            },
-            headerShown: false,
-            tabBarStyle: { height: "10%" }, //탭 바의 스타일을 설정한다.
-            tabBarLabelStyle: { paddingBottom: 7 }, //탭 바 라벨의 스타일을 설정한다.
-            tabBarActiveTintColor: "black", //활성화된 탭의 텍스트 색상을 설정한다.
-            tabBarInactiveTintColor: "black", //비활성화된 탭의 텍스트 색상을 설정한다.
-          })}
-        >
-          {/* 각 탭 화면을 정의하는 컴포넌트
-          name속성을 탭의 이름
-          component 속성은 해당 탭이 표시될 때 렌더링 될 컴포넌트를 지정 */}
-          <Tab.Screen name={"개인"} component={PersonalPageTab} />
-          <Tab.Screen name={"팀"} component={TeamPageTab} />
-          <Tab.Screen name={"시간표"} component={SchedulePageTab} />
-          <Tab.Screen name={"길라잡이"} component={GuidancePageTab} />
-          <Tab.Screen name={"설정"} component={SettingPageTab} />
-        </Tab.Navigator>
-      </NavigationContainer>
-    );
+    if(!logUserIn && !loginSuccess) {
+      return (
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="UserInfoInputPage" component={UserInfoInputPage} initialParams={{ userEmail: userEmail, onUploadSuccess: handleUploadSuccess }}/>
+          </Stack.Navigator>
+        </ NavigationContainer>
+      );
+    }
+    else if(loginSuccess || logUserIn) {
+      return (
+        <NavigationContainer>
+          {/* 탭 네비게이션을 설정하는 컴포넌트 */}
+          <Tab.Navigator
+            // screenListeners: 탭 내 각 화면에 대한 옵션을 정의한다. 아이콘, 스타일, 라벨등을 설정할 수 있다.
+            //route는 현재 화면의 정보를 담고있는 객체이다. 이 객체를 통해 현재 화면에 정보에 접근할 수 있다.
+            screenOptions={({ route }) => ({
+              //탭 바에 표시될 아이콘을 설정한다.
+              //현재 선택된 탭일 때와 아닐 때 아이콘을 다르게 지정할 수 있다.
+              tabBarIcon: ({ focused, color, size }) => {
+                let iconAddress;
+  
+                if (route.name === "개인") {
+                  //focused는 현재 탭이 활성화 된 상태인지 여부를 나타내는 불리언 값
+                  //require("...")는 현재 탭이 (비)활성화 되었을 때 상요할 이미지의 경로를 나타낸다.
+                  iconAddress = focused
+                    ? require("./screens/images/PersonalIconSelected.png")
+                    : require("./screens/images/PersonalIconUnselected.png");
+                } else if (route.name === "팀") {
+                  iconAddress = focused
+                    ? require("./screens/images/TeamIconSelected.png")
+                    : require("./screens/images/TeamIconUnselected.png");
+                } else if (route.name === "시간표") {
+                  iconAddress = focused
+                    ? require("./screens/images/ScheduleIconSelected.png")
+                    : require("./screens/images/ScheduleIconUnselected.png");
+                } else if (route.name === "길라잡이") {
+                  iconAddress = focused
+                    ? require("./screens/images/GuidanceIconSelected.png")
+                    : require("./screens/images/GuidanceIconUnselected.png");
+                } else if (route.name === "설정") {
+                  iconAddress = focused
+                    ? require("./screens/images/SettingIconSelected.png")
+                    : require("./screens/images/SettingIconUnselected.png");
+                }
+  
+                return (
+                  <Image source={iconAddress} style={{ width: 25, height: 25 }} />
+                );
+              },
+              headerShown: false,
+              tabBarStyle: { height: "10%" }, //탭 바의 스타일을 설정한다.
+              tabBarLabelStyle: { paddingBottom: 7 }, //탭 바 라벨의 스타일을 설정한다.
+              tabBarActiveTintColor: "black", //활성화된 탭의 텍스트 색상을 설정한다.
+              tabBarInactiveTintColor: "black", //비활성화된 탭의 텍스트 색상을 설정한다.
+            })}
+          >
+            {/* 각 탭 화면을 정의하는 컴포넌트
+            name속성을 탭의 이름
+            component 속성은 해당 탭이 표시될 때 렌더링 될 컴포넌트를 지정 */}
+            <Tab.Screen name={"개인"} component={PersonalPageTab} />
+            <Tab.Screen name={"팀"} component={TeamPageTab} />
+            <Tab.Screen name={"시간표"} component={SchedulePageTab} />
+            <Tab.Screen name={"길라잡이"} component={GuidancePageTab} />
+            <Tab.Screen name={"설정"} component={SettingPageTab} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      );
+    }
+    
   }
 }

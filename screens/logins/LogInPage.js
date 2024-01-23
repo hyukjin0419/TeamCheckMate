@@ -19,21 +19,23 @@ import { auth } from "../../firebase";
 import { Alert } from "react-native";
 import styles from "../styles/css";
 
-export default function LogInPage() {
+export default function LogInPage({ route }) {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const loginSuccess = route.params || false
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        if (user.emailVerified) {
-          console.log("LogInPage -> User signed in: ", user.email);
-        } else {
-          alert("Email not verified");
+        if(user.emailVerified) {
+          console.log("User signed in: ", user.email);
+        }
+        else {
+          alert("인증되지 않은 이메일입니다");
           signOut(auth);
         }
-      }
+      } 
     });
 
     return unsubscribe;
@@ -45,10 +47,15 @@ export default function LogInPage() {
       .then((userCredentials) => {
         const user = userCredentials.user;
         console.log("Logged in with: " + user.email);
+        //Set handleLoginSuccess function to be true and bring it over to App.js
+        route.params.handleLoginSuccess(true);
       })
       .catch((error) => {
-        if (error.code === "auth/invalid-credential") {
-          alert("You have entered the wrong email or password");
+        if(error.code === "auth/invalid-credential") {
+          alert("잘못된 이메일이나 비밀번호 입력했습니다");
+        }
+        else {
+          alert("유효한 이메일과 비밀번호를 입력해 주세요");
         }
       });
   };
@@ -72,6 +79,7 @@ export default function LogInPage() {
           value={email}
           onChangeText={(text) => setEmail(text)}
           style={styles.textInput}
+          keyboardType="email-address"
         />
         <TextInput
           placeholder="비밀번호"
