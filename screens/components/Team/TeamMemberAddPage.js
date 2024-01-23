@@ -32,6 +32,7 @@ import {
   db,
   auth,
 } from "../../../firebase";
+import { color } from "../../styles/colors";
 
 export default function AddMembers({ route }) {
   const navigation = useNavigation();
@@ -257,7 +258,7 @@ const s = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     height: 50,
-    backgroundColor: "#EFEFEF",
+    backgroundColor: color.deletegrey,
     borderRadius: 24,
     marginTop: "5%",
   },
@@ -290,7 +291,7 @@ const s = StyleSheet.create({
   //이메일 리스트 컨테이너
   emailContainer: {
     zIndex: 1,
-    backgroundColor: "#EFEFEF",
+    backgroundColor: color.deletegrey,
     borderRadius: 24,
     marginTop: "5%",
   },
@@ -305,7 +306,7 @@ const s = StyleSheet.create({
   },
   emailAddedTitle: {
     fontSize: 12,
-    color: "#050026",
+    color: color.activated,
     fontWeight: "bold",
     marginTop: 20,
     marginLeft: 10,

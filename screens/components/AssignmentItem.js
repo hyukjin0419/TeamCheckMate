@@ -125,9 +125,7 @@ const AssignmentItem = (props) => {
                     {assignmentName}
                   </Text>
                 </View>
-                <Text style={styles.modalDueDateTextContainer}>
-                  Due Date: {dueDate}
-                </Text>
+                <Text style={styles.modalDueDateText}>Due Date: {dueDate}</Text>
                 {/* 참여 코드, 팀원 목록 표시 */}
                 <View flex={1}></View>
                 {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
@@ -192,17 +190,17 @@ const styles = StyleSheet.create({
     paddingVertical: "5%",
   },
   dueDateText: {
-    color: "#FF2868",
+    color: color.redpink,
   },
   modalAssignmentNameTextContainer: {
     flex: 1,
     marginTop: "7%",
   },
-  modalDueDateTextContainer: {
+  modalDueDateText: {
     flex: 1,
-    color: "#FF2868",
     alignSelf: "flex-start",
     marginHorizontal: "10%",
+    color: color.redpink,
   },
   assignmentNameText: {
     color: color.activated,
@@ -233,24 +231,24 @@ const styles = StyleSheet.create({
   teamReviseBtn: {
     width: WINDOW_WIDHT * 0.4,
     height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: "#050026",
+    backgroundColor: color.activated,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   teamReviseText: {
-    color: "#D9D9D9",
+    color: "white",
   },
   teamDeleteBtn: {
     width: WINDOW_WIDHT * 0.4,
     height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: "#EFEFEF",
+    backgroundColor: color.deletegrey,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   teamDeleteText: {
-    color: "#FF2868",
+    color: color.redpink,
   },
   modal: {
     flex: 1,
@@ -258,7 +256,7 @@ const styles = StyleSheet.create({
   modalVector: {
     height: 5,
     width: 50,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: color.deactivated,
     borderRadius: 10,
     marginTop: 10,
   },

@@ -18,24 +18,24 @@ import {
 import { auth } from "../../firebase";
 import { Alert } from "react-native";
 import styles from "../styles/css";
+import { color } from "../styles/colors";
 
 export default function LogInPage({ route }) {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const loginSuccess = route.params || false
+  const loginSuccess = route.params || false;
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        if(user.emailVerified) {
+        if (user.emailVerified) {
           console.log("User signed in: ", user.email);
-        }
-        else {
+        } else {
           Alert.alert("인증되지 않은 이메일입니다");
           signOut(auth);
         }
-      } 
+      }
     });
 
     return unsubscribe;
@@ -51,10 +51,9 @@ export default function LogInPage({ route }) {
         route.params.handleLoginSuccess(true);
       })
       .catch((error) => {
-        if(error.code === "auth/invalid-credential") {
+        if (error.code === "auth/invalid-credential") {
           Alert.alert("잘못된 이메일이나 비밀번호 입력했습니다");
-        }
-        else {
+        } else {
           Alert.alert("유효한 이메일과 비밀번호를 입력해 주세요");
         }
       });
@@ -92,7 +91,7 @@ export default function LogInPage({ route }) {
       <View>
         <TouchableOpacity
           onPress={handleLogin}
-          style={{ ...styles.button, backgroundColor: "#050026" }}
+          style={{ ...styles.button, backgroundColor: color.activated }}
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>Login</Text>
         </TouchableOpacity>

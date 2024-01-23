@@ -9,6 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/core";
+import { color } from "../../styles/colors";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -195,7 +196,7 @@ const TeamItem = (props) => {
                         SetTeamOptionModalVisible(false);
                       }}
                     >
-                      <Text style={styles.teamReviseText}>팀 수정</Text>
+                      <Text style={styles.teamReviseText}>수정</Text>
                     </TouchableOpacity>
                     {/* 팀 삭제 버튼 */}
                     <TouchableOpacity
@@ -203,7 +204,7 @@ const TeamItem = (props) => {
                       onPress={deleteItem}
                     >
                       {/* 터치 시 팀 삭제 */}
-                      <Text style={styles.teamDeleteText}>팀 삭제</Text>
+                      <Text style={styles.teamDeleteText}>삭제</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -231,24 +232,24 @@ const styles = StyleSheet.create({
   teamReviseBtn: {
     width: WINDOW_WIDHT * 0.4,
     height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: "#050026",
+    backgroundColor: color.activated,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   teamReviseText: {
-    color: "#D9D9D9",
+    color: "white",
   },
   teamDeleteBtn: {
     width: WINDOW_WIDHT * 0.4,
     height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: "#EFEFEF",
+    backgroundColor: color.deletegrey,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   teamDeleteText: {
-    color: "#FF2868",
+    color: color.redpink,
   },
   modal: {
     flex: 1,
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
   modalVector: {
     height: 5,
     width: 50,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: color.deactivated,
     borderRadius: 10,
     marginTop: 10,
   },

@@ -160,9 +160,7 @@ export default TeamAddPage = () => {
           </TouchableWithoutFeedback>
         </View>
         <View style={styles.descriptionContainter}>
-          <Text style={styles.description}>
-            색상을 변경할 수 있습니다
-          </Text>
+          <Text style={styles.description}>색상을 변경할 수 있습니다</Text>
         </View>
         {/* 색상 선택 버튼 */}
         <View>
@@ -423,7 +421,7 @@ const styles = StyleSheet.create({
   modalVector: {
     height: 5,
     width: 50,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: color.deactivated,
     borderRadius: 10,
     marginTop: 10,
   },

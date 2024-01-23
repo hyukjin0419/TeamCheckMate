@@ -9,11 +9,16 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
+} from "firebase/auth";
 import { auth } from "../../firebase.js";
 import { Alert } from "react-native";
 import styles from "../styles/css.js";
 import { db, doc, setDoc } from "../../firebase.js";
+import { color } from "../styles/colors.js";
 
 export default function SignInPage({ route }) {
   const navigation = useNavigation();
@@ -22,17 +27,18 @@ export default function SignInPage({ route }) {
   const appState = useRef(AppState.currentState);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
-
   useEffect(() => {
-    const unsubscribeAuthStateChanged = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        await user.reload();
-        if (user.emailVerified) {
-          console.log("User signed in:", user.email);
+    const unsubscribeAuthStateChanged = auth.onAuthStateChanged(
+      async (user) => {
+        if (user) {
+          await user.reload();
+          if (user.emailVerified) {
+            console.log("User signed in:", user.email);
+          }
         }
       }
-    });
-  
+    );
+
     const handleAppStateChange = async (nextAppState) => {
       if (
         appState.current.match(/inactive|background/) &&
@@ -46,47 +52,43 @@ export default function SignInPage({ route }) {
           }
         }
       }
-  
+
       appState.current = nextAppState;
       setAppStateVisible(appState.current);
       console.log("AppState", appState.current);
     };
-  
+
     AppState.addEventListener("change", handleAppStateChange);
-  
+
     return () => {
       unsubscribeAuthStateChanged();
-  
+
       // Check if AppState.removeEventListener is defined before calling
       if (AppState.removeEventListener) {
         AppState.removeEventListener("change", handleAppStateChange);
       }
     };
   }, [navigation]);
-  
 
   //회원가입 관련 함수
   const handleSignUp = () => {
-      createUserWithEmailAndPassword(auth, email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredentials) => {
         const user = userCredentials.user;
-        await sendEmailVerification(user)
-        .then(async () => {
-          Alert.alert('인증 이메일이 전송되었습니다');
+        await sendEmailVerification(user).then(async () => {
+          Alert.alert("인증 이메일이 전송되었습니다");
           console.log("Registered with: " + user.email);
           route.params?.handleSignUp(false);
-        })
-        
+        });
       })
-    .catch ((error) => {
-      if (error.code === "auth/email-already-in-use") {
-        Alert.alert("이 계정은 이미 존재합니다");
-      } else {
-        Alert.alert("이메일과 비밀번호 입력해 주세요");
-      }
-    })
+      .catch((error) => {
+        if (error.code === "auth/email-already-in-use") {
+          Alert.alert("이 계정은 이미 존재합니다");
+        } else {
+          Alert.alert("이메일과 비밀번호 입력해 주세요");
+        }
+      });
   };
-
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -108,9 +110,8 @@ export default function SignInPage({ route }) {
           style={styles.textInput}
           keyboardType="email-address"
           autoCapitalize="none"
-          
         />
-        
+
         {/*비밀번호 입력창*/}
         <TextInput
           placeholder=" 비밀번호"
@@ -125,7 +126,7 @@ export default function SignInPage({ route }) {
         {/*가입하기 버튼*/}
         <TouchableOpacity
           onPress={handleSignUp}
-          style={{ ...styles.button, backgroundColor: "#050026" }}
+          style={{ ...styles.button, backgroundColor: color.activated }}
         >
           <Text style={{ ...styles.buttonText, color: "white" }}>가입하기</Text>
         </TouchableOpacity>
@@ -133,4 +134,3 @@ export default function SignInPage({ route }) {
     </KeyboardAvoidingView>
   );
 }
-
