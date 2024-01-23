@@ -149,7 +149,7 @@ export default TeamUpdatePage = ({ route }) => {
         </View>
         <View>
           <Modal
-            animationType="fade"
+            // animationType="fade"
             visible={isModalVisible}
             transparent={true}
           >

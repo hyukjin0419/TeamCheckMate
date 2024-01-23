@@ -104,9 +104,11 @@ export default TeamPage = () => {
           {/* 모달 뷰 */}
           <Modal
             style={styles.modalView}
-            animationType="fade"
+            // animationType="fade"
             transparent={true}
             visible={showModal}
+            animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
+            animationOutTiming={20}
           >
             <TouchableWithoutFeedback onPress={handlePress}>
               {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}

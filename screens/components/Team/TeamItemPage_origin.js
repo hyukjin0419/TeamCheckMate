@@ -139,19 +139,21 @@ const TeamItem = (props) => {
           style={styles.modal}
           visible={TeamOptionModalVisible}
           transparent={true}
-          // animationType="fade"
+          animationType="fade"
         >
           {/* 모달창 회색 배경 */}
           <View style={styles.background}>
             {/* 팀 설정 모달창 */}
             <Modal
+              onSwipeComplete={() => SetTeamOptionModalVisible(false)}
               swipeDirection={"down"}
               animationType="slide"
               visible={TeamOptionModalVisible}
+              //모달이 아닌 영역을 터치하면 창을 닫자!
               onBackdropPress={handleTeamOptionPress}
+              //모달 뒷배경 투명도를 0으로 설정
               backdropOpacity={0}
               transparent={true}
-              onSwipeComplete={() => SetTeamOptionModalVisible(false)}
             >
               {/* 팀 설정 모달창 */}
               <View style={styles.modalView}>
@@ -199,6 +201,7 @@ const TeamItem = (props) => {
                 </View>
               </View>
             </Modal>
+            <View></View>
           </View>
         </Modal>
       </ImageBackground>
