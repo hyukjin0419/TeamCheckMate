@@ -104,7 +104,7 @@ export default TeamAddPage = ({ navigation }) => {
                 navigation.navigate("TeamPage");
               }}
             >
-              <AntDesign name="left" size={30} color="black" />
+              <AntDesign name="left" size={20} color="black" />
             </TouchableOpacity>
           </View>
           <View style={styles.headerTitleContainer}>
@@ -141,7 +141,7 @@ export default TeamAddPage = ({ navigation }) => {
               value={textInputValue}
               returnKeyType="done"
               onChangeText={onTextInputChange}
-              style={{ ...styles.colorTextInput, color: colorConfirmed }}
+              style={styles.colorTextInput}
             ></TextInput>
           </View>
           {/* 색상 선택 버튼 */}
@@ -158,7 +158,7 @@ export default TeamAddPage = ({ navigation }) => {
           </TouchableWithoutFeedback>
         </View>
         <View style={styles.descriptionContainter}>
-          <Text style={{ ...styles.description, color: colorConfirmed }}>
+          <Text style={styles.description}>
             색상을 변경할 수 있습니다
           </Text>
         </View>

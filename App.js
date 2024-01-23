@@ -15,6 +15,8 @@ import TeamAddPage from "./screens/components/Team/TeamAddPage";
 import TeamJoinPage from "./screens/components/Team/TeamJoinPage";
 import TeamUpdatePage from "./screens/components/Team/TeamUpdatePage";
 import AssignmentPage from "./screens/components/AssignmentPage";
+import AssignmentAddPage from "./screens/components/AssignmentAddPage";
+import AssignmentUpdatePage from "./screens/components/AssignmentUpdatePage";
 import SettingPage from "./screens/components/SettingPage";
 import PersonalPage from "./screens/components/PersonalPage";
 import GuidancePage from "./screens/components/GuidancePage";
@@ -59,6 +61,14 @@ function TeamPageTab() {
         component={TeamMemberAddPage}
       />
       <TeamStack.Screen name="AssignmentPage" component={AssignmentPage} />
+      <TeamStack.Screen
+        name="AssignmentAddPage"
+        component={AssignmentAddPage}
+      />
+      <TeamStack.Screen
+        name="AssignmentUpdatePage"
+        component={AssignmentUpdatePage}
+      />
     </TeamStack.Navigator>
   );
 }

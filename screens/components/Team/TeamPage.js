@@ -161,6 +161,7 @@ export default TeamPage = () => {
         {
           <FlatList
             numColumns={2}
+            showsVerticalScrollIndicator={false}
             data={teamList}
             contentContainerStyle={styles.teamListContainer}
             renderItem={({ item }) => (
