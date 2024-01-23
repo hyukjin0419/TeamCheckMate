@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
-import { db, collection, addDoc, auth, doc } from "../../../firebase";
+import { db, collection, addDoc, auth, doc, setDoc } from "../../../firebase";
 import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/core";
 
@@ -88,7 +88,7 @@ export default TeamAddPage = () => {
 
   const addTeamIdtoUser = async (userDocRef, teamDocRefID) => {
     const teamListCollectionRef = collection(userDocRef, "teamList");
-    await addDoc(teamListCollectionRef, {
+    await setDoc(doc(teamListCollectionRef, teamDocRefID), {
       teamID: teamDocRefID,
     });
   };
