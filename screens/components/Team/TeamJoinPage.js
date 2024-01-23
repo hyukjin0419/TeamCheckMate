@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
+import s from "../../styles/css";
 
 export default function TeamJoinPage() {
   const navigation = useNavigation();
@@ -52,15 +53,15 @@ export default function TeamJoinPage() {
             <AntDesign name="left" size={20} color="black" />
           </TouchableOpacity>
           <Text style={s.title}>팀 참여</Text>
-          <TouchableOpacity disabled={buttonDisabled} style={s.titleSendBtn}>
-            <Text style={{ ...s.titleSendText }}>확인</Text>
+          <TouchableOpacity disabled={buttonDisabled} style={s.titleRightBtn}>
+            <Text style={s.titleRightText}>확인</Text>
           </TouchableOpacity>
         </View>
-        <View style={s.inputContainer}>
+        <View style={styles.inputContainer}>
           <TextInput
             placeholder="참여 코드"
             onChangeText={joinCodeInputChange}
-            style={s.inputContainerText}
+            style={styles.inputContainerText}
           ></TextInput>
         </View>
       </KeyboardAvoidingView>
@@ -68,7 +69,7 @@ export default function TeamJoinPage() {
   );
 }
 
-const s = StyleSheet.create({
+const styles = StyleSheet.create({
   //화면 전체 컨테이너
   container: {
     flex: 1,
@@ -98,12 +99,12 @@ const s = StyleSheet.create({
     // backgroundColor: "yellow",
   },
   //헤더 컨테이너 오른쪽 TouchableOpacity
-  titleSendBtn: {
+  titleRightBtn: {
     flex: 1,
     // backgroundColor: "blue",
   },
   //헤더 컨테이너 오른쪽 TouchableOpacity안 Text
-  titleSendText: {
+  titleRightText: {
     fontWeight: "bold",
     fontSize: 16,
     alignSelf: "flex-end", // 오른쪽 정렬

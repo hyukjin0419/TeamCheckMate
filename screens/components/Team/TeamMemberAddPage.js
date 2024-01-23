@@ -16,7 +16,7 @@ import {
   Keyboard,
 } from "react-native";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
-import styles from "../../styles/css";
+import s from "../../styles/css";
 import * as MailComposer from "expo-mail-composer";
 import {
   getFirestore, //get db
@@ -137,24 +137,27 @@ export default function AddMembers({ route }) {
     >
       <KeyboardAvoidingView style={s.container}>
         {/* 헤더부분 */}
-        <View style={s.head}>
+        <View style={s.headContainer}>
           <TouchableOpacity
-            style={styles.headBtn}
+            style={{ ...s.headBtn, flex: 0.6 }}
             onPress={() => navigation.goBack()}
           >
             <AntDesign name="left" size={20} color="black" />
           </TouchableOpacity>
           <Text style={s.title}>팀 메이트 초대</Text>
-          <TouchableOpacity onPress={sendEmail}>
-            <Text style={{ ...s.titleSend }}>보내기</Text>
+          <TouchableOpacity
+            style={{ ...s.titleRightBtn, flex: 0.6 }}
+            onPress={sendEmail}
+          >
+            <Text style={s.titleRightText}>보내기</Text>
           </TouchableOpacity>
         </View>
 
         {/* 검색창 */}
         <View>
-          <View style={s.searchContainer}>
+          <View style={styles.searchContainer}>
             <Image
-              style={s.glass}
+              style={styles.glass}
               source={require("../../images/icons/glass_grey.png")}
             />
             <TextInput
@@ -179,13 +182,13 @@ export default function AddMembers({ route }) {
           {isSearching ? (
             /* 검색된 emailContainer */
             filteredResults.length > 0 && (
-              <View style={s.emailContainer}>
+              <View style={styles.emailContainer}>
                 <FlatList
                   data={filteredResults}
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => addEmail(item.id)}>
-                      <Text style={s.emailText}>{item.id}</Text>
+                      <Text style={styles.emailText}>{item.id}</Text>
                     </TouchableOpacity>
                   )}
                 />
@@ -195,23 +198,23 @@ export default function AddMembers({ route }) {
             /* 건너뛰기 버튼 및 새로운 배열에 추가된 이메일들 -> 초대할 이메일*/
             <View>
               <Pressable>
-                <View style={s.subBtn}>
-                  <Text style={s.subBtnText}>건너뛰기</Text>
+                <View style={styles.subBtn}>
+                  <Text style={styles.subBtnText}>건너뛰기</Text>
                 </View>
               </Pressable>
               {addedUserEmailArray.length > 0 && (
                 <View>
-                  <Text style={s.emailAddedTitle}>초대할 이메일</Text>
-                  <View style={s.emailAddedContainer}>
+                  <Text style={styles.emailAddedTitle}>초대할 이메일</Text>
+                  <View style={styles.emailAddedContainer}>
                     <FlatList
                       data={addedUserEmailArray}
                       keyExtractor={(item) => item.id.toString()}
                       renderItem={({ item }) => (
-                        <View style={s.emailAddedContainer}>
-                          <Text style={s.emailAddedText}>{item.id}</Text>
+                        <View style={styles.emailAddedContainer}>
+                          <Text style={styles.emailAddedText}>{item.id}</Text>
                           {/* 삭제 버튼 */}
                           <TouchableOpacity
-                            style={s.xIcon}
+                            style={styles.xIcon}
                             onPress={() => removeEmail(item.id)}
                           >
                             <Image
@@ -232,28 +235,7 @@ export default function AddMembers({ route }) {
   );
 }
 
-const s = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: "5%",
-    backgroundColor: "white",
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginLeft: "31%",
-  },
-  titleSend: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginLeft: "38%",
-  },
-  head: {
-    position: "relative",
-    marginTop: "18%",
-    flexDirection: "row",
-    marginBottom: "2%",
-  },
+const styles = StyleSheet.create({
   //검색창 컨테이너
   searchContainer: {
     flexDirection: "row",
