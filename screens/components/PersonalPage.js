@@ -1,24 +1,35 @@
-import {View, Text, StyleSheet} from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import * as Font from "expo-font";
+import { useEffect } from "react";
 
 const PersonalPage = () => {
-    return(
-        <View style={styles.container}>
-            <Text style={styles.text}>Personal Page</Text>
-        </View>
-    );
+  useEffect(() => {
+    const loadFonts = async () => {
+      await Font.loadAsync({
+        "SUIT-Regular": require("../../assets/fonts/SUIT-Regular.ttf"),
+      });
+    };
+    loadFonts();
+  }, []);
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>personal page</Text>
+    </View>
+  );
 };
 
 export default PersonalPage;
 
 const styles = StyleSheet.create({
-    container: {
-        flex:1,
-        alignItems: "center",
-        justifyContent: "center"
-    },
-    text: {
-        fontSize: 24,
-        fontWeight: "bold",
-        marginBottom: 16,
-    }
-})
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 50,
+    // fontWeight: "bold",
+    marginBottom: 16,
+  },
+});
