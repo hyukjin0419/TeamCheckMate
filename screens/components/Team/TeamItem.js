@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   },
   file: {
     width: WINDOW_WIDHT * 0.43,
-    height: WINDOW_HEIGHT * 0.15,
+    height: WINDOW_HEIGHT > 700 ? WINDOW_HEIGHT * 0.15 : WINDOW_HEIGHT * 0.2,
     marginHorizontal: "1%",
     marginTop: "8%",
   },
