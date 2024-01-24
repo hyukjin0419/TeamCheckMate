@@ -1,14 +1,18 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const WINDOW_WIDHT = Dimensions.get("window").width;
+const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 const commonStyles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: "5%",
+    backgroundColor: "white",
   },
   //헤더
   headContainer: {
     display: "flex",
-    marginTop: "18%",
+    marginTop: WINDOW_HEIGHT > 700 ? "18%" : "12%",
     flexDirection: "row",
     marginBottom: "2%",
   },
