@@ -15,7 +15,7 @@ const commonStyles = StyleSheet.create({
   headBtn: {
     flex: 0.5,
     alignSelf: "flex-start",
-    backgroundColor: "red",
+    // backgroundColor: "red",
   },
   //헤더에 들어가는 타이틀 -> 글꼴수에 따라 marginLeft 수정 바람.
   title: {
@@ -23,12 +23,12 @@ const commonStyles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     textAlign: "center",
-    backgroundColor: "violet",
+    // backgroundColor: "violet",
   },
   //헤더 오른쪽 버튼 (안보일 수 있음, 비율 맞추기 위해 존재)
   titleRightBtn: {
     flex: 0.5,
-    backgroundColor: "blue",
+    // backgroundColor: "blue",
   },
   titleRightText: {
     fontWeight: "bold",

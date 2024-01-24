@@ -156,26 +156,30 @@ export default function AddMembers({ route }) {
         {/* 검색창 */}
         <View>
           <View style={styles.searchContainer}>
-            <Image
-              style={styles.glass}
-              source={require("../../images/icons/glass_grey.png")}
-            />
-            <TextInput
-              value={searchEmail}
-              onChangeText={(text) => {
-                setSearchEmail(text);
-                setIsSearching(text.trim() !== "");
-              }}
-              onSubmitEditing={() => {
-                setSearchEmail("");
-                setIsSearching(false);
-              }}
-              placeholder="초대할 팀 메이트의 이메일을 입력해주세요!"
-              style={s.textInput}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              returnKeyType="done"
-            />
+            <View style={styles.iconContainer}>
+              <Image
+                style={styles.glass}
+                source={require("../../images/icons/glass_grey.png")}
+              />
+            </View>
+            <View style={styles.textInputContainer}>
+              <TextInput
+                value={searchEmail}
+                onChangeText={(text) => {
+                  setSearchEmail(text);
+                  setIsSearching(text.trim() !== "");
+                }}
+                onSubmitEditing={() => {
+                  setSearchEmail("");
+                  setIsSearching(false);
+                }}
+                placeholder="초대할 팀 메이트의 이메일을 입력해주세요!"
+                style={styles.textInput}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                returnKeyType="done"
+              />
+            </View>
           </View>
 
           {/* 검색중일때 이메일 매치해서 보여주기 */}
@@ -238,30 +242,42 @@ export default function AddMembers({ route }) {
 const styles = StyleSheet.create({
   //검색창 컨테이너
   searchContainer: {
+    display: "flex",
     flexDirection: "row",
+    alignContent: "center",
     height: 50,
-    backgroundColor: color.deletegrey,
+    backgroundColor: "#E4E4E4",
     borderRadius: 24,
     marginTop: "5%",
   },
-  //돋보기
-  glass: {
+  //돋보기 컨테이너
+  iconContainer: {
+    flex: 1,
     alignSelf: "center",
     marginLeft: "5%",
   },
-  //검색창 입력
-  textInput: {
-    flex: 0.9,
+  //돋보기
+  glass: {},
+  //검색창 컨테이너
+  textInputContainer: {
+    flexDirection: "row",
+    flex: 23,
     alignSelf: "center",
     marginLeft: "3%",
+  },
+  //검색창 입력
+  textInput: {
+    // backgroundColor: "green",
+    flex: 0.93,
+    fontSize: 14,
   },
   //건너뛰기 버튼 컨테이너
   subBtn: {
     borderBottomWidth: 1,
     borderBottomColor: "black",
-    paddingBottom: 5,
+    paddingBottom: 2,
     alignSelf: "center",
-    width: 50,
+    width: 48,
     marginTop: 20,
   },
   //건너뛰기 버튼 Text
@@ -273,7 +289,7 @@ const styles = StyleSheet.create({
   //이메일 리스트 컨테이너
   emailContainer: {
     zIndex: 1,
-    backgroundColor: color.deletegrey,
+    backgroundColor: "#E4E4E4",
     borderRadius: 24,
     marginTop: "5%",
   },
