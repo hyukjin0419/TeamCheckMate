@@ -7,6 +7,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import {
@@ -60,43 +62,49 @@ export default function LogInPage({ route }) {
   };
 
   return (
-    <KeyboardAvoidingView style={s.container}>
-      <View style={s.headContainer}>
-        <TouchableOpacity
-          style={s.headBtn}
-          onPress={() => navigation.navigate("InitialPage")}
-        >
-          <AntDesign name="left" size={20} color="black" />
-        </TouchableOpacity>
-        <Text style={s.title}>로그인</Text>
-        <View style={s.titleRightBtn}></View>
-      </View>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
+      <KeyboardAvoidingView style={s.container}>
+        <View style={s.headContainer}>
+          <TouchableOpacity
+            style={s.headBtn}
+            onPress={() => navigation.navigate("InitialPage")}
+          >
+            <AntDesign name="left" size={20} color="black" />
+          </TouchableOpacity>
+          <Text style={s.title}>로그인</Text>
+          <View style={s.titleRightBtn}></View>
+        </View>
 
-      <View style={s.inputTextContainer}>
-        <TextInput
-          placeholder="이메일"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={s.textInput}
-          keyboardType="email-address"
-        />
-        <TextInput
-          placeholder="비밀번호"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          style={s.textInput}
-          secureTextEntry
-        />
-      </View>
-      <View>
-        <TouchableOpacity
-          onPress={handleLogin}
-          style={{ ...s.button, backgroundColor: color.activated }}
-        >
-          <Text style={{ ...s.buttonText, color: "white" }}>로그인</Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+        <View style={s.inputTextContainer}>
+          <TextInput
+            placeholder="이메일"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            style={s.textInput}
+            keyboardType="email-address"
+          />
+          <TextInput
+            placeholder="비밀번호"
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            style={s.textInput}
+            secureTextEntry
+          />
+        </View>
+        <View>
+          <TouchableOpacity
+            onPress={handleLogin}
+            style={{ ...s.button, backgroundColor: color.activated }}
+          >
+            <Text style={{ ...s.buttonText, color: "white" }}>로그인</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }

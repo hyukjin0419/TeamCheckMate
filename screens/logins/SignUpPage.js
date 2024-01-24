@@ -7,6 +7,8 @@ import {
   View,
   TouchableOpacity,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import {
@@ -98,47 +100,53 @@ export default function SignInPage({ route }) {
   };
 
   return (
-    <KeyboardAvoidingView style={s.container}>
-      {/*head 부분*/}
-      <View style={s.headContainer}>
-        <TouchableOpacity style={s.headBtn} onPress={goingBack}>
-          <AntDesign name="left" size={20} color="black" />
-        </TouchableOpacity>
-        <Text style={s.title}>가입하기</Text>
-        <View style={s.titleRightBtn}></View>
-      </View>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
+      <KeyboardAvoidingView style={s.container}>
+        {/*head 부분*/}
+        <View style={s.headContainer}>
+          <TouchableOpacity style={s.headBtn} onPress={goingBack}>
+            <AntDesign name="left" size={20} color="black" />
+          </TouchableOpacity>
+          <Text style={s.title}>가입하기</Text>
+          <View style={s.titleRightBtn}></View>
+        </View>
 
-      {/*입력창*/}
-      <View style={s.inputTextContainer}>
-        {/*이메일 입력창*/}
-        <TextInput
-          placeholder=" 이메일"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={s.textInput}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+        {/*입력창*/}
+        <View style={s.inputTextContainer}>
+          {/*이메일 입력창*/}
+          <TextInput
+            placeholder=" 이메일"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            style={s.textInput}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
 
-        {/*비밀번호 입력창*/}
-        <TextInput
-          placeholder=" 비밀번호"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          style={s.textInput}
-          secureTextEntry
-        />
-      </View>
-      {/*버튼 Container*/}
-      <View>
-        {/*가입하기 버튼*/}
-        <TouchableOpacity
-          onPress={handleSignUp}
-          style={{ ...s.button, backgroundColor: color.activated }}
-        >
-          <Text style={{ ...s.buttonText, color: "white" }}>가입하기</Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+          {/*비밀번호 입력창*/}
+          <TextInput
+            placeholder=" 비밀번호"
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            style={s.textInput}
+            secureTextEntry
+          />
+        </View>
+        {/*버튼 Container*/}
+        <View>
+          {/*가입하기 버튼*/}
+          <TouchableOpacity
+            onPress={handleSignUp}
+            style={{ ...s.button, backgroundColor: color.activated }}
+          >
+            <Text style={{ ...s.buttonText, color: "white" }}>가입하기</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
