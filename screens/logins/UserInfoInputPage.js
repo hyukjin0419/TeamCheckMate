@@ -12,6 +12,7 @@ import { Alert } from "react-native";
 import s from "../styles/css.js";
 import { auth, db, doc, setDoc } from "../../firebase.js";
 import {
+  deleteUser,
   onAuthStateChanged,
   signInWithCredential,
   signOut,
@@ -69,6 +70,8 @@ export default function UserInfoInputPage({ route }) {
   };
 
   const previousPage = () => {
+    const user = auth.currentUser;
+    deleteUser(user);
     signOut(auth);
   };
 

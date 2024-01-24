@@ -11,6 +11,7 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import {
   createUserWithEmailAndPassword,
+  deleteUser,
   sendEmailVerification,
   signOut,
 } from "firebase/auth";
@@ -90,13 +91,19 @@ export default function SignInPage({ route }) {
       });
   };
 
+  const goingBack = () => {
+    const user = auth.currentUser;
+    deleteUser(user);
+    navigation.goBack()
+  }
+
   return (
     <KeyboardAvoidingView style={s.container}>
       {/*head 부분*/}
       <View style={s.headContainer}>
         <TouchableOpacity
           style={s.headBtn}
-          onPress={() => navigation.navigate("InitialPage")}
+          onPress={goingBack}
         >
           <AntDesign name="left" size={20} color="black" />
         </TouchableOpacity>
