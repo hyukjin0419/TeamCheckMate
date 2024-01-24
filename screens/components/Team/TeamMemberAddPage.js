@@ -87,6 +87,7 @@ export default function AddMembers({ route }) {
   // console.log(filteredResults);
 
   //4. 검색 후 이메일 누를시 그 이메일 발송이메일에 추가
+  //console.log를 보기 위해 조건문 추가 -> 기능상 제거해도 무관함
   const addEmail = (props) => {
     const isDuplicate = addedUserEmailArray.some((item) => item.id === props);
 
@@ -97,9 +98,10 @@ export default function AddMembers({ route }) {
       });
       console.log("이메일 추가 성공");
     } else {
-      Alert.alert("이미 추가된 이메일입니다.");
       console.log("이미 추가된 이메일입니다.");
     }
+    setIsSearching(false);
+    setSearchEmail("");
     console.log("현재 추가된: ", addedUserEmailArray);
   };
 
@@ -280,7 +282,8 @@ const styles = StyleSheet.create({
     paddingBottom: 2,
     alignSelf: "center",
     width: 48,
-    marginTop: 20,
+    marginTop: 25,
+    marginBottom: 10,
   },
   //건너뛰기 버튼 Text
   subBtnText: {
@@ -309,6 +312,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 20,
     marginLeft: 10,
+    marginBottom: 20,
   },
   //초대할 이메일 리스트 컨테이너
   emailAddedContainer: {
@@ -317,7 +321,6 @@ const styles = StyleSheet.create({
   //초대할 이메일 텍스트
   emailAddedText: {
     fontSize: 14,
-    marginTop: 10,
     marginLeft: 10,
     marginBottom: 10,
   },
@@ -325,5 +328,6 @@ const styles = StyleSheet.create({
   xIcon: {
     alignSelf: "center",
     marginLeft: 5,
+    marginBottom: 10,
   },
 });
