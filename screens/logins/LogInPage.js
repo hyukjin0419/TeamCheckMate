@@ -26,7 +26,7 @@ export default function LogInPage({ route }) {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const loginSuccess = route.params || false;
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -45,6 +45,10 @@ export default function LogInPage({ route }) {
 
   //로그인 관련 함수
   const handleLogin = () => {
+    if(isButtonClicked) {
+      return;
+    }
+    setIsButtonClicked(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredentials) => {
         const user = userCredentials.user;
@@ -55,8 +59,10 @@ export default function LogInPage({ route }) {
       .catch((error) => {
         if (error.code === "auth/invalid-credential") {
           Alert.alert("잘못된 이메일이나 비밀번호 입력했습니다");
+          setIsButtonClicked(false);
         } else {
           Alert.alert("유효한 이메일과 비밀번호를 입력해 주세요");
+          setIsButtonClicked(false);
         }
       });
   };
