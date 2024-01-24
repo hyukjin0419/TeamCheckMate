@@ -236,6 +236,7 @@ const styles = StyleSheet.create({
   },
   teamReviseText: {
     color: "white",
+    fontFamily: "SUIT-Medium",
   },
   teamDeleteBtn: {
     width: WINDOW_WIDHT * 0.4,
@@ -247,6 +248,7 @@ const styles = StyleSheet.create({
   },
   teamDeleteText: {
     color: color.redpink,
+    fontFamily: "SUIT-Medium",
   },
   modal: {
     flex: 1,

@@ -127,15 +127,15 @@ export default TeamPage = () => {
                 </View>
 
                 {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
-                <View style={styles.TwoBtnContainer} onPress={handlePress}>
+                <View style={styles.twoBtnContainer} onPress={handlePress}>
                   {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
                   <TouchableOpacity
                     onPress={() => {
                       navigation.navigate("TeamAddPage"), setShowModal(false);
                     }}
                   >
-                    <View style={styles.AddClassBtn}>
-                      <Text>팀 등록</Text>
+                    <View style={styles.addClassBtn}>
+                      <Text style={styles.addClassBtnText}>팀 등록</Text>
                     </View>
                   </TouchableOpacity>
                   {/* 팀 참여하기 버튼: 팀 참여하기 페이지로 넘어가는 버튼 */}
@@ -144,8 +144,8 @@ export default TeamPage = () => {
                       navigation.navigate("TeamJoinPage"), setShowModal(false);
                     }}
                   >
-                    <View style={styles.JoinClassBtn}>
-                      <Text>팀 참여하기</Text>
+                    <View style={styles.joinClassBtn}>
+                      <Text style={styles.addClassBtnText}>팀 참여하기</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -217,21 +217,22 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     paddingHorizontal: "5%",
   },
-  TwoBtnContainer: {
+  twoBtnContainer: {
     flex: 1,
     alignItems: "flex-end",
     justifyContent: "flex-start",
   },
-  AddClassBtn: {
+  addClassBtn: {
     backgroundColor: "white",
     padding: 10,
     borderRadius: 20,
     marginBottom: "2%",
   },
-  AddBtnText: {
+  addClassBtnText: {
+    fontFamily: "SUIT-Regular",
     fontSize: 14,
   },
-  JoinClassBtn: {
+  joinClassBtn: {
     backgroundColor: "white",
     padding: 10,
     borderRadius: 20,

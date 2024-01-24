@@ -72,7 +72,7 @@ export default function LogInPage({ route }) {
         <View style={s.titleRightBtn}></View>
       </View>
 
-      <View style={s.textBox}>
+      <View style={s.inputTextContainer}>
         <TextInput
           placeholder="이메일"
           autoCapitalize="none"
@@ -94,7 +94,7 @@ export default function LogInPage({ route }) {
           onPress={handleLogin}
           style={{ ...s.button, backgroundColor: color.activated }}
         >
-          <Text style={{ ...s.buttonText, color: "white" }}>Login</Text>
+          <Text style={{ ...s.buttonText, color: "white" }}>로그인</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

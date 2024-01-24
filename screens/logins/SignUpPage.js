@@ -94,17 +94,14 @@ export default function SignInPage({ route }) {
   const goingBack = () => {
     const user = auth.currentUser;
     deleteUser(user);
-    navigation.goBack()
-  }
+    navigation.goBack();
+  };
 
   return (
     <KeyboardAvoidingView style={s.container}>
       {/*head 부분*/}
       <View style={s.headContainer}>
-        <TouchableOpacity
-          style={s.headBtn}
-          onPress={goingBack}
-        >
+        <TouchableOpacity style={s.headBtn} onPress={goingBack}>
           <AntDesign name="left" size={20} color="black" />
         </TouchableOpacity>
         <Text style={s.title}>가입하기</Text>
@@ -112,7 +109,7 @@ export default function SignInPage({ route }) {
       </View>
 
       {/*입력창*/}
-      <View style={s.textBox}>
+      <View style={s.inputTextContainer}>
         {/*이메일 입력창*/}
         <TextInput
           placeholder=" 이메일"
