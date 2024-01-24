@@ -64,6 +64,7 @@ export default function AddMembers({ route }) {
     });
     setUserEmailArray(list);
   };
+
   //2.처음 화면 렌더링시 파이어 베이스에서 이메일 가져오기
   useEffect(() => {
     getUsers();

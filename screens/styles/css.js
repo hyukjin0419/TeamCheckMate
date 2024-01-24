@@ -5,7 +5,6 @@ import { StyleSheet, Dimensions } from "react-native";
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-
 export const css = () => {
   useEffect(() => {
     const loadFonts = async () => {
@@ -57,11 +56,11 @@ const commonStyles = StyleSheet.create({
   },
   //로그인 화면에서 쓰이는 textBox
   inputTextContainer: {
-    marginTop: "5%",
+    marginTop: "%",
   },
   //로그인 화면에서 쓰이는 textInput
   textInput: {
-    margin: "3%",
+    marginTop: "8%",
     fontSize: 16,
     borderBottomColor: "#050026",
     borderBottomWidth: 2,
@@ -74,7 +73,7 @@ const commonStyles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: "5%",
     marginBottom: "3%",
-    marginTop: "7%",
+    marginTop: "11%",
   },
   //버튼안 text 기본 디자인
   buttonText: {
@@ -85,6 +84,7 @@ const commonStyles = StyleSheet.create({
   },
   //가입하기 버튼 & 건너뛰기 버튼처럼 메인 버튼 밑에 있는 작은 글꼴 디자인
   subButton: {
+    marginTop: "2%",
     borderBottomWidth: 0.8,
     padding: 1,
     alignSelf: "center",
