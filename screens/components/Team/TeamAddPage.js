@@ -26,6 +26,7 @@ export default TeamAddPage_origin = () => {
   const navigation = useNavigation();
   //회원정보 가져오기
   const user = auth.currentUser;
+  //가져온 정보에서 이메일 빼서 저장하기
   const email = user.email;
 
   //색상 선택  띄우기/숨기기 (초기값: 숨기기)
@@ -90,7 +91,7 @@ export default TeamAddPage_origin = () => {
         teamID: teamDocRef.id,
       });
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error("TeamAddPage: Error adding document: ", e);
     }
   };
 
