@@ -221,8 +221,10 @@ export default function AddMembers({ route }) {
                             style={styles.xIcon}
                             onPress={() => removeEmail(item.id)}
                           >
-                            <Image
-                              source={require("../../images/icons/x.png")}
+                            <AntDesign
+                              name="closecircle"
+                              size={15}
+                              color="black"
                             />
                           </TouchableOpacity>
                         </View>
@@ -256,7 +258,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginLeft: "5%",
   },
-  //돋보기
+  //돋보기 아이콘
   glass: {},
   //검색창 컨테이너
   textInputContainer: {
@@ -293,15 +295,14 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginTop: "5%",
   },
-  emailPressed: {
-    backgroundColor: "red",
-  },
   //이메일 리스트 컨테이너 안 이메일 Text
   emailText: {
     padding: 15,
     justifyContent: "center",
     marginLeft: "3%",
   },
+  // 추가된 이메일 보여주는 창
+  //초대할 이메일 (제목)
   emailAddedTitle: {
     fontSize: 12,
     color: color.activated,
@@ -309,16 +310,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginLeft: 10,
   },
+  //초대할 이메일 리스트 컨테이너
   emailAddedContainer: {
     flexDirection: "row",
   },
+  //초대할 이메일 텍스트
   emailAddedText: {
     fontSize: 14,
     marginTop: 10,
     marginLeft: 10,
     marginBottom: 10,
   },
+  //삭제 아이콘 컨테이너
   xIcon: {
     alignSelf: "center",
+    marginLeft: 5,
   },
 });
