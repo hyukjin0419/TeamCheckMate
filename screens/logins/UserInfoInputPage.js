@@ -124,7 +124,7 @@ export default function UserInfoInputPage({ route }) {
           onPress={uploadInformation}
           style={{ ...s.button, backgroundColor: color.activated }}
         >
-          <Text style={{ ...s.buttonText, color: "white" }}>가입하기</Text>
+          <Text style={{ ...s.buttonText, color: "white" }}>확인</Text>
         </TouchableOpacity>
         {/*가입하기 버튼*/}
         <TouchableOpacity onPress={skipInput} style={s.subButton}>

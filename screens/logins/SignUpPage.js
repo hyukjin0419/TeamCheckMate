@@ -150,7 +150,7 @@ export default function SignInPage({ route }) {
             onPress={handleSignUp}
             style={{ ...s.button, backgroundColor: color.activated }}
           >
-            <Text style={{ ...s.buttonText, color: "white" }}>가입하기</Text>
+            <Text style={{ ...s.buttonText, color: "white" }}>확인</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
