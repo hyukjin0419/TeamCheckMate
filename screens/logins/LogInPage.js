@@ -101,7 +101,7 @@ export default function LogInPage({ route }) {
             onPress={handleLogin}
             style={{ ...s.button, backgroundColor: color.activated }}
           >
-            <Text style={{ ...s.buttonText, color: "white" }}>로그인</Text>
+            <Text style={{ ...s.buttonText, color: "white" }}>확인</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
