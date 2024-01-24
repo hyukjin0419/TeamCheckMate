@@ -26,6 +26,7 @@ export default function SignInPage({ route }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const appState = useRef(AppState.currentState);
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
   const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   useEffect(() => {
@@ -73,6 +74,10 @@ export default function SignInPage({ route }) {
 
   //회원가입 관련 함수
   const handleSignUp = () => {
+    if(isButtonClicked) {
+      return;
+    }
+    setIsButtonClicked(true);
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredentials) => {
         const user = userCredentials.user;
@@ -85,8 +90,10 @@ export default function SignInPage({ route }) {
       .catch((error) => {
         if (error.code === "auth/email-already-in-use") {
           Alert.alert("이 계정은 이미 존재합니다");
+          setIsButtonClicked(false);
         } else {
           Alert.alert("이메일과 비밀번호 입력해 주세요");
+          setIsButtonClicked(false);
         }
       });
   };
