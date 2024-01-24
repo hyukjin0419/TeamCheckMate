@@ -13,7 +13,7 @@ const PersonalPage = () => {
   }, []);
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>personal page</Text>
+      <Text style={styles.text}>Personal Page</Text>
     </View>
   );
 };
