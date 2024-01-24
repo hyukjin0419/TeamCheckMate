@@ -87,6 +87,7 @@ export default function AddMembers({ route }) {
   // console.log(filteredResults);
 
   //4. 검색 후 이메일 누를시 그 이메일 발송이메일에 추가
+  //console.log를 보기 위해 조건문 추가 -> 기능상 제거해도 무관함
   const addEmail = (props) => {
     const isDuplicate = addedUserEmailArray.some((item) => item.id === props);
 
@@ -97,9 +98,10 @@ export default function AddMembers({ route }) {
       });
       console.log("이메일 추가 성공");
     } else {
-      Alert.alert("이미 추가된 이메일입니다.");
       console.log("이미 추가된 이메일입니다.");
     }
+    setIsSearching(false);
+    setSearchEmail("");
     console.log("현재 추가된: ", addedUserEmailArray);
   };
 
@@ -221,8 +223,10 @@ export default function AddMembers({ route }) {
                             style={styles.xIcon}
                             onPress={() => removeEmail(item.id)}
                           >
-                            <Image
-                              source={require("../../images/icons/x.png")}
+                            <AntDesign
+                              name="closecircle"
+                              size={15}
+                              color="black"
                             />
                           </TouchableOpacity>
                         </View>
@@ -256,7 +260,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginLeft: "5%",
   },
-  //돋보기
+  //돋보기 아이콘
   glass: {},
   //검색창 컨테이너
   textInputContainer: {
@@ -278,7 +282,8 @@ const styles = StyleSheet.create({
     paddingBottom: 2,
     alignSelf: "center",
     width: 48,
-    marginTop: 20,
+    marginTop: 25,
+    marginBottom: 10,
   },
   //건너뛰기 버튼 Text
   subBtnText: {
@@ -293,32 +298,36 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginTop: "5%",
   },
-  emailPressed: {
-    backgroundColor: "red",
-  },
   //이메일 리스트 컨테이너 안 이메일 Text
   emailText: {
     padding: 15,
     justifyContent: "center",
     marginLeft: "3%",
   },
+  // 추가된 이메일 보여주는 창
+  //초대할 이메일 (제목)
   emailAddedTitle: {
     fontSize: 12,
     color: color.activated,
     fontWeight: "bold",
     marginTop: 20,
     marginLeft: 10,
+    marginBottom: 20,
   },
+  //초대할 이메일 리스트 컨테이너
   emailAddedContainer: {
     flexDirection: "row",
   },
+  //초대할 이메일 텍스트
   emailAddedText: {
     fontSize: 14,
-    marginTop: 10,
     marginLeft: 10,
     marginBottom: 10,
   },
+  //삭제 아이콘 컨테이너
   xIcon: {
     alignSelf: "center",
+    marginLeft: 5,
+    marginBottom: 10,
   },
 });
