@@ -23,6 +23,7 @@ import SchedulePage from "./screens/components/SchedulePage";
 import TeamMemberAddPage from "./screens/components/Team/TeamMemberAddPage";
 import UserInfoInputPage from "./screens/logins/UserInfoInputPage";
 import { getDoc } from "firebase/firestore";
+import * as Font from "expo-font";
 
 const Stack = createNativeStackNavigator();
 // - 스택 형태로 화면 전환을 관리한다
@@ -99,6 +100,16 @@ function SettingPageTab() {
 }
 
 export default function App() {
+  //font 불러오기
+  useEffect(() => {
+    const loadFonts = async () => {
+      await Font.loadAsync({
+        "SUIT-Regular": require("./assets/fonts/SUIT-Regular.ttf"),
+        "SUIT-Medium": require("./assets/fonts/SUIT-Medium.ttf"),
+      });
+    };
+    loadFonts();
+  }, []);
   //로그인이 되었는지 저장하는 변수
   const [isLogIn, setIsLogIn] = useState(false);
   const [userEmail, setUserEmail] = useState("");
@@ -189,16 +200,17 @@ export default function App() {
   };
 
   // if loading is true, show loading image
-  if(loading) {
+  if (loading) {
     return (
-      <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-        <Image style={{height: "70%", width: "70%"}} source={require("./screens/images/loading.gif")} />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Image
+          style={{ height: "70%", width: "70%" }}
+          source={require("./screens/images/loading.gif")}
+        />
       </View>
     );
-  }
-
-  else {
-      //로그인 안되어 있을때 실행화면
+  } else {
+    //로그인 안되어 있을때 실행화면
     if (!isLogIn) {
       return (
         <NavigationContainer>

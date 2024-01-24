@@ -127,24 +127,11 @@ export default TeamAddPage_origin = () => {
             }}
           >
             <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
-              확인
+              다음
             </Text>
           </TouchableOpacity>
         </View>
 
-        <View>
-          <TouchableOpacity
-            disabled={buttonDisabled}
-            style={styles.confirmBtn}
-            onPress={() => {
-              addTeamItem();
-            }}
-          >
-            <Text style={{ ...styles.headerText, color: confirmBtnColor }}>
-              확인
-            </Text>
-          </TouchableOpacity>
-        </View>
         {/* 팀 이름 입력란과 색상 선택 버튼*/}
         <View
           style={{
@@ -174,9 +161,7 @@ export default TeamAddPage_origin = () => {
             </View>
           </TouchableWithoutFeedback>
         </View>
-        <View style={styles.descriptionContainter}>
-          <Text style={styles.description}>색상을 변경할 수 있습니다</Text>
-        </View>
+
         {/* 색상 선택 버튼 */}
         <View>
           {/* 색상 팔레트 모달창 회색 배경 */}
@@ -386,13 +371,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     //backgroundColor: "blue",
     borderBottomWidth: 2,
+    marginTop: "3%",
   },
   colorTextInput: {
     height: 50,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "500",
     marginLeft: "1%",
-    //marginTop: "5%",
+    fontFamily: "SUIT-Regular",
     paddingTop: "2%",
   },
   modalItemContainter: {
@@ -480,7 +466,7 @@ const styles = StyleSheet.create({
   triangle: {
     width: 10,
     height: 10,
-    marginLeft: "3%",
+    marginLeft: 10,
     marginRight: "5%",
   },
   circleContainer: {
