@@ -12,6 +12,8 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { useState, useEffect } from "react";
+import * as Font from "expo-font";
+import s from "../../styles/css";
 import { useFocusEffect } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
 import {
@@ -91,41 +93,38 @@ export default TeamPage = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={s.container}>
       <StatusBar style={"dark"}></StatusBar>
-      <View style={styles.addBtnContainter}>
-        {/* 팀 추가에 점근할 수 있는 버튼 */}
-        <TouchableOpacity style={styles.addBtnContainter} onPress={handlePress}>
-          <Image
-            style={styles.addOrCloseBtn}
-            source={require("../../images/ClassAddBtn.png")}
-          ></Image>
+      <View style={s.headContainer}></View>
+      {/* 팀 추가에 점근할 수 있는 버튼 */}
+      <TouchableOpacity style={styles.AddBtnContainer} onPress={handlePress}>
+        <Image
+          style={styles.addOrCloseBtn}
+          source={require("../../images/ClassAddBtn.png")}
+        ></Image>
 
-          {/* 모달 뷰 */}
-          <Modal
-            style={styles.modalView}
-            // animationType="fade"
-            transparent={true}
-            visible={showModal}
-            animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
-            animationOutTiming={20}
-          >
-            <TouchableWithoutFeedback onPress={handlePress}>
-              {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
-              <View style={styles.modalView}>
-                <View style={styles.addBtnContainter}>
-                  {/* 엑스 버튼 */}
-                  <TouchableOpacity
-                    style={styles.addBtnContainter}
-                    onPress={handlePress}
-                  >
-                    <Image
-                      style={styles.addOrCloseBtn}
-                      source={require("../../images/CloseClassAddBtn.png")}
-                    ></Image>
-                  </TouchableOpacity>
-                </View>
-
+        {/* 모달 뷰 */}
+        <Modal
+          style={styles.modalView}
+          // animationType="fade"
+          transparent={true}
+          visible={showModal}
+          animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
+          animationOutTiming={20}
+        >
+          <TouchableWithoutFeedback onPress={handlePress}>
+            {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
+            <View style={styles.modalView}>
+              {/* 엑스 버튼 */}
+              <TouchableOpacity
+                style={styles.AddBtnContainer}
+                onPress={handlePress}
+              >
+                <Image
+                  style={styles.addOrCloseBtn}
+                  source={require("../../images/CloseClassAddBtn.png")}
+                ></Image>
+              </TouchableOpacity>
                 {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
                 <View style={styles.twoBtnContainer} onPress={handlePress}>
                   {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
@@ -148,38 +147,32 @@ export default TeamPage = () => {
                       <Text style={styles.addClassBtnText}>팀 참여하기</Text>
                     </View>
                   </TouchableOpacity>
-                </View>
-                {/* 버튼 위치 맞추기 위한 style */}
-                <View flex={1}></View>
-                <View height="10%"></View>
               </View>
-            </TouchableWithoutFeedback>
-          </Modal>
-        </TouchableOpacity>
-      </View>
-
+              {/* 버튼 위치 맞추기 위한 style */}
+              <View flex={1}></View>
+              <View height="10%"></View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      </TouchableOpacity>
       {/* 팀 파일 렌더링하는 코드 */}
       {/* 저장된 팀 리스트를 TeamItem페이지로 보내어서 생성하여 생성된 TeamIteam들을 TeamPage화면에 렌더링*/}
-      <View style={styles.classContainer}>
-        {
-          <FlatList
-            numColumns={2}
-            showsVerticalScrollIndicator={false}
-            data={teamList}
-            contentContainerStyle={styles.teamListContainer}
-            renderItem={({ item }) => (
-              <TeamItem
-                title={item.title}
-                id={item.id}
-                fileColor={item.fileImage}
-                deleteTeamItem={deleteTeamItem}
-                //getTeamList={getTeamList}
-              ></TeamItem>
-            )}
-            keyExtractor={(item) => item.id}
-          />
-        }
-      </View>
+      <FlatList
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        data={teamList}
+        contentContainerStyle={styles.teamListContainer}
+        renderItem={({ item }) => (
+          <TeamItem
+            title={item.title}
+            id={item.id}
+            fileColor={item.fileImage}
+            deleteTeamItem={deleteTeamItem}
+            //getTeamList={getTeamList}
+          ></TeamItem>
+        )}
+        keyExtractor={(item) => item.id}
+      />
     </View>
   );
 };
@@ -190,22 +183,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: "5%",
     backgroundColor: "white",
   },
-  classContainer: {
-    flex: 2,
-    //backgroundColor: "grey",
-    alignItems: "center",
-    flexWrap: "wrap",
-  },
   teamListContainer: {
     //backgroundColor: "red",
     width: WINDOW_WIDHT * 0.9,
+    alignItems: "center",
+    justifyContent: "space-between",
+    alignSelf: "center",
   },
-  addBtnContainter: {
-    flex: 0.3,
-    //backgroundColor: "teal",
+  AddBtnContainer: {
     alignItems: "flex-end",
-    justifyContent: "flex-end",
-    marginBottom: "2%",
+    paddingVertical: "1%",
   },
   addOrCloseBtn: {
     width: 40,
