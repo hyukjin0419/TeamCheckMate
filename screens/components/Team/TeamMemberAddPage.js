@@ -49,8 +49,12 @@ export default function AddMembers({ route }) {
   const [isSearching, setIsSearching] = useState(false);
   //사용자가 이메일 선택시 선택한 이메일 새로운 배열에 저장하기 위한 배열
   const [addedUserEmailArray, setAddedUserEmailArray] = useState([]);
-  //현재 로그인되 유저 정보
+  //현재 로그인된 유저 정보
   const user = auth.currentUser;
+  //보내기 버튼 활성||비활성
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  //확인 버튼 상태 (초기값:비활성화 상태)
+  const [buttonDisabled, setButtonDisabled] = useState(true);
 
   //1. 파이어 베이스에서 이메일 가져오는 함수 (자신의 이메일은 가져오지 x)
   const getUsers = async () => {
@@ -140,19 +144,7 @@ export default function AddMembers({ route }) {
       <KeyboardAvoidingView style={s.container}>
         {/* 헤더부분 */}
         <View style={s.headContainer}>
-          <TouchableOpacity
-            style={{ ...s.headBtn, flex: 0.6 }}
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="black" />
-          </TouchableOpacity>
           <Text style={s.title}>팀 메이트 초대</Text>
-          <TouchableOpacity
-            style={{ ...s.titleRightBtn, flex: 0.6 }}
-            onPress={sendEmail}
-          >
-            <Text style={s.titleRightText}>보내기</Text>
-          </TouchableOpacity>
         </View>
 
         {/* 검색창 */}
@@ -161,7 +153,11 @@ export default function AddMembers({ route }) {
             <View style={styles.iconContainer}>
               <Image
                 style={styles.glass}
-                source={require("../../images/icons/glass_grey.png")}
+                source={
+                  isSearching
+                    ? require("../../images/icons/glass_navy.png")
+                    : require("../../images/icons/glass_grey.png")
+                }
               />
             </View>
             <View style={styles.textInputContainer}>
@@ -190,6 +186,7 @@ export default function AddMembers({ route }) {
             filteredResults.length > 0 && (
               <View style={styles.emailContainer}>
                 <FlatList
+                  style={styles.emailTextContainer}
                   data={filteredResults}
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={({ item }) => (
@@ -202,39 +199,55 @@ export default function AddMembers({ route }) {
             )
           ) : (
             /* 건너뛰기 버튼 및 새로운 배열에 추가된 이메일들 -> 초대할 이메일*/
+
             <View>
-              <Pressable>
-                <View style={styles.subBtn}>
-                  <Text style={styles.subBtnText}>건너뛰기</Text>
-                </View>
-              </Pressable>
               {addedUserEmailArray.length > 0 && (
                 <View>
                   <Text style={styles.emailAddedTitle}>초대할 이메일</Text>
-                  <View style={styles.emailAddedContainer}>
-                    <FlatList
-                      data={addedUserEmailArray}
-                      keyExtractor={(item) => item.id.toString()}
-                      renderItem={({ item }) => (
-                        <View style={styles.emailAddedContainer}>
-                          <Text style={styles.emailAddedText}>{item.id}</Text>
-                          {/* 삭제 버튼 */}
-                          <TouchableOpacity
-                            style={styles.xIcon}
-                            onPress={() => removeEmail(item.id)}
-                          >
-                            <AntDesign
-                              name="closecircle"
-                              size={15}
-                              color="black"
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      )}
-                    />
-                  </View>
+                  <FlatList
+                    data={addedUserEmailArray}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                      <View style={styles.emailAddedContainer}>
+                        <Text style={styles.emailAddedText}>{item.id}</Text>
+                        {/* 삭제 버튼 */}
+                        <TouchableOpacity
+                          style={styles.xIcon}
+                          onPress={() => removeEmail(item.id)}
+                        >
+                          <AntDesign
+                            name="closecircle"
+                            size={15}
+                            color="black"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  />
                 </View>
               )}
+              <View style={s.twoBtnContainer}>
+                <TouchableOpacity
+                  style={{
+                    ...s.twoBtnContainerLeft,
+                    backgroundColor:
+                      addedUserEmailArray.length > 0
+                        ? "#050026"
+                        : confirmBtnColor,
+                  }}
+                  onPress={sendEmail}
+                >
+                  <Text style={s.twoBtnContainerLeftText}>보내기</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={s.twoBtnContainerRight}
+                  onPress={() => {
+                    navigation.navigate("TeamPage");
+                  }}
+                >
+                  <Text style={s.twoBtnContainerRightText}>건너뛰기</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
         </View>
@@ -250,7 +263,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignContent: "center",
     height: 50,
-    backgroundColor: "#E4E4E4",
+    backgroundColor: "#EFEFEF",
     borderRadius: 24,
     marginTop: "5%",
   },
@@ -274,35 +287,26 @@ const styles = StyleSheet.create({
     // backgroundColor: "green",
     flex: 0.93,
     fontSize: 14,
-  },
-  //건너뛰기 버튼 컨테이너
-  subBtn: {
-    borderBottomWidth: 1,
-    borderBottomColor: "black",
-    paddingBottom: 2,
-    alignSelf: "center",
-    width: 48,
-    marginTop: 25,
-    marginBottom: 10,
-  },
-  //건너뛰기 버튼 Text
-  subBtnText: {
-    alignSelf: "center",
-    fontSize: 12,
-    borderBottomColor: "black",
+    fontFamily: "SUIT-Regular",
   },
   //이메일 리스트 컨테이너
   emailContainer: {
     zIndex: 1,
-    backgroundColor: "#E4E4E4",
+    backgroundColor: "#EFEFEF",
     borderRadius: 24,
     marginTop: "5%",
   },
+  emailTextContainer: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
   //이메일 리스트 컨테이너 안 이메일 Text
   emailText: {
-    padding: 15,
+    padding: 10,
     justifyContent: "center",
     marginLeft: "3%",
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
   },
   // 추가된 이메일 보여주는 창
   //초대할 이메일 (제목)
@@ -310,9 +314,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: color.activated,
     fontWeight: "bold",
-    marginTop: 20,
+    marginTop: 30,
     marginLeft: 10,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   //초대할 이메일 리스트 컨테이너
   emailAddedContainer: {
@@ -323,6 +327,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 10,
     marginBottom: 10,
+    fontFamily: "SUIT-Regular",
   },
   //삭제 아이콘 컨테이너
   xIcon: {
@@ -331,3 +336,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
+// 1. 검색창 색상 바꾸기
+// 2. 초대할 이메일 간격 넓히기
