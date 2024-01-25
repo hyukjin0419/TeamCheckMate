@@ -14,6 +14,8 @@ import {
 import { useState, useEffect } from "react";
 import * as Font from "expo-font";
 import s from "../../styles/css";
+import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
 import {
@@ -93,7 +95,7 @@ export default TeamPage = () => {
   );
 
   return (
-    <View style={s.container}>
+    <View style={styles.container}>
       <StatusBar style={"dark"}></StatusBar>
       <View style={s.headContainer}></View>
       {/* 팀 추가에 점근할 수 있는 버튼 */}
@@ -115,6 +117,7 @@ export default TeamPage = () => {
           <TouchableWithoutFeedback onPress={handlePress}>
             {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
             <View style={styles.modalView}>
+              <View style={s.headContainer}></View>
               {/* 엑스 버튼 */}
               <TouchableOpacity
                 style={styles.AddBtnContainer}
@@ -125,32 +128,34 @@ export default TeamPage = () => {
                   source={require("../../images/CloseClassAddBtn.png")}
                 ></Image>
               </TouchableOpacity>
-                {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
-                <View style={styles.twoBtnContainer} onPress={handlePress}>
-                  {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("TeamAddPage"), setShowModal(false);
-                    }}
-                  >
-                    <View style={styles.addClassBtn}>
-                      <Text style={styles.addClassBtnText}>팀 등록</Text>
-                    </View>
-                  </TouchableOpacity>
-                  {/* 팀 참여하기 버튼: 팀 참여하기 페이지로 넘어가는 버튼 */}
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("TeamJoinPage"), setShowModal(false);
-                    }}
-                  >
-                    <View style={styles.joinClassBtn}>
-                      <Text style={styles.addClassBtnText}>팀 참여하기</Text>
-                    </View>
-                  </TouchableOpacity>
+              {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
+              <View style={styles.twoBtnContainer} onPress={handlePress}>
+                {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
+                <TouchableOpacity
+                  style={styles.addClassBtn}
+                  onPress={() => {
+                    navigation.navigate("TeamAddPage"), setShowModal(false);
+                  }}
+                >
+                  <Text style={styles.addClassBtnText}>팀 등록</Text>
+                  <FontAwesome5 name="plus" size={18} color="black" />
+                </TouchableOpacity>
+                {/* 팀 참여하기 버튼: 팀 참여하기 페이지로 넘어가는 버튼 */}
+                <TouchableOpacity
+                  style={styles.joinClassBtn}
+                  onPress={() => {
+                    navigation.navigate("TeamJoinPage"), setShowModal(false);
+                  }}
+                >
+                  <Text style={styles.addClassBtnText}>팀 참여</Text>
+                  <Ionicons name="people-sharp" size={18} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("TeamJoinPage"), setShowModal(false);
+                  }}
+                ></TouchableOpacity>
               </View>
-              {/* 버튼 위치 맞추기 위한 style */}
-              <View flex={1}></View>
-              <View height="10%"></View>
             </View>
           </TouchableWithoutFeedback>
         </Modal>
@@ -180,19 +185,20 @@ export default TeamPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: "5%",
+    paddingHorizontal: "0%",
     backgroundColor: "white",
   },
   teamListContainer: {
     //backgroundColor: "red",
-    width: WINDOW_WIDHT * 0.9,
-    alignItems: "center",
-    justifyContent: "space-between",
+    width: WINDOW_WIDHT * 0.95,
+    alignItems: "flex-start",
     alignSelf: "center",
+    flexDirection: "column",
   },
   AddBtnContainer: {
     alignItems: "flex-end",
-    paddingVertical: "1%",
+    paddingBottom: "2%",
+    paddingHorizontal: "5%",
   },
   addOrCloseBtn: {
     width: 40,
@@ -202,26 +208,33 @@ const styles = StyleSheet.create({
   modalView: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    paddingHorizontal: "5%",
   },
   twoBtnContainer: {
-    flex: 1,
+    paddingHorizontal: "6%",
     alignItems: "flex-end",
-    justifyContent: "flex-start",
+    justifyContent: "center",
   },
   addClassBtn: {
     backgroundColor: "white",
     padding: 10,
-    borderRadius: 20,
-    marginBottom: "2%",
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginBottom: 12,
+    marginTop: "2%",
   },
   addClassBtnText: {
     fontFamily: "SUIT-Regular",
     fontSize: 14,
+    marginHorizontal: 5,
   },
   joinClassBtn: {
     backgroundColor: "white",
     padding: 10,
-    borderRadius: 20,
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
   },
 });
