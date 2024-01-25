@@ -7,6 +7,7 @@ import {
   ImageBackground,
   Dimensions,
   FlatList,
+  Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
@@ -24,6 +25,7 @@ import {
   auth,
 } from "../../firebase";
 import AssignmentItem from "./AssignmentItem";
+import s from "../styles/css";
 import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 구하는 코드
@@ -154,9 +156,20 @@ const AssignmentPage = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        ...s.container,
+        alignItems: "center",
+      }}
+    >
       <StatusBar style={"dark"}></StatusBar>
-      <View style={styles.headerContainer}>
+      <View
+        style={{
+          ...s.headContainer,
+          alignItems: "center",
+          alignSelf: "flex-start",
+        }}
+      >
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("TeamPage");
@@ -172,9 +185,7 @@ const AssignmentPage = () => {
         <Text style={styles.teamMateText}>팀 메이트: </Text>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("AssignmentAddPage", {
-              title: title,
-              fileColor: fileColor,
+            navigation.navigate("TeamMemberAddPage", {
               teamid: teamid,
             });
           }}
@@ -187,26 +198,44 @@ const AssignmentPage = () => {
           />
         </TouchableOpacity>
       </View>
-      <View style={styles.assignment}>
-        {
-          <FlatList
-            data={assignmentList}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <AssignmentItem
-                assignmentName={item.assignmentName}
-                dueDate={item.dueDate}
-                teamid={teamid}
-                title={title}
-                fileColor={fileColor}
-                assignmentId={item.assignmentId}
-                getAssignmentList={getAssignmentList}
-              ></AssignmentItem>
-            )}
-            keyExtractor={(item) => item.id}
-          />
-        }
-      </View>
+      <FlatList
+        data={assignmentList}
+        contentContainerStyle={styles.assignment}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <AssignmentItem
+            assignmentName={item.assignmentName}
+            dueDate={item.dueDate}
+            teamid={teamid}
+            title={title}
+            fileColor={fileColor}
+            assignmentId={item.assignmentId}
+            getAssignmentList={getAssignmentList}
+          ></AssignmentItem>
+        )}
+        keyExtractor={(item) => item.id}
+        /* 과제 아이템 아래에 있는 과제추가 버튼 */
+        ListFooterComponent={() => (
+          <View style={styles.addBtnContainer}>
+            <TouchableOpacity
+              /* Top마진을 주기 위한 스타일 */
+              style={styles.addBtnMargin}
+              onPress={() => {
+                navigation.navigate("AssignmentAddPage", {
+                  title: title,
+                  fileColor: fileColor,
+                  teamid: teamid,
+                });
+              }}
+            >
+              <Image
+                style={styles.addBtn}
+                source={require("../images/ClassAddBtn.png")}
+              ></Image>
+            </TouchableOpacity>
+          </View>
+        )}
+      ></FlatList>
     </View>
   );
 };
@@ -214,13 +243,6 @@ const AssignmentPage = () => {
 export default AssignmentPage;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "white",
-    paddingHorizontal: "5%",
-  },
   openedFile: {
     position: "absolute",
     top: "25%",
@@ -232,33 +254,37 @@ const styles = StyleSheet.create({
     height: 155,
     marginBottom: "15%",
   },
-  headerContainer: {
-    marginTop: "5%",
-    marginBottom: "5%",
-    flex: 0.15,
-    alignItems: "center",
-    flexDirection: "row",
-    //backgroundColor: "red",
-    alignSelf: "flex-start",
-  },
   teamMate: {
     flexDirection: "row",
     alignItems: "center",
     height: WINDOW_HEIGHT > 800 ? "4%" : "5%",
-    marginTop: WINDOW_HEIGHT > 800 ? "20%" : "30%",
+    marginTop: WINDOW_HEIGHT > 800 ? "40%" : "45%",
     backgroundColor: color.activated,
     width: WINDOW_WIDHT,
     justifyContent: "space-between",
+    marginBottom: "6%",
   },
   teamMateText: {
     color: "white",
     paddingLeft: "3%",
+    fontFamily: "SUIT-Regular",
+    fontSize: 12,
   },
   plusBtn: {
     paddingRight: "3%",
   },
   assignment: {
-    flex: 0.85,
     //backgroundColor: "red",
+  },
+  addBtnContainer: {
+    alignItems: "center",
+    //marginTop: "4%",
+  },
+  addBtnMargin: {
+    marginTop: 20,
+  },
+  addBtn: {
+    width: 40,
+    height: 40,
   },
 });
