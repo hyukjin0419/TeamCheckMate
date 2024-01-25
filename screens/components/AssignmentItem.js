@@ -97,7 +97,7 @@ const AssignmentItem = (props) => {
         style={styles.modal}
         visible={assignmentOptionModalVisible}
         transparent={true}
-        animationType="fade"
+        //animationType="fade"
       >
         {/* 모달창 회색 배경 */}
         <View style={styles.background}>
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     //backgroundColor: "red",
     borderWidth: 1,
     borderRadius: 10,
-    marginTop: "5%",
+    marginBottom: "5%",
     flexDirection: "row",
   },
   teamReviseBtn: {

@@ -28,7 +28,6 @@ export default AssignmentAddPage = ({ route }) => {
     /* AssignmentPage에서 팀 이름, 파일 아이콘 색상, 팀 id 불러오기 */
   }
   const { title, fileColor, teamid } = route.params;
-  console.log("teamid before navigation:", teamid);
   {
     /* 과제추가 확인버튼 상태 변경 코드 */
   }
