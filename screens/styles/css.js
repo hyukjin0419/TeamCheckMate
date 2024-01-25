@@ -113,6 +113,7 @@ const commonStyles = StyleSheet.create({
     color: "white",
     fontFamily: "SUIT-Medium",
     textAlign: "center",
+    fontSize: 13,
   },
   twoBtnContainerRight: {
     flex: 1,
@@ -124,6 +125,7 @@ const commonStyles = StyleSheet.create({
   twoBtnContainerRightText: {
     fontFamily: "SUIT-Medium",
     textAlign: "center",
+    fontSize: 13,
   },
 });
 

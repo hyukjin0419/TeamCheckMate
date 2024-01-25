@@ -153,7 +153,11 @@ export default function AddMembers({ route }) {
             <View style={styles.iconContainer}>
               <Image
                 style={styles.glass}
-                source={require("../../images/icons/glass_grey.png")}
+                source={
+                  isSearching
+                    ? require("../../images/icons/glass_navy.png")
+                    : require("../../images/icons/glass_grey.png")
+                }
               />
             </View>
             <View style={styles.textInputContainer}>
