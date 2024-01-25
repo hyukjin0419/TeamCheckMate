@@ -5,6 +5,7 @@ import {
   ImageBackground,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
@@ -169,11 +170,26 @@ const TeamItem = (props) => {
                   {/* 모달창 상단 회색 막대 */}
                   <View style={styles.modalVector}></View>
                   {/* 모달창 상단 팀 이름 표시 */}
-                  <View flex={1}>
-                    <Text>{title}</Text>
+                  <Text style={styles.modalTitle}>{title}</Text>
+                  {/* 참여 코드 */}
+                  <View style={styles.joinCode}>
+                    <Text>참여 코드: {props.id}</Text>
                   </View>
-                  {/* 참여 코드, 팀원 목록 표시 */}
-                  <View flex={1}></View>
+                  <View flex={1}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        navigation.navigate("TeamMemberAddPage", {
+                          teamId: props.id,
+                        });
+                        handleTeamOptionPress();
+                      }}
+                    >
+                      <Image
+                        style={styles.teamInviteBtn}
+                        source={require("../../images/ClassAddBtn.png")}
+                      ></Image>
+                    </TouchableOpacity>
+                  </View>
                   {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
                   <View style={styles.modalTeamBtnContainer}>
                     {/* 팀 수정 버튼 */}
@@ -194,7 +210,7 @@ const TeamItem = (props) => {
                         SetTeamOptionModalVisible(false);
                       }}
                     >
-                      <Text style={styles.teamReviseText}>수정</Text>
+                      <Text style={styles.teamReviseText}>팀 수정</Text>
                     </TouchableOpacity>
                     {/* 팀 삭제 버튼 */}
                     <TouchableOpacity
@@ -202,7 +218,7 @@ const TeamItem = (props) => {
                       onPress={deleteItem}
                     >
                       {/* 터치 시 팀 삭제 */}
-                      <Text style={styles.teamDeleteText}>삭제</Text>
+                      <Text style={styles.teamDeleteText}>팀 삭제</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -220,7 +236,7 @@ export default TeamItem;
 const styles = StyleSheet.create({
   modalTeamBtnContainer: {
     width: WINDOW_WIDHT,
-    //backgroundColor:"yellow",
+    //backgroundColor: "yellow",
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
@@ -260,6 +276,23 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
   },
+  modalTitle: {
+    marginTop: 30,
+    fontFamily: "SUIT-Medium",
+    fontSize: 16,
+  },
+  joinCode: {
+    marginTop: 15,
+    backgroundColor: color.deletegrey,
+    padding: 10,
+    borderRadius: 20,
+    marginBottom: "2%",
+  },
+  teamInviteBtn: {
+    width: 40,
+    height: 40,
+    marginRight: "2%",
+  },
   modalItemContainter: {
     flex: 1,
     alignItems: "center",
@@ -281,41 +314,34 @@ const styles = StyleSheet.create({
     borderStartStartRadius: 20,
     borderStartEndRadius: 20,
     height: 400 /*WINDOW_HEIGHT * 0.6*/,
-    alignSelf: "stretch",
-    alignItems: "center",
     marginTop: "auto",
     marginHorizontal: "-5.5%",
     marginBottom: "-6%",
-  },
-  file: {
-    width: WINDOW_WIDHT * 0.43,
-    height: WINDOW_HEIGHT > 700 ? WINDOW_HEIGHT * 0.15 : WINDOW_HEIGHT * 0.2,
-    marginHorizontal: "1%",
-    marginTop: "8%",
   },
   optionContainer: {
     flex: 1,
     alignItems: "flex-end",
     justifyContent: "flex-start",
-    //backgroundColor: "blue",
-    marginBottom: "5%",
   },
   fileOption: {
-    //backgroundColor: "red",
     width: "20%",
-    height: "80%",
+    height: "100%",
+  },
+  file: {
+    width: WINDOW_WIDHT * 0.45,
+    height: WINDOW_HEIGHT > 700 ? WINDOW_HEIGHT * 0.15 : WINDOW_HEIGHT * 0.2,
+    marginHorizontal: WINDOW_WIDHT > 376 ? "1.6%" : "1.7%",
+    marginTop: "8%",
   },
   titleContainer: {
     flex: 1,
-    paddingHorizontal: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "30%",
+    paddingHorizontal: WINDOW_WIDHT > 376 ? 60 : 50,
+    marginTop: WINDOW_HEIGHT > 700 ? "20.5%" : "22%",
     //backgroundColor: "teal",
   },
   title: {
     textAlign: "center",
     fontSize: 17,
-    fontWeight: "400",
+    fontFamily: "SUIT-Medium",
   },
 });
