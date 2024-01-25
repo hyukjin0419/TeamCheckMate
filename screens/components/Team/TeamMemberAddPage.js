@@ -235,10 +235,16 @@ export default function AddMembers({ route }) {
                         ? "#050026"
                         : confirmBtnColor,
                   }}
+                  onPress={sendEmail}
                 >
                   <Text style={s.twoBtnContainerLeftText}>보내기</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={s.twoBtnContainerRight}>
+                <TouchableOpacity
+                  style={s.twoBtnContainerRight}
+                  onPress={() => {
+                    navigation.navigate("TeamPage");
+                  }}
+                >
                   <Text style={s.twoBtnContainerRightText}>건너뛰기</Text>
                 </TouchableOpacity>
               </View>
