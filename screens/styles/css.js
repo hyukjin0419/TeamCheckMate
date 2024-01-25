@@ -95,6 +95,36 @@ const commonStyles = StyleSheet.create({
     fontFamily: "SUIT-Regular",
   },
   // -----------------------팀 등록 & 팀 수정 페이지--------------------------------------
+  twoBtnContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 30,
+  },
+  twoBtnContainerLeft: {
+    flex: 1,
+    backgroundColor: "#050026",
+    padding: 15,
+    marginRight: 5,
+    borderRadius: 7,
+  },
+  twoBtnContainerLeftText: {
+    color: "white",
+    fontFamily: "SUIT-Medium",
+    textAlign: "center",
+  },
+  twoBtnContainerRight: {
+    flex: 1,
+    backgroundColor: "#EFEFEF",
+    padding: 15,
+    marginLeft: 5,
+    borderRadius: 7,
+  },
+  twoBtnContainerRightText: {
+    fontFamily: "SUIT-Medium",
+    textAlign: "center",
+  },
 });
 
 export default commonStyles;
