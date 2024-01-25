@@ -100,7 +100,7 @@ const commonStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 30,
+    marginTop: 25,
   },
   twoBtnContainerLeft: {
     flex: 1,

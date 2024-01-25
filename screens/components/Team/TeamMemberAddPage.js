@@ -304,9 +304,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: color.activated,
     fontWeight: "bold",
-    marginTop: 20,
+    marginTop: 30,
     marginLeft: 10,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   //초대할 이메일 리스트 컨테이너
   emailAddedContainer: {
