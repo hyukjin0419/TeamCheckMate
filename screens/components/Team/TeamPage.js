@@ -167,6 +167,9 @@ export default TeamPage = () => {
         showsVerticalScrollIndicator={false}
         data={teamList}
         contentContainerStyle={styles.teamListContainer}
+        columnWrapperStyle={{
+          justifyContent: "space-between",
+        }}
         renderItem={({ item }) => (
           <TeamItem
             title={item.title}
@@ -185,15 +188,12 @@ export default TeamPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: "0%",
     backgroundColor: "white",
   },
   teamListContainer: {
     //backgroundColor: "red",
-    width: WINDOW_WIDHT * 0.95,
-    alignItems: "flex-start",
+    width: WINDOW_WIDHT * 0.92,
     alignSelf: "center",
-    flexDirection: "column",
   },
   AddBtnContainer: {
     alignItems: "flex-end",
