@@ -18,7 +18,7 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 const TeamItem = (props) => {
   const navigation = useNavigation();
-  console.log("teamID:", props.id);
+  // console.log("teamID:", props.id);
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
