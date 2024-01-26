@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import commonStyles from "./styles/css.js";
+import s from "./styles/css.js";
 import { auth } from "../firebase.js";
 import { signOut } from "firebase/auth";
 import { color } from "./styles/colors.js";
@@ -31,7 +31,7 @@ export default function InitialPage() {
   }, []);
 
   return (
-    <View style={commonStyles.container}>
+    <View style={s.container}>
       {/*로고 Container*/}
       <StatusBar style={"dark"} />
       <View style={styles.logoContainter}>
@@ -47,7 +47,7 @@ export default function InitialPage() {
           source={require("./images/LoginImages.gif")}
         ></Image>
         {/*Description Container*/}
-        <Text style={styles.description}>
+        <Text style={styles.descriptionText}>
           무임승차를 방지하기 위한 최적의 방법
         </Text>
       </View>
@@ -56,16 +56,16 @@ export default function InitialPage() {
         {/*로그인 버튼*/}
         <TouchableOpacity
           onPress={() => navigation.navigate("LogInPage")}
-          style={{ ...commonStyles.button, backgroundColor: color.activated }}
+          style={{ ...s.button, backgroundColor: color.activated }}
         >
-          <Text style={commonStyles.buttonText}>로그인</Text>
+          <Text style={s.buttonText}>로그인</Text>
         </TouchableOpacity>
         {/*가입하기 버튼*/}
         <TouchableOpacity
           onPress={() => navigation.navigate("SignInPage")}
-          style={commonStyles.subButton}
+          style={s.subButton}
         >
-          <Text style={commonStyles.subButtonText}>가입하기</Text>
+          <Text style={s.subButtonText}>가입하기</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -94,12 +94,13 @@ const styles = StyleSheet.create({
     height: 107,
     width: 115,
   },
-  description: {
+  descriptionText: {
     color: color.activated,
     fontSize: 16,
     fontWeight: 400,
     alignSelf: "center",
     marginBottom: "11%",
+    fontFamily: "SUIT-Regular",
   },
   BtnContainter: {
     flex: 1,

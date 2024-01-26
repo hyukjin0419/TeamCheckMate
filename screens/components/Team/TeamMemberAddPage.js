@@ -16,7 +16,7 @@ import {
   Keyboard,
 } from "react-native";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
-import styles from "../../styles/css";
+import s from "../../styles/css";
 import * as MailComposer from "expo-mail-composer";
 import {
   getFirestore, //get db
@@ -49,8 +49,12 @@ export default function AddMembers({ route }) {
   const [isSearching, setIsSearching] = useState(false);
   //사용자가 이메일 선택시 선택한 이메일 새로운 배열에 저장하기 위한 배열
   const [addedUserEmailArray, setAddedUserEmailArray] = useState([]);
-  //현재 로그인되 유저 정보
+  //현재 로그인된 유저 정보
   const user = auth.currentUser;
+  //보내기 버튼 활성||비활성
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  //확인 버튼 상태 (초기값:비활성화 상태)
+  const [buttonDisabled, setButtonDisabled] = useState(true);
 
   //1. 파이어 베이스에서 이메일 가져오는 함수 (자신의 이메일은 가져오지 x)
   const getUsers = async () => {
@@ -87,6 +91,7 @@ export default function AddMembers({ route }) {
   // console.log(filteredResults);
 
   //4. 검색 후 이메일 누를시 그 이메일 발송이메일에 추가
+  //console.log를 보기 위해 조건문 추가 -> 기능상 제거해도 무관함
   const addEmail = (props) => {
     const isDuplicate = addedUserEmailArray.some((item) => item.id === props);
 
@@ -97,9 +102,10 @@ export default function AddMembers({ route }) {
       });
       console.log("이메일 추가 성공");
     } else {
-      Alert.alert("이미 추가된 이메일입니다.");
       console.log("이미 추가된 이메일입니다.");
     }
+    setIsSearching(false);
+    setSearchEmail("");
     console.log("현재 추가된: ", addedUserEmailArray);
   };
 
@@ -113,7 +119,7 @@ export default function AddMembers({ route }) {
     console.log("이메일 제거 성공");
   };
 
-  const sendEmail = () => {
+  const sendEmail = async () => {
     const bodyText = `
     안녕하세요, 사용자가 발송한 Check Team Mate의 팀 초대코드입니다.
     팀 등록 페이지에서 팀 초대코드를 입력해주세요.
@@ -121,11 +127,25 @@ export default function AddMembers({ route }) {
     팀 초대코드: ${teamCode}
   `;
     const recipientEmails = addedUserEmailArray.map((item) => item.id);
-    MailComposer.composeAsync({
-      recipients: recipientEmails,
-      subject: "[Check Team Mate_초대코드 발송]",
-      body: bodyText,
-    });
+    try {
+      const result = await MailComposer.composeAsync({
+        recipients: recipientEmails,
+        subject: "[Check Team Mate_초대코드 발송]",
+        body: bodyText,
+      });
+      console.log("MailComposer 결과:", result);
+
+      // 메일이 성공적으로 전송되었을 때에만 navigate
+      if (result.status === "sent") {
+        navigation.navigate("TeamPage", { teamAdded: true });
+      } else {
+        // 사용자가 메일을 취소하거나 전송에 실패한 경우의 처리
+        console.log("메일 전송이 취소되었거나 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("메일 보내기 오류:", error);
+      // 오류 처리 등이 필요하면 추가할 수 있습니다.
+    }
   };
   return (
     // 이메일 입력중 나머지 화면 누르면 키보드 및 검색창 내리기
@@ -137,55 +157,55 @@ export default function AddMembers({ route }) {
     >
       <KeyboardAvoidingView style={s.container}>
         {/* 헤더부분 */}
-        <View style={s.head}>
-          <TouchableOpacity
-            style={styles.headBtn}
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="black" />
-          </TouchableOpacity>
+        <View style={s.headContainer}>
           <Text style={s.title}>팀 메이트 초대</Text>
-          <TouchableOpacity onPress={sendEmail}>
-            <Text style={{ ...s.titleSend }}>보내기</Text>
-          </TouchableOpacity>
         </View>
 
         {/* 검색창 */}
         <View>
-          <View style={s.searchContainer}>
-            <Image
-              style={s.glass}
-              source={require("../../images/icons/glass_grey.png")}
-            />
-            <TextInput
-              value={searchEmail}
-              onChangeText={(text) => {
-                setSearchEmail(text);
-                setIsSearching(text.trim() !== "");
-              }}
-              onSubmitEditing={() => {
-                setSearchEmail("");
-                setIsSearching(false);
-              }}
-              placeholder="초대할 팀 메이트의 이메일을 입력해주세요!"
-              style={s.textInput}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              returnKeyType="done"
-            />
+          <View style={styles.searchContainer}>
+            <View style={styles.iconContainer}>
+              <Image
+                style={styles.glass}
+                source={
+                  isSearching
+                    ? require("../../images/icons/glass_navy.png")
+                    : require("../../images/icons/glass_grey.png")
+                }
+              />
+            </View>
+            <View style={styles.textInputContainer}>
+              <TextInput
+                value={searchEmail}
+                onChangeText={(text) => {
+                  setSearchEmail(text);
+                  setIsSearching(text.trim() !== "");
+                }}
+                onSubmitEditing={() => {
+                  setSearchEmail("");
+                  setIsSearching(false);
+                }}
+                placeholder="초대할 팀 메이트의 이메일을 입력해주세요!"
+                style={styles.textInput}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                returnKeyType="done"
+              />
+            </View>
           </View>
 
           {/* 검색중일때 이메일 매치해서 보여주기 */}
           {isSearching ? (
             /* 검색된 emailContainer */
             filteredResults.length > 0 && (
-              <View style={s.emailContainer}>
+              <View style={styles.emailContainer}>
                 <FlatList
+                  style={styles.emailTextContainer}
                   data={filteredResults}
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => addEmail(item.id)}>
-                      <Text style={s.emailText}>{item.id}</Text>
+                      <Text style={styles.emailText}>{item.id}</Text>
                     </TouchableOpacity>
                   )}
                 />
@@ -193,37 +213,56 @@ export default function AddMembers({ route }) {
             )
           ) : (
             /* 건너뛰기 버튼 및 새로운 배열에 추가된 이메일들 -> 초대할 이메일*/
+
             <View>
-              <Pressable>
-                <View style={s.subBtn}>
-                  <Text style={s.subBtnText}>건너뛰기</Text>
-                </View>
-              </Pressable>
               {addedUserEmailArray.length > 0 && (
                 <View>
-                  <Text style={s.emailAddedTitle}>초대할 이메일</Text>
-                  <View style={s.emailAddedContainer}>
-                    <FlatList
-                      data={addedUserEmailArray}
-                      keyExtractor={(item) => item.id.toString()}
-                      renderItem={({ item }) => (
-                        <View style={s.emailAddedContainer}>
-                          <Text style={s.emailAddedText}>{item.id}</Text>
-                          {/* 삭제 버튼 */}
-                          <TouchableOpacity
-                            style={s.xIcon}
-                            onPress={() => removeEmail(item.id)}
-                          >
-                            <Image
-                              source={require("../../images/icons/x.png")}
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      )}
-                    />
-                  </View>
+                  <Text style={styles.emailAddedTitle}>초대할 이메일</Text>
+                  <FlatList
+                    data={addedUserEmailArray}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                      <View style={styles.emailAddedContainer}>
+                        <Text style={styles.emailAddedText}>{item.id}</Text>
+                        {/* 삭제 버튼 */}
+                        <TouchableOpacity
+                          style={styles.xIcon}
+                          onPress={() => removeEmail(item.id)}
+                        >
+                          <AntDesign
+                            name="closecircle"
+                            size={15}
+                            color="black"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  />
                 </View>
               )}
+              <View style={s.twoBtnContainer}>
+                <TouchableOpacity
+                  style={{
+                    ...s.twoBtnContainerLeft,
+                    backgroundColor:
+                      addedUserEmailArray.length > 0
+                        ? "#050026"
+                        : confirmBtnColor,
+                  }}
+                  onPress={sendEmail}
+                >
+                  <Text style={s.twoBtnContainerLeftText}>보내기</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={s.twoBtnContainerRight}
+                  onPress={() => {
+                    //팀 페이지로 넘어갈 때 토스트 띄우기 위한 boolean
+                    navigation.navigate("TeamPage", { teamAdded: true });
+                  }}
+                >
+                  <Text style={s.twoBtnContainerRightText}>건너뛰기</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
         </View>
@@ -232,95 +271,86 @@ export default function AddMembers({ route }) {
   );
 }
 
-const s = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: "5%",
-    backgroundColor: "white",
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginLeft: "31%",
-  },
-  titleSend: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginLeft: "38%",
-  },
-  head: {
-    position: "relative",
-    marginTop: "18%",
-    flexDirection: "row",
-    marginBottom: "2%",
-  },
+const styles = StyleSheet.create({
   //검색창 컨테이너
   searchContainer: {
+    display: "flex",
     flexDirection: "row",
+    alignContent: "center",
     height: 50,
-    backgroundColor: color.deletegrey,
+    backgroundColor: "#EFEFEF",
     borderRadius: 24,
     marginTop: "5%",
   },
-  //돋보기
-  glass: {
+  //돋보기 컨테이너
+  iconContainer: {
+    flex: 1,
     alignSelf: "center",
     marginLeft: "5%",
   },
-  //검색창 입력
-  textInput: {
-    flex: 0.9,
+  //돋보기 아이콘
+  glass: {},
+  //검색창 컨테이너
+  textInputContainer: {
+    flexDirection: "row",
+    flex: 23,
     alignSelf: "center",
     marginLeft: "3%",
   },
-  //건너뛰기 버튼 컨테이너
-  subBtn: {
-    borderBottomWidth: 1,
-    borderBottomColor: "black",
-    paddingBottom: 5,
-    alignSelf: "center",
-    width: 50,
-    marginTop: 20,
-  },
-  //건너뛰기 버튼 Text
-  subBtnText: {
-    alignSelf: "center",
-    fontSize: 12,
-    borderBottomColor: "black",
+  //검색창 입력
+  textInput: {
+    // backgroundColor: "green",
+    flex: 0.93,
+    fontSize: 14,
+    fontFamily: "SUIT-Regular",
   },
   //이메일 리스트 컨테이너
   emailContainer: {
     zIndex: 1,
-    backgroundColor: color.deletegrey,
+    backgroundColor: "#EFEFEF",
     borderRadius: 24,
     marginTop: "5%",
   },
-  emailPressed: {
-    backgroundColor: "red",
+  emailTextContainer: {
+    marginTop: 10,
+    marginBottom: 10,
   },
   //이메일 리스트 컨테이너 안 이메일 Text
   emailText: {
-    padding: 15,
+    padding: 10,
     justifyContent: "center",
     marginLeft: "3%",
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
   },
+  // 추가된 이메일 보여주는 창
+  //초대할 이메일 (제목)
   emailAddedTitle: {
     fontSize: 12,
     color: color.activated,
     fontWeight: "bold",
-    marginTop: 20,
+    marginTop: 30,
     marginLeft: 10,
+    marginBottom: 15,
   },
+  //초대할 이메일 리스트 컨테이너
   emailAddedContainer: {
     flexDirection: "row",
   },
+  //초대할 이메일 텍스트
   emailAddedText: {
     fontSize: 14,
-    marginTop: 10,
     marginLeft: 10,
     marginBottom: 10,
+    fontFamily: "SUIT-Regular",
   },
+  //삭제 아이콘 컨테이너
   xIcon: {
     alignSelf: "center",
+    marginLeft: 5,
+    marginBottom: 10,
   },
 });
+
+// 1. 검색창 색상 바꾸기
+// 2. 초대할 이메일 간격 넓히기

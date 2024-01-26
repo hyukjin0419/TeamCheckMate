@@ -16,6 +16,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
 import { db, collection, addDoc, auth, doc, setDoc } from "../../../firebase";
 import Modal from "react-native-modal";
+import s from "../../styles/css";
 import { useNavigation } from "@react-navigation/core";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -25,6 +26,7 @@ export default TeamAddPage_origin = () => {
   const navigation = useNavigation();
   //회원정보 가져오기
   const user = auth.currentUser;
+  //가져온 정보에서 이메일 빼서 저장하기
   const email = user.email;
 
   //색상 선택  띄우기/숨기기 (초기값: 숨기기)
@@ -80,8 +82,10 @@ export default TeamAddPage_origin = () => {
         title: textInputValue,
         fileImage: colorConfirmed,
         timestamp: timestamp,
+        leader_id: email,
+        member_id_array: [],
       });
-      console.log("Document written with ID: ", teamDocRef.id);
+      console.log("TeamAddPage: Document written with ID: ", teamDocRef.id);
       const userDocRef = doc(db, "user", email);
       addTeamIdtoUser(userDocRef, teamDocRef.id);
 
@@ -89,7 +93,7 @@ export default TeamAddPage_origin = () => {
         teamID: teamDocRef.id,
       });
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error("TeamAddPage: Error adding document: ", e);
     }
   };
 
@@ -102,11 +106,11 @@ export default TeamAddPage_origin = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
+      <View style={s.container}>
         <StatusBar style={"dark"}></StatusBar>
         {/* 뒤로가기 버튼, 팀 등록 헤더와 확인버튼 컨테이너 */}
-        <View style={styles.headerContainer}>
-          <View style={styles.backBtn}>
+        <View style={s.headContainer}>
+          <View style={s.headBtn}>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("TeamPage");
@@ -115,21 +119,22 @@ export default TeamAddPage_origin = () => {
               <AntDesign name="left" size={20} color="black" />
             </TouchableOpacity>
           </View>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerText}>팀 등록</Text>
-          </View>
+
+          <Text style={s.title}>팀 등록</Text>
+
           <TouchableOpacity
             disabled={buttonDisabled}
-            style={styles.confirmBtn}
+            style={s.titleRightBtn}
             onPress={() => {
               addTeamItem();
             }}
           >
-            <Text style={{ ...styles.headerText, color: confirmBtnColor }}>
-              확인
+            <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
+              다음
             </Text>
           </TouchableOpacity>
         </View>
+
         {/* 팀 이름 입력란과 색상 선택 버튼*/}
         <View
           style={{
@@ -159,9 +164,7 @@ export default TeamAddPage_origin = () => {
             </View>
           </TouchableWithoutFeedback>
         </View>
-        <View style={styles.descriptionContainter}>
-          <Text style={styles.description}>색상을 변경할 수 있습니다</Text>
-        </View>
+
         {/* 색상 선택 버튼 */}
         <View>
           {/* 색상 팔레트 모달창 회색 배경 */}
@@ -187,6 +190,15 @@ export default TeamAddPage_origin = () => {
                   <View style={styles.modalItemContainter}>
                     {/* 모달창 상위 부분 회색 막대기 */}
                     <View style={styles.modalVector}></View>
+                    <Text
+                      style={{
+                        marginTop: 15,
+                        fontFamily: "SUIT-Medium",
+                        fontSize: 14,
+                      }}
+                    >
+                      색상
+                    </Text>
                     {/* 모달창 내 색상 옵션 컨테이너 */}
                     <View style={styles.colorContainer}>
                       {/* 6x6 색상 옵션 컨테이너 (rowColorsContainer 하나당 색상 6개씩 총 6줄) */}
@@ -342,14 +354,11 @@ export default TeamAddPage_origin = () => {
                         ))}
                       </View>
                     </View>
-                    <View style={styles.modalBtnContainer}>
-                      <TouchableOpacity onPress={confirmColor}>
-                        <Image
-                          style={styles.modalConfirmBtn}
-                          source={require("../../images/modalConfirmBtn.png")}
-                        ></Image>
-                      </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={confirmColor}>
+                      <View style={styles.modalConfirmBtn}>
+                        <Text style={styles.modalText}>확인</Text>
+                      </View>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </Modal>
@@ -371,14 +380,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     //backgroundColor: "blue",
     borderBottomWidth: 2,
+    marginTop: "3%",
   },
   colorTextInput: {
     height: 50,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "500",
     marginLeft: "1%",
-    //marginTop: "5%",
+    fontFamily: "SUIT-Regular",
     paddingTop: "2%",
+  },
+  modalText: {
+    fontSize: 14,
+    fontFamily: "SUIT-Medium",
   },
   modalItemContainter: {
     flex: 1,
@@ -390,16 +404,13 @@ const styles = StyleSheet.create({
   colorContainer: {
     flex: 1.5,
     justifyContent: "space-evenly",
-    //backgroundColor: "yellow"
+    //backgroundColor: "yellow",
   },
   modalBtnContainer: {
     flex: 0.2,
     alignItems: "center",
-    //backgroundColor: "red"
-  },
-  modalText: {
-    marginTop: "3%",
-    fontSize: 16,
+    //backgroundColor: "red",
+    marginBottom: 20,
   },
   circleSelected: {
     height: 40,
@@ -412,12 +423,17 @@ const styles = StyleSheet.create({
   modalColorsContainer: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    width: "95%",
+    width: "100%",
+    //backgroundColor: "red",
   },
   modalConfirmBtn: {
     borderRadius: 10,
     width: WINDOW_WIDHT * 0.9,
     height: WINDOW_HEIGHT * 0.06,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    backgroundColor: color.deletegrey,
   },
   modalVector: {
     height: 5,
@@ -439,7 +455,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderStartStartRadius: 20,
     borderStartEndRadius: 20,
-    height: 550 /*WINDOW_HEIGHT * 0.6*/,
+    height: 490 /*WINDOW_HEIGHT * 0.6*/,
     marginTop: "auto",
     marginHorizontal: "-5.5%",
     marginVertical: "-7%",
@@ -465,7 +481,7 @@ const styles = StyleSheet.create({
   triangle: {
     width: 10,
     height: 10,
-    marginLeft: "3%",
+    marginLeft: 10,
     marginRight: "5%",
   },
   circleContainer: {
@@ -475,34 +491,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     flexDirection: "row",
   },
-  headerContainer: {
-    marginTop: "5%",
-    flex: 0.13,
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
-    //backgroundColor: "red",
-  },
-  backBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: "center",
-    marginLeft: "3%",
-  },
   confirmBtn: {
     flex: 1,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "flex-end",
     marginRight: "3%",
-  },
-  headerText: {
-    fontSize: 19,
-    fontWeight: "500",
   },
 });

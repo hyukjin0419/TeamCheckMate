@@ -16,6 +16,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { color } from "../styles/colors";
 import { db, collection, addDoc, auth, doc, setDoc } from "../../firebase";
 import { useNavigation } from "@react-navigation/core";
+import s from "../styles/css";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -27,7 +28,6 @@ export default AssignmentAddPage = ({ route }) => {
     /* AssignmentPage에서 팀 이름, 파일 아이콘 색상, 팀 id 불러오기 */
   }
   const { title, fileColor, teamid } = route.params;
-  console.log("teamid before navigation:", teamid);
   {
     /* 과제추가 확인버튼 상태 변경 코드 */
   }
@@ -109,13 +109,13 @@ export default AssignmentAddPage = ({ route }) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
+      <View style={s.container}>
         <StatusBar style={"dark"}></StatusBar>
         {/* 헤더 (뒤로가기 버튼, 과제추가 헤더, 확인버튼) */}
-        <View style={styles.headerContainer}>
+        <View style={s.headContainer}>
           {/* 뒤로가기 버튼 */}
           <TouchableOpacity
-            style={styles.backBtn}
+            style={s.headBtn}
             onPress={() => {
               navigation.navigate("AssignmentPage", {
                 title: title,
@@ -126,41 +126,41 @@ export default AssignmentAddPage = ({ route }) => {
           >
             <AntDesign name="left" size={20} color="black" />
           </TouchableOpacity>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerText}>과제 추가</Text>
-          </View>
+
+          <Text style={s.title}>과제 추가</Text>
+
           {/* 확인 버튼 */}
           <TouchableOpacity
-            style={styles.confirmBtn}
+            style={s.titleRightBtn}
             disabled={buttonDisabled}
             onPress={() => {
               addAssignment();
             }}
           >
-            <Text style={{ ...styles.headerText, color: confirmBtnColor }}>
+            <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
               확인
             </Text>
           </TouchableOpacity>
         </View>
+
         {/* 과제이름 입력란 */}
-        <View style={styles.inputContainer}>
-          <View style={styles.TextInputContainer}>
-            <TextInput
-              placeholder="과제 이름"
-              onChangeText={AssignmentNameInputChange}
-              value={assignmentName}
-              style={styles.TextInput}
-            ></TextInput>
-          </View>
+
+        <View style={s.inputTextContainer}>
+          <TextInput
+            placeholder="과제 이름"
+            onChangeText={AssignmentNameInputChange}
+            value={assignmentName}
+            style={s.textInput}
+          ></TextInput>
+
           {/* DueDate TimePicker */}
-          <View style={styles.TextInputContainer}>
-            <TextInput
-              placeholder="Due Date"
-              onChangeText={dueDateInputChange}
-              value={dueDate}
-              style={styles.TextInput}
-            ></TextInput>
-          </View>
+
+          <TextInput
+            placeholder="Due Date"
+            onChangeText={dueDateInputChange}
+            value={dueDate}
+            style={s.textInput}
+          ></TextInput>
         </View>
       </View>
     </TouchableWithoutFeedback>

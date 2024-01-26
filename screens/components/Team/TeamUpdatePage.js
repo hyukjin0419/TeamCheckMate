@@ -23,6 +23,7 @@ import {
   updateDoc,
 } from "../../../firebase";
 import Modal from "react-native-modal";
+import s from "../../styles/css";
 import { useNavigation } from "@react-navigation/core";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 구하는 코드
@@ -94,10 +95,10 @@ export default TeamUpdatePage = ({ route }) => {
   /* TeamAddPage와 구성은 동일 */
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
+      <View style={s.container}>
         <StatusBar style={"dark"}></StatusBar>
-        <View style={styles.headerContainer}>
-          <View style={styles.backBtn}>
+        <View style={s.headContainer}>
+          <View style={s.headBtn}>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("TeamPage");
@@ -106,18 +107,18 @@ export default TeamUpdatePage = ({ route }) => {
               <AntDesign name="left" size={20} color="black" />
             </TouchableOpacity>
           </View>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerText}>팀 수정</Text>
-          </View>
+
+          <Text style={s.title}>팀 수정</Text>
+
           <TouchableOpacity
             disabled={buttonDisabled}
-            style={styles.confirmBtn}
+            style={s.titleRightBtn}
             onPress={() => {
               updateTeam();
               navigation.navigate("TeamPage");
             }}
           >
-            <Text style={{ ...styles.headerText, color: confirmBtnColor }}>
+            <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
               확인
             </Text>
           </TouchableOpacity>
@@ -149,9 +150,7 @@ export default TeamUpdatePage = ({ route }) => {
             </View>
           </TouchableWithoutFeedback>
         </View>
-        <View style={styles.descriptionContainter}>
-          <Text style={styles.description}>색상을 변경할 수 있습니다</Text>
-        </View>
+
         <View>
           <Modal
             animationIn="fadeIn"
@@ -172,6 +171,9 @@ export default TeamUpdatePage = ({ route }) => {
                 <View style={styles.modalView}>
                   <View style={styles.modalItemContainter}>
                     <View style={styles.modalVector}></View>
+                    <Text style={{ ...styles.modalText, marginTop: 15 }}>
+                      색상
+                    </Text>
                     <View style={styles.colorContainer}>
                       <View style={styles.modalColorsContainer}>
                         {color.colors1.map((color, index) => (
@@ -324,14 +326,11 @@ export default TeamUpdatePage = ({ route }) => {
                         ))}
                       </View>
                     </View>
-                    <View style={styles.modalBtnContainer}>
-                      <TouchableOpacity onPress={confirmColor}>
-                        <Image
-                          style={styles.modalConfirmBtn}
-                          source={require("../../images/modalConfirmBtn.png")}
-                        ></Image>
-                      </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={confirmColor}>
+                      <View style={styles.modalConfirmBtn}>
+                        <Text style={styles.modalText}>확인</Text>
+                      </View>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </Modal>
@@ -353,13 +352,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     //backgroundColor: "blue",
     borderBottomWidth: 2,
+    marginTop: "3%",
   },
   colorTextInput: {
     height: 50,
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "500",
     marginLeft: "1%",
-    //marginTop: "5%",
+    fontFamily: "SUIT-Regular",
     paddingTop: "2%",
   },
   modalItemContainter: {
@@ -374,14 +374,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     //backgroundColor: "yellow"
   },
-  modalBtnContainer: {
-    flex: 0.2,
-    alignItems: "center",
-    //backgroundColor: "red"
-  },
   modalText: {
-    marginTop: "3%",
-    fontSize: 16,
+    fontSize: 14,
+    fontFamily: "SUIT-Medium",
   },
   circleSelected: {
     height: 40,
@@ -394,12 +389,16 @@ const styles = StyleSheet.create({
   modalColorsContainer: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    width: "95%",
+    width: "100%",
   },
   modalConfirmBtn: {
     borderRadius: 10,
     width: WINDOW_WIDHT * 0.9,
     height: WINDOW_HEIGHT * 0.06,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    backgroundColor: color.deletegrey,
   },
   modalVector: {
     height: 5,
@@ -421,18 +420,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderStartStartRadius: 20,
     borderStartEndRadius: 20,
-    height: 550 /*WINDOW_HEIGHT * 0.6*/,
+    height: 490 /*WINDOW_HEIGHT * 0.6*/,
     marginTop: "auto",
     marginHorizontal: "-5.5%",
     marginVertical: "-7%",
-  },
-  descriptionContainter: {
-    alignItems: "flex-end",
-    paddingVertical: "3%",
-    paddingHorizontal: "2%",
-  },
-  description: {
-    fontWeight: "400",
   },
   circle: {
     height: 30,
@@ -447,7 +438,7 @@ const styles = StyleSheet.create({
   triangle: {
     width: 10,
     height: 10,
-    marginLeft: "3%",
+    marginLeft: 10,
     marginRight: "5%",
   },
   circleContainer: {
@@ -457,34 +448,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     flexDirection: "row",
   },
-  headerContainer: {
-    marginTop: "5%",
-    flex: 0.15,
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
-    //backgroundColor: "red",
-  },
-  backBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: "center",
-    marginLeft: "3%",
-  },
   confirmBtn: {
     flex: 1,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "flex-end",
     marginRight: "3%",
-  },
-  headerText: {
-    fontSize: 19,
-    fontWeight: "500",
   },
 });

@@ -10,9 +10,14 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import * as Font from "expo-font";
+import s from "../../styles/css";
+import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
 import {
   db,
@@ -26,15 +31,27 @@ import {
 } from "../../../firebase";
 import { query, orderBy } from "firebase/firestore";
 import * as React from "react";
+import { showToast, toastConfig } from "../Toast";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamPage = () => {
   const navigation = useNavigation();
+  //토스트 창을 사용하기 위해
+  //TeamMemberAddPage에서 넘어왔다면 => 팀이 생성 되었다는 뜻.
+  const route = useRoute();
+  const teamAdded = route.params?.teamAdded; //true
+  //Toast.js 사용. 토스트 함수 생성
+  const handleShowToast = () => {
+    console.log("TeamPage: Toast 작동중");
+    showToast("success", "  ✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
+  };
+
   //회원정보 가져오기
   const user = auth.currentUser;
-  console.log("이걸로도 갖올 수 있는겨?" + user.email);
+  console.log("TeamPage: 이걸로도 갖올 수 있는겨?" + user.email);
   //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
   const [showModal, setShowModal] = useState(false);
   const handlePress = () => {
@@ -55,7 +72,7 @@ export default TeamPage = () => {
       const querySnapshot2 = await getDocs(query(userTeamCollectionRef));
       const list = [];
       querySnapshot2.forEach((doc2) => {
-        console.log("TeamID in querySnapshot2:", doc2.data().teamID);
+        // console.log("TeamID in querySnapshot2:", doc2.data().teamID);
       });
 
       querySnapshot1.forEach((doc) => {
@@ -67,7 +84,7 @@ export default TeamPage = () => {
             id: doc.id,
             ...doc.data(),
           });
-          console.log("성공: " + doc.id, doc.data());
+          // console.log("성공: " + doc.id, doc.data());
         }
       });
       setTeamList(list);
@@ -90,96 +107,114 @@ export default TeamPage = () => {
     }, [])
   );
 
+  //화면 렌더링 시 TeamPage에서 넘어온 teamAdded 변수가 true인지 확인하고 토스트 띄우기
+  useEffect(() => {
+    console.log("TeamPage", teamAdded);
+    if (teamAdded) {
+      handleShowToast();
+      navigation.setParams({ teamAdded: false });
+    }
+  }, [handleShowToast, teamAdded]);
+
   return (
     <View style={styles.container}>
       <StatusBar style={"dark"}></StatusBar>
-      <View style={styles.addBtnContainter}>
-        {/* 팀 추가에 점근할 수 있는 버튼 */}
-        <TouchableOpacity style={styles.addBtnContainter} onPress={handlePress}>
-          <Image
-            style={styles.addOrCloseBtn}
-            source={require("../../images/ClassAddBtn.png")}
-          ></Image>
+      <View style={s.headContainer}></View>
+      {/* 팀 추가에 점근할 수 있는 버튼 */}
+      <TouchableOpacity style={styles.AddBtnContainer} onPress={handlePress}>
+        <Image
+          style={styles.addOrCloseBtn}
+          source={require("../../images/ClassAddBtn.png")}
+        ></Image>
 
-          {/* 모달 뷰 */}
-          <Modal
-            style={styles.modalView}
-            // animationType="fade"
-            transparent={true}
-            visible={showModal}
-            animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
-            animationOutTiming={20}
-          >
-            <TouchableWithoutFeedback onPress={handlePress}>
-              {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
-              <View style={styles.modalView}>
-                <View style={styles.addBtnContainter}>
-                  {/* 엑스 버튼 */}
-                  <TouchableOpacity
-                    style={styles.addBtnContainter}
-                    onPress={handlePress}
-                  >
-                    <Image
-                      style={styles.addOrCloseBtn}
-                      source={require("../../images/CloseClassAddBtn.png")}
-                    ></Image>
-                  </TouchableOpacity>
-                </View>
-
-                {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
-                <View style={styles.TwoBtnContainer} onPress={handlePress}>
-                  {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("TeamAddPage"), setShowModal(false);
-                    }}
-                  >
-                    <View style={styles.AddClassBtn}>
-                      <Text>팀 등록</Text>
-                    </View>
-                  </TouchableOpacity>
-                  {/* 팀 참여하기 버튼: 팀 참여하기 페이지로 넘어가는 버튼 */}
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("TeamJoinPage"), setShowModal(false);
-                    }}
-                  >
-                    <View style={styles.JoinClassBtn}>
-                      <Text>팀 참여하기</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                {/* 버튼 위치 맞추기 위한 style */}
-                <View flex={1}></View>
-                <View height="10%"></View>
+        {/* 모달 뷰 */}
+        <Modal
+          style={styles.modalView}
+          // animationType="fade"
+          transparent={true}
+          visible={showModal}
+          animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
+          animationOutTiming={20}
+        >
+          <TouchableWithoutFeedback onPress={handlePress}>
+            {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
+            <View style={styles.modalView}>
+              <View style={s.headContainer}></View>
+              {/* 엑스 버튼 */}
+              <TouchableOpacity
+                style={styles.AddBtnContainer}
+                onPress={handlePress}
+              >
+                <Image
+                  style={styles.addOrCloseBtn}
+                  source={require("../../images/CloseClassAddBtn.png")}
+                ></Image>
+              </TouchableOpacity>
+              {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
+              <View style={styles.twoBtnContainer} onPress={handlePress}>
+                {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
+                <TouchableOpacity
+                  style={styles.addClassBtn}
+                  onPress={() => {
+                    navigation.navigate("TeamAddPage"), setShowModal(false);
+                  }}
+                >
+                  <Text style={styles.addClassBtnText}>팀 등록</Text>
+                  <Image
+                    source={require("../../images/icons/teamAdd_plus.png")}
+                    style={{ width: 16, height: 16 }}
+                  />
+                </TouchableOpacity>
+                {/* 팀 참여하기 버튼: 팀 참여하기 페이지로 넘어가는 버튼 */}
+                <TouchableOpacity
+                  style={styles.joinClassBtn}
+                  onPress={() => {
+                    navigation.navigate("TeamJoinPage"), setShowModal(false);
+                  }}
+                >
+                  <Text style={styles.addClassBtnText}>팀 참여</Text>
+                  <Image
+                    source={require("../../images/icons/teamJoin.png")}
+                    style={{ width: 16, height: 16 }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("TeamJoinPage"), setShowModal(false);
+                  }}
+                ></TouchableOpacity>
               </View>
-            </TouchableWithoutFeedback>
-          </Modal>
-        </TouchableOpacity>
-      </View>
-
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      </TouchableOpacity>
       {/* 팀 파일 렌더링하는 코드 */}
       {/* 저장된 팀 리스트를 TeamItem페이지로 보내어서 생성하여 생성된 TeamIteam들을 TeamPage화면에 렌더링*/}
-      <View style={styles.classContainer}>
-        {
-          <FlatList
-            numColumns={2}
-            showsVerticalScrollIndicator={false}
-            data={teamList}
-            contentContainerStyle={styles.teamListContainer}
-            renderItem={({ item }) => (
-              <TeamItem
-                title={item.title}
-                id={item.id}
-                fileColor={item.fileImage}
-                deleteTeamItem={deleteTeamItem}
-                //getTeamList={getTeamList}
-              ></TeamItem>
-            )}
-            keyExtractor={(item) => item.id}
-          />
-        }
-      </View>
+      <FlatList
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        data={teamList}
+        contentContainerStyle={styles.teamListContainer}
+        columnWrapperStyle={{
+          justifyContent: "space-between",
+        }}
+        renderItem={({ item }) => (
+          <TeamItem
+            title={item.title}
+            id={item.id}
+            fileColor={item.fileImage}
+            deleteTeamItem={deleteTeamItem}
+            //getTeamList={getTeamList}
+          ></TeamItem>
+        )}
+        keyExtractor={(item) => item.id}
+      />
+      <Toast
+        position="bottom"
+        style={styles.text}
+        visibilityTime={2000}
+        config={toastConfig}
+      />
     </View>
   );
 };
@@ -187,25 +222,17 @@ export default TeamPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: "5%",
     backgroundColor: "white",
-  },
-  classContainer: {
-    flex: 2,
-    //backgroundColor: "grey",
-    alignItems: "center",
-    flexWrap: "wrap",
   },
   teamListContainer: {
     //backgroundColor: "red",
-    width: WINDOW_WIDHT * 0.9,
+    width: WINDOW_WIDHT * 0.92,
+    alignSelf: "center",
   },
-  addBtnContainter: {
-    flex: 0.3,
-    //backgroundColor: "teal",
+  AddBtnContainer: {
     alignItems: "flex-end",
-    justifyContent: "flex-end",
-    marginBottom: "2%",
+    paddingBottom: "2%",
+    paddingHorizontal: "5%",
   },
   addOrCloseBtn: {
     width: 40,
@@ -215,25 +242,34 @@ const styles = StyleSheet.create({
   modalView: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    paddingHorizontal: "5%",
   },
-  TwoBtnContainer: {
-    flex: 1,
+  twoBtnContainer: {
+    paddingHorizontal: "6%",
     alignItems: "flex-end",
-    justifyContent: "flex-start",
+    justifyContent: "center",
   },
-  AddClassBtn: {
+  addClassBtn: {
     backgroundColor: "white",
     padding: 10,
-    borderRadius: 20,
-    marginBottom: "2%",
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginBottom: 12,
+    marginTop: "2%",
   },
-  AddBtnText: {
+  addClassBtnText: {
+    fontFamily: "SUIT-Regular",
     fontSize: 14,
+    paddingHorizontal: 1,
+    marginRight: 3,
   },
-  JoinClassBtn: {
+  joinClassBtn: {
     backgroundColor: "white",
     padding: 10,
-    borderRadius: 20,
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
   },
 });

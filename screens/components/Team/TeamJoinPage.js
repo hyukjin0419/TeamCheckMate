@@ -13,20 +13,37 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
+import s from "../../styles/css";
+import {
+  db,
+  collection,
+  addDoc,
+  auth,
+  doc,
+  setDoc,
+  getDocs,
+  updateDoc,
+} from "../../../firebase";
+import { arrayUnion } from "firebase/firestore";
 
 export default function TeamJoinPage() {
   const navigation = useNavigation();
-
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated); //확인 버튼 색상 초기값 (회색)
-  const [buttonDisabled, setButtonDisabled] = useState(true); //확인 버튼 상태 초기값 (비활성화 상태)
-
+  //회원정보 가져오기
+  const user = auth.currentUser;
+  //가져온 정보에서 이메일 빼서 저장하기
+  const email = user.email;
+  //확인 버튼 색상 초기값 (회색)
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  //확인 버튼 상태 초기값 (비활성화 상태)
+  const [buttonDisabled, setButtonDisabled] = useState(true);
   //참여코드
-  const [joinCode, setJoinCode] = useState("");
-  //문자 입력시 확인버튼 활성화, 색상 변경
+  const [teamCode, setTeamCode] = useState("");
+  //확인 버튼 한번 누르면, 다음부터는 안눌릴 수 있도록 하기 위한 변수
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
 
   //문자 입력시 확인버튼 활성화, 색상 변경
-  const joinCodeInputChange = (text) => {
-    setJoinCode(text);
+  const activatedHeadBtn = (text) => {
+    setTeamCode(text);
     if (text.length > 0) {
       setButtonDisabled(false);
       setConfirmBtnColor(color.activated);
@@ -34,6 +51,31 @@ export default function TeamJoinPage() {
       setButtonDisabled(true);
       setConfirmBtnColor(color.deactivated);
     }
+  };
+
+  //확인 버튼 누르면 팀 코드가, 자신의 teamList 문서에 추가된다
+  const pressHeadBtn = async () => {
+    try {
+      if (isButtonClicked) {
+        return;
+      }
+      setIsButtonClicked(true);
+      //팀코드 -> 유저 페이지에 추가
+      const userDocRef = doc(db, "user", email);
+      const teamListCollectionRef = collection(userDocRef, "teamList");
+      await setDoc(doc(teamListCollectionRef, teamCode), {
+        teamID: teamCode,
+      });
+
+      //팀 페이지 -> 유저 이메일 추가
+      const teamDocRef = doc(db, "team", teamCode);
+      await updateDoc(teamDocRef, {
+        member_id_array: arrayUnion(email),
+      });
+    } catch (e) {
+      console.error("[TeamJoinPage] Error adding document: ", e);
+    }
+    navigation.navigate("TeamPage");
   };
 
   return (
@@ -52,15 +94,21 @@ export default function TeamJoinPage() {
             <AntDesign name="left" size={20} color="black" />
           </TouchableOpacity>
           <Text style={s.title}>팀 참여</Text>
-          <TouchableOpacity disabled={buttonDisabled} style={s.titleSendBtn}>
-            <Text style={{ ...s.titleSendText }}>확인</Text>
+          <TouchableOpacity
+            disabled={buttonDisabled}
+            style={s.titleRightBtn}
+            onPress={() => {
+              pressHeadBtn();
+            }}
+          >
+            <Text style={s.titleRightText}>확인</Text>
           </TouchableOpacity>
         </View>
-        <View style={s.inputContainer}>
+        <View style={styles.inputContainer}>
           <TextInput
             placeholder="참여 코드"
-            onChangeText={joinCodeInputChange}
-            style={s.inputContainerText}
+            onChangeText={activatedHeadBtn}
+            style={styles.inputContainerText}
           ></TextInput>
         </View>
       </KeyboardAvoidingView>
@@ -68,7 +116,7 @@ export default function TeamJoinPage() {
   );
 }
 
-const s = StyleSheet.create({
+const styles = StyleSheet.create({
   //화면 전체 컨테이너
   container: {
     flex: 1,
@@ -98,12 +146,12 @@ const s = StyleSheet.create({
     // backgroundColor: "yellow",
   },
   //헤더 컨테이너 오른쪽 TouchableOpacity
-  titleSendBtn: {
+  titleRightBtn: {
     flex: 1,
     // backgroundColor: "blue",
   },
   //헤더 컨테이너 오른쪽 TouchableOpacity안 Text
-  titleSendText: {
+  titleRightText: {
     fontWeight: "bold",
     fontSize: 16,
     alignSelf: "flex-end", // 오른쪽 정렬
@@ -111,7 +159,7 @@ const s = StyleSheet.create({
   //참여 코드 입력창
   inputContainer: {
     // backgroundColor: "yellow",
-    marginTop: 40,
+    marginTop: 20,
     flex: 0.08,
     display: "flex",
     justifyContent: "center",
