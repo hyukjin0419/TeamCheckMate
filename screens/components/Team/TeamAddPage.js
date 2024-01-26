@@ -188,6 +188,15 @@ export default TeamAddPage_origin = () => {
                   <View style={styles.modalItemContainter}>
                     {/* 모달창 상위 부분 회색 막대기 */}
                     <View style={styles.modalVector}></View>
+                    <Text
+                      style={{
+                        marginTop: 15,
+                        fontFamily: "SUIT-Medium",
+                        fontSize: 14,
+                      }}
+                    >
+                      색상
+                    </Text>
                     {/* 모달창 내 색상 옵션 컨테이너 */}
                     <View style={styles.colorContainer}>
                       {/* 6x6 색상 옵션 컨테이너 (rowColorsContainer 하나당 색상 6개씩 총 6줄) */}
@@ -343,14 +352,11 @@ export default TeamAddPage_origin = () => {
                         ))}
                       </View>
                     </View>
-                    <View style={styles.modalBtnContainer}>
-                      <TouchableOpacity onPress={confirmColor}>
-                        <Image
-                          style={styles.modalConfirmBtn}
-                          source={require("../../images/modalConfirmBtn.png")}
-                        ></Image>
-                      </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={confirmColor}>
+                      <View style={styles.modalConfirmBtn}>
+                        <Text style={styles.modalText}>확인</Text>
+                      </View>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </Modal>
@@ -382,6 +388,10 @@ const styles = StyleSheet.create({
     fontFamily: "SUIT-Regular",
     paddingTop: "2%",
   },
+  modalText: {
+    fontSize: 14,
+    fontFamily: "SUIT-Medium",
+  },
   modalItemContainter: {
     flex: 1,
     alignItems: "center",
@@ -392,16 +402,13 @@ const styles = StyleSheet.create({
   colorContainer: {
     flex: 1.5,
     justifyContent: "space-evenly",
-    //backgroundColor: "yellow"
+    //backgroundColor: "yellow",
   },
   modalBtnContainer: {
     flex: 0.2,
     alignItems: "center",
-    //backgroundColor: "red"
-  },
-  modalText: {
-    marginTop: "3%",
-    fontSize: 16,
+    //backgroundColor: "red",
+    marginBottom: 20,
   },
   circleSelected: {
     height: 40,
@@ -414,12 +421,17 @@ const styles = StyleSheet.create({
   modalColorsContainer: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    width: "95%",
+    width: "100%",
+    //backgroundColor: "red",
   },
   modalConfirmBtn: {
     borderRadius: 10,
     width: WINDOW_WIDHT * 0.9,
     height: WINDOW_HEIGHT * 0.06,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    backgroundColor: color.deletegrey,
   },
   modalVector: {
     height: 5,
@@ -441,7 +453,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderStartStartRadius: 20,
     borderStartEndRadius: 20,
-    height: 550 /*WINDOW_HEIGHT * 0.6*/,
+    height: 490 /*WINDOW_HEIGHT * 0.6*/,
     marginTop: "auto",
     marginHorizontal: "-5.5%",
     marginVertical: "-7%",
@@ -477,34 +489,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     flexDirection: "row",
   },
-  headerContainer: {
-    marginTop: "5%",
-    flex: 0.13,
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
-    //backgroundColor: "red",
-  },
-  backBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: "center",
-    marginLeft: "3%",
-  },
   confirmBtn: {
     flex: 1,
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "flex-end",
     marginRight: "3%",
-  },
-  headerText: {
-    fontSize: 19,
-    fontWeight: "500",
   },
 });
