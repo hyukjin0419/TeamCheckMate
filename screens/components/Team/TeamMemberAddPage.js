@@ -102,6 +102,7 @@ export default function AddMembers({ route }) {
       });
       console.log("이메일 추가 성공");
     } else {
+      Alert.alert("이미 추가된 이메일입니다.");
       console.log("이미 추가된 이메일입니다.");
     }
     setIsSearching(false);
