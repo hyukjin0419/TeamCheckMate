@@ -138,7 +138,10 @@ export default TeamPage = () => {
                   }}
                 >
                   <Text style={styles.addClassBtnText}>팀 등록</Text>
-                  <FontAwesome5 name="plus" size={18} color="black" />
+                  <Image
+                    source={require("../../images/icons/teamAdd_plus.png")}
+                    style={{ width: 16, height: 16 }}
+                  />
                 </TouchableOpacity>
                 {/* 팀 참여하기 버튼: 팀 참여하기 페이지로 넘어가는 버튼 */}
                 <TouchableOpacity
@@ -148,7 +151,10 @@ export default TeamPage = () => {
                   }}
                 >
                   <Text style={styles.addClassBtnText}>팀 참여</Text>
-                  <Ionicons name="people-sharp" size={18} color="black" />
+                  <Image
+                    source={require("../../images/icons/teamJoin.png")}
+                    style={{ width: 16, height: 16 }}
+                  />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
@@ -227,7 +233,8 @@ const styles = StyleSheet.create({
   addClassBtnText: {
     fontFamily: "SUIT-Regular",
     fontSize: 14,
-    marginHorizontal: 5,
+    paddingHorizontal: 1,
+    marginRight: 3,
   },
   joinClassBtn: {
     backgroundColor: "white",
