@@ -82,6 +82,8 @@ export default TeamAddPage_origin = () => {
         title: textInputValue,
         fileImage: colorConfirmed,
         timestamp: timestamp,
+        leader_id: email,
+        member_id_array: [],
       });
       console.log("TeamAddPage: Document written with ID: ", teamDocRef.id);
       const userDocRef = doc(db, "user", email);

@@ -14,7 +14,17 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
 import s from "../../styles/css";
-import { db, collection, addDoc, auth, doc, setDoc } from "../../../firebase";
+import {
+  db,
+  collection,
+  addDoc,
+  auth,
+  doc,
+  setDoc,
+  getDocs,
+  updateDoc,
+} from "../../../firebase";
+import { arrayUnion } from "firebase/firestore";
 
 export default function TeamJoinPage() {
   const navigation = useNavigation();
@@ -50,13 +60,20 @@ export default function TeamJoinPage() {
         return;
       }
       setIsButtonClicked(true);
+      //팀코드 -> 유저 페이지에 추가
       const userDocRef = doc(db, "user", email);
       const teamListCollectionRef = collection(userDocRef, "teamList");
       await setDoc(doc(teamListCollectionRef, teamCode), {
         teamID: teamCode,
       });
+
+      //팀 페이지 -> 유저 이메일 추가
+      const teamDocRef = doc(db, "team", teamCode);
+      await updateDoc(teamDocRef, {
+        member_id_array: arrayUnion(email),
+      });
     } catch (e) {
-      console.error("TeamJoinPage: Error adding document: ", e);
+      console.error("[TeamJoinPage] Error adding document: ", e);
     }
     navigation.navigate("TeamPage");
   };
