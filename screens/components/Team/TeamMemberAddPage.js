@@ -242,7 +242,7 @@ export default function AddMembers({ route }) {
                 <TouchableOpacity
                   style={s.twoBtnContainerRight}
                   onPress={() => {
-                    navigation.navigate("TeamPage");
+                    navigation.navigate("TeamPage", { teamAdded: true });
                   }}
                 >
                   <Text style={s.twoBtnContainerRightText}>건너뛰기</Text>

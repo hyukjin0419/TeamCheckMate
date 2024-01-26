@@ -83,7 +83,7 @@ export default TeamAddPage_origin = () => {
         fileImage: colorConfirmed,
         timestamp: timestamp,
       });
-      console.log("Document written with ID: ", teamDocRef.id);
+      console.log("TeamAddPage: Document written with ID: ", teamDocRef.id);
       const userDocRef = doc(db, "user", email);
       addTeamIdtoUser(userDocRef, teamDocRef.id);
 
