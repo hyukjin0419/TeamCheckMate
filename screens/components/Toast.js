@@ -1,13 +1,11 @@
 // ToastContainer.js
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
-import { Text, View } from "react-native";
 import React from "react";
 
 export const showToast = (type, message) => {
   Toast.show({
     type: type,
     text1: message,
-    // additional configurations if needed
   });
 };
 
@@ -16,8 +14,9 @@ export const toastConfig = {
     <BaseToast
       {...props}
       style={{
-        backgroundColor: "yellow",
+        backgroundColor: "#000000BF",
         borderRadius: 15,
+        borderLeftWidth: 0,
         borderLeftColor: "#000000BF",
       }}
       contentContainerStyle={{ paddingHorizontal: 15 }}

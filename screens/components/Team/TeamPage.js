@@ -17,11 +17,7 @@ import * as Font from "expo-font";
 import s from "../../styles/css";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import {
-  useFocusEffect,
-  useIsFocused,
-  useRoute,
-} from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
 import {
   db,
@@ -44,13 +40,14 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 export default TeamPage = () => {
   const navigation = useNavigation();
   //토스트 창을 사용하기 위해
-  const isFocused = useIsFocused();
+  //TeamMemberAddPage에서 넘어왔다면 => 팀이 생성 되었다는 뜻.
   const route = useRoute();
+  const teamAdded = route.params?.teamAdded; //true
+  //Toast.js 사용. 토스트 함수 생성
   const handleShowToast = () => {
     console.log("TeamPage: Toast 작동중");
-    showToast("success", "✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
+    showToast("success", "  ✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
   };
-  const teamAdded = route.params?.teamAdded;
 
   //회원정보 가져오기
   const user = auth.currentUser;
@@ -110,13 +107,14 @@ export default TeamPage = () => {
     }, [])
   );
 
+  //화면 렌더링 시 TeamPage에서 넘어온 teamAdded 변수가 true인지 확인하고 토스트 띄우기
   useEffect(() => {
     console.log("TeamPage", teamAdded);
     if (teamAdded) {
       handleShowToast();
       navigation.setParams({ teamAdded: false });
     }
-  }, [isFocused, handleShowToast, teamAdded]);
+  }, [handleShowToast, teamAdded]);
 
   return (
     <View style={styles.container}>
