@@ -60,7 +60,7 @@ const commonStyles = StyleSheet.create({
   },
   //로그인 화면에서 쓰이는 textInput
   textInput: {
-    marginTop: "8%",
+    marginTop: "10%",
     fontSize: 16,
     borderBottomColor: "#050026",
     borderBottomWidth: 2,

@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/core";
 import { color } from "../../styles/colors";
+import * as Clipboard from "expo-clipboard"
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -122,6 +124,11 @@ const TeamItem = (props) => {
     SetTeamOptionModalVisible(!TeamOptionModalVisible);
   };
 
+  const copyToClipboard = async (groupCode) => {
+    await Clipboard.setStringAsync(groupCode);
+    Alert.alert("코드 복사 했습니다");
+  }
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -172,9 +179,11 @@ const TeamItem = (props) => {
                   {/* 모달창 상단 팀 이름 표시 */}
                   <Text style={styles.modalTitle}>{title}</Text>
                   {/* 참여 코드 */}
-                  <View style={styles.joinCode}>
-                    <Text>참여 코드: {props.id}</Text>
-                  </View>
+                  <TouchableOpacity onPress={() => copyToClipboard(props.id)}>
+                    <View style={styles.joinCode}>
+                      <Text>참여 코드: {props.id}</Text>
+                    </View>
+                  </TouchableOpacity>
                   <View flex={1}>
                     <TouchableOpacity
                       onPress={() => {
