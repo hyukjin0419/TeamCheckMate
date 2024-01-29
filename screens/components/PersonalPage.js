@@ -1,8 +1,9 @@
-import { View, Button, StyleSheet } from "react-native";
+import { View, Button, StyleSheet, Text, TouchableOpacity } from "react-native";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { EvilIcons } from "@expo/vector-icons";
 import { showToast, toastConfig } from "../components/Toast";
 import Modal from "react-native-modal"
+import { useState } from "react";
 
 const PersonalPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -44,7 +45,6 @@ const PersonalPage = () => {
             </View>
           </View>
       </Modal>
-      <StatusBar style="auto" />
     </View>
   );
 };
