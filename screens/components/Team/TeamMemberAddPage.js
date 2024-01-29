@@ -148,6 +148,8 @@ export default function AddMembers({ route }) {
       // 오류 처리 등이 필요하면 추가할 수 있습니다.
     }
   };
+
+  // -------------------------------------------------------------
   return (
     // 이메일 입력중 나머지 화면 누르면 키보드 및 검색창 내리기
     <TouchableWithoutFeedback
@@ -250,7 +252,11 @@ export default function AddMembers({ route }) {
                         ? "#050026"
                         : confirmBtnColor,
                   }}
-                  onPress={sendEmail}
+                  onPress={() => {
+                    if (addedUserEmailArray.length > 0) {
+                      sendEmail();
+                    }
+                  }}
                 >
                   <Text style={s.twoBtnContainerLeftText}>보내기</Text>
                 </TouchableOpacity>
