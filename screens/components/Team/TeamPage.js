@@ -24,6 +24,7 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  getDoc,
   getDocs,
   collection,
   addDoc,
@@ -97,11 +98,18 @@ export default TeamPage = () => {
   //팀 삭제 코드
   const deleteTeamItem = async (id) => {
     const teamRef = doc(db, "team", id);
+    const teamDoc = await getDoc(teamRef); // getDocs 대신 getDoc 사용
+    const teamData = teamDoc.data(); // .data() 호출 제거
+
     await updateDoc(teamRef, {
       member_id_array: arrayRemove(user.email),
     });
-    // await deleteDoc(doc(db, "team", id));
-    await deleteDoc(doc(doc(db, "user", user.email), "teamList", id));
+
+    await deleteDoc(doc(db, "user", user.email), "teamList", id); // doc 함수 수정
+
+    if (teamData.member_id_array.length === 0) {
+      await deleteDoc(doc(db, "team", id));
+    }
     getTeamList();
   };
 

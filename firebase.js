@@ -12,6 +12,7 @@ import {
   doc, //문서
   addDoc, //C
   getDocs, //R
+  getDoc,
   updateDoc, //U
   deleteDoc, //D
   setDoc,
@@ -53,6 +54,7 @@ export {
   getFirestore,
   collection,
   addDoc,
+  getDoc,
   getDocs,
   doc,
   setDoc,
