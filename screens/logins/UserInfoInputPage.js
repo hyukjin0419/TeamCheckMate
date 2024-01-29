@@ -27,6 +27,8 @@ export default function UserInfoInputPage({ route }) {
   const [studentNumber, setstudentNumber] = useState("");
   const [phoneNumber, setphoneNumber] = useState("");
   const [logIn, setLogIn] = useState(true);
+  const [disableBtn, setDisableBtn] = useState(true);
+  const [btnColor, setBtnColor] = useState("#D9D9D9")
 
   //회원가입 관련 함수
   const uploadInformation = async () => {
@@ -51,21 +53,26 @@ export default function UserInfoInputPage({ route }) {
 
   //If user presses skip button, set all non mandatory values to be blank
   const skipInput = async () => {
-    try {
-      const timestamp = new Date();
-      const docRef = await setDoc(doc(db, "user", userEmail), {
-        email: userEmail,
-        name: "",
-        school: "",
-        studentNumber: "",
-        phoneNumber: "",
-        hasSignedUp: logIn,
-        timestamp: timestamp,
-      });
-      onUploadSuccess(true);
-    } catch (e) {
-      console.error("문서 추가 중 오류 발생: ", e);
-      setLogIn(false);
+    if(disableBtn) {
+      Alert.alert("이름/닉네임 입력해주세요");
+    }
+    else {
+      try {
+        const timestamp = new Date();
+        const docRef = await setDoc(doc(db, "user", userEmail), {
+          email: userEmail,
+          name: "",
+          school: "",
+          studentNumber: "",
+          phoneNumber: "",
+          hasSignedUp: logIn,
+          timestamp: timestamp,
+        });
+        onUploadSuccess(true);
+      } catch (e) {
+        console.error("문서 추가 중 오류 발생: ", e);
+        setLogIn(false);
+      }
     }
   };
 
@@ -74,6 +81,18 @@ export default function UserInfoInputPage({ route }) {
     deleteUser(user);
     signOut(auth);
   };
+
+  const isNameEmpty = (text) => {
+    setname(text);
+    if(!text.trim()) {
+      setDisableBtn(true);
+      setBtnColor("#D9D9D9");
+    }
+    else {
+      setDisableBtn(false);
+      setBtnColor("#050026");
+    }
+  }
 
   return (
     <KeyboardAvoidingView style={s.container}>
@@ -85,33 +104,40 @@ export default function UserInfoInputPage({ route }) {
         <Text style={s.title}>가입하기</Text>
         <View style={s.titleRightBtn}></View>
       </View>
-
       {/*입력창*/}
       <View style={s.textBox}>
         {/*이름 입력창*/}
         <TextInput
-          placeholder="이름"
+          placeholder="  이름/닉네임"
           value={name}
-          onChangeText={(text) => setname(text)}
+          onChangeText={(text) => isNameEmpty(text)}
           style={s.textInput}
         />
+        {!name.trim() && (
+          <Text style={{color: "red", position: "absolute", marginTop: "9%"}}>*</Text>
+        )}
+        {!name.trim() && (
+          <Text style={{color: "red", position: "absolute", marginLeft: "40%", marginTop: "21%"}} >이름/닉네임을 반드시 입력해주세요!</Text>
+        )}
+
         {/*학교 입력창*/}
         <TextInput
-          placeholder="학교"
+          placeholder=" 학교"
           value={school}
           onChangeText={(text) => setschool(text)}
           style={s.textInput}
         />
+        
         {/*학번 입력창*/}
         <TextInput
-          placeholder="학번"
+          placeholder=" 학번"
           value={studentNumber}
           onChangeText={(text) => setstudentNumber(text)}
           style={s.textInput}
         />
         {/*전화번호 입력창*/}
         <TextInput
-          placeholder="전화번호"
+          placeholder=" 전화번호"
           value={phoneNumber}
           onChangeText={(text) => setphoneNumber(text)}
           style={s.textInput}
@@ -122,7 +148,8 @@ export default function UserInfoInputPage({ route }) {
         {/*가입하기 버튼*/}
         <TouchableOpacity
           onPress={uploadInformation}
-          style={{ ...s.button, backgroundColor: color.activated }}
+          style={{ ...s.button, backgroundColor: btnColor }}
+          disabled={disableBtn}
         >
           <Text style={{ ...s.buttonText, color: "white" }}>확인</Text>
         </TouchableOpacity>

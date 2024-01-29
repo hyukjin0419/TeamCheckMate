@@ -102,6 +102,7 @@ export default function AddMembers({ route }) {
       });
       console.log("이메일 추가 성공");
     } else {
+      Alert.alert("이미 추가된 이메일입니다.");
       console.log("이미 추가된 이메일입니다.");
     }
     setIsSearching(false);
@@ -119,7 +120,7 @@ export default function AddMembers({ route }) {
     console.log("이메일 제거 성공");
   };
 
-  const sendEmail = () => {
+  const sendEmail = async () => {
     const bodyText = `
     안녕하세요, 사용자가 발송한 Check Team Mate의 팀 초대코드입니다.
     팀 등록 페이지에서 팀 초대코드를 입력해주세요.
@@ -127,12 +128,28 @@ export default function AddMembers({ route }) {
     팀 초대코드: ${teamCode}
   `;
     const recipientEmails = addedUserEmailArray.map((item) => item.id);
-    MailComposer.composeAsync({
-      recipients: recipientEmails,
-      subject: "[Check Team Mate_초대코드 발송]",
-      body: bodyText,
-    });
+    try {
+      const result = await MailComposer.composeAsync({
+        recipients: recipientEmails,
+        subject: "[Check Team Mate_초대코드 발송]",
+        body: bodyText,
+      });
+      console.log("MailComposer 결과:", result);
+
+      // 메일이 성공적으로 전송되었을 때에만 navigate
+      if (result.status === "sent") {
+        navigation.navigate("TeamPage", { teamAdded: true });
+      } else {
+        // 사용자가 메일을 취소하거나 전송에 실패한 경우의 처리
+        console.log("메일 전송이 취소되었거나 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("메일 보내기 오류:", error);
+      // 오류 처리 등이 필요하면 추가할 수 있습니다.
+    }
   };
+
+  // -------------------------------------------------------------
   return (
     // 이메일 입력중 나머지 화면 누르면 키보드 및 검색창 내리기
     <TouchableWithoutFeedback
@@ -235,14 +252,19 @@ export default function AddMembers({ route }) {
                         ? "#050026"
                         : confirmBtnColor,
                   }}
-                  onPress={sendEmail}
+                  onPress={() => {
+                    if (addedUserEmailArray.length > 0) {
+                      sendEmail();
+                    }
+                  }}
                 >
                   <Text style={s.twoBtnContainerLeftText}>보내기</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={s.twoBtnContainerRight}
                   onPress={() => {
-                    navigation.navigate("TeamPage");
+                    //팀 페이지로 넘어갈 때 토스트 띄우기 위한 boolean
+                    navigation.navigate("TeamPage", { teamAdded: true });
                   }}
                 >
                   <Text style={s.twoBtnContainerRightText}>건너뛰기</Text>

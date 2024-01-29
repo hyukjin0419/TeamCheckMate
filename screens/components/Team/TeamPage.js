@@ -10,13 +10,14 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { useState, useEffect } from "react";
 import * as Font from "expo-font";
 import s from "../../styles/css";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
 import {
   db,
@@ -30,15 +31,27 @@ import {
 } from "../../../firebase";
 import { query, orderBy } from "firebase/firestore";
 import * as React from "react";
+import { showToast, toastConfig } from "../Toast";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamPage = () => {
   const navigation = useNavigation();
+  //토스트 창을 사용하기 위해
+  //TeamMemberAddPage에서 넘어왔다면 => 팀이 생성 되었다는 뜻.
+  const route = useRoute();
+  const teamAdded = route.params?.teamAdded; //true
+  //Toast.js 사용. 토스트 함수 생성
+  const handleShowToast = () => {
+    console.log("TeamPage: Toast 작동중");
+    showToast("success", "  ✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
+  };
+
   //회원정보 가져오기
   const user = auth.currentUser;
-  console.log("이걸로도 갖올 수 있는겨?" + user.email);
+  console.log("TeamPage: 이걸로도 갖올 수 있는겨?" + user.email);
   //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
   const [showModal, setShowModal] = useState(false);
   const handlePress = () => {
@@ -59,7 +72,7 @@ export default TeamPage = () => {
       const querySnapshot2 = await getDocs(query(userTeamCollectionRef));
       const list = [];
       querySnapshot2.forEach((doc2) => {
-        console.log("TeamID in querySnapshot2:", doc2.data().teamID);
+        // console.log("TeamID in querySnapshot2:", doc2.data().teamID);
       });
 
       querySnapshot1.forEach((doc) => {
@@ -71,7 +84,7 @@ export default TeamPage = () => {
             id: doc.id,
             ...doc.data(),
           });
-          console.log("성공: " + doc.id, doc.data());
+          // console.log("성공: " + doc.id, doc.data());
         }
       });
       setTeamList(list);
@@ -93,6 +106,15 @@ export default TeamPage = () => {
       getTeamList();
     }, [])
   );
+
+  //화면 렌더링 시 TeamPage에서 넘어온 teamAdded 변수가 true인지 확인하고 토스트 띄우기
+  useEffect(() => {
+    console.log("TeamPage", teamAdded);
+    if (teamAdded) {
+      handleShowToast();
+      navigation.setParams({ teamAdded: false });
+    }
+  }, [handleShowToast, teamAdded]);
 
   return (
     <View style={styles.container}>
@@ -185,6 +207,12 @@ export default TeamPage = () => {
           ></TeamItem>
         )}
         keyExtractor={(item) => item.id}
+      />
+      <Toast
+        position="bottom"
+        style={styles.text}
+        visibilityTime={2000}
+        config={toastConfig}
       />
     </View>
   );
