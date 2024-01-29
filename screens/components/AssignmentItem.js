@@ -78,7 +78,7 @@ const AssignmentItem = (props) => {
     <View style={styles.assignmentBox}>
       {/* DueDate와 과제 이름 */}
       <View style={styles.assignmentDataContainer}>
-        <Text style={styles.dueDateText}>Due Date: {dueDate}</Text>
+        <Text style={styles.dueDateText}>제출 기한: {dueDate}</Text>
         <Text style={styles.assignmentNameText}>{assignmentName}</Text>
       </View>
       {/* 과제 옵션 버튼 (터치 시 모달창 띄움) */}
@@ -125,7 +125,7 @@ const AssignmentItem = (props) => {
                     {assignmentName}
                   </Text>
                 </View>
-                <Text style={styles.modalDueDateText}>Due Date: {dueDate}</Text>
+                <Text style={styles.modalDueDateText}>제출기한: {dueDate}</Text>
                 {/* 참여 코드, 팀원 목록 표시 */}
                 <View flex={1}></View>
                 {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
@@ -191,6 +191,8 @@ const styles = StyleSheet.create({
   },
   dueDateText: {
     color: color.redpink,
+    fontSize: 12,
+    fontFamily: "SUIT-Regular",
   },
   modalAssignmentNameTextContainer: {
     flex: 1,
@@ -201,11 +203,13 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginHorizontal: "10%",
     color: color.redpink,
+    fontSize: 14,
+    fontFamily: "SUIT-Regular",
   },
   assignmentNameText: {
     color: color.activated,
     fontSize: 20,
-    fontWeight: "500",
+    fontFamily: "SUIT-Regular",
   },
   assignmentOptionBtnContainer: {
     flex: 0.05,
@@ -238,6 +242,8 @@ const styles = StyleSheet.create({
   },
   teamReviseText: {
     color: "white",
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
   },
   teamDeleteBtn: {
     width: WINDOW_WIDHT * 0.4,
@@ -249,6 +255,8 @@ const styles = StyleSheet.create({
   },
   teamDeleteText: {
     color: color.redpink,
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
   },
   modal: {
     flex: 1,
@@ -292,30 +300,5 @@ const styles = StyleSheet.create({
     width: WINDOW_WIDHT * 0.4,
     height: WINDOW_HEIGHT * 0.18,
     marginHorizontal: 10,
-  },
-  optionContainer: {
-    flex: 1,
-    alignItems: "flex-end",
-    justifyContent: "flex-start",
-    //backgroundColor: "blue",
-    marginBottom: "5%",
-  },
-  fileOption: {
-    //backgroundColor: "red",
-    width: "20%",
-    height: "80%",
-  },
-  titleContainer: {
-    flex: 1,
-    paddingHorizontal: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: "30%",
-    //backgroundColor: "teal",
-  },
-  title: {
-    textAlign: "center",
-    fontSize: 17,
-    fontWeight: "400",
   },
 });
