@@ -204,7 +204,6 @@ export default TeamPage = () => {
             id={item.id}
             fileColor={item.fileImage}
             deleteTeamItem={deleteTeamItem}
-            //getTeamList={getTeamList}
           ></TeamItem>
         )}
         keyExtractor={(item) => item.id}

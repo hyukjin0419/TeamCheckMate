@@ -14,19 +14,9 @@ import { useNavigation } from "@react-navigation/core";
 import React, { useState, useEffect } from "react";
 import { color } from "../styles/colors";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
-import {
-  db,
-  doc,
-  updateDoc,
-  deleteDoc,
-  getDocs,
-  collection,
-  addDoc,
-  auth,
-} from "../../firebase";
+import { db, doc, getDocs, collection, auth } from "../../firebase";
 import AssignmentItem from "./AssignmentItem";
 import s from "../styles/css";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 구하는 코드
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -163,6 +153,7 @@ const AssignmentPage = () => {
       }}
     >
       <StatusBar style={"dark"}></StatusBar>
+      {/* 헤더 */}
       <View
         style={{
           ...s.headContainer,
@@ -181,8 +172,10 @@ const AssignmentPage = () => {
           <Text>{title}</Text>
         </ImageBackground>
       </View>
+      {/* 팀메이트 보여주는 남색 칸 */}
       <View style={styles.teamMate}>
         <Text style={styles.teamMateText}>팀 메이트: </Text>
+        {/* 팀메이트 추가 버튼 */}
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("TeamMemberAddPage", {
@@ -198,9 +191,9 @@ const AssignmentPage = () => {
           />
         </TouchableOpacity>
       </View>
+      {/* 과제 리스트 */}
       <FlatList
         data={assignmentList}
-        contentContainerStyle={styles.assignment}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <AssignmentItem
@@ -228,6 +221,7 @@ const AssignmentPage = () => {
                 });
               }}
             >
+              {/* Add 버튼 */}
               <Image
                 style={styles.addBtn}
                 source={require("../images/ClassAddBtn.png")}
@@ -272,9 +266,6 @@ const styles = StyleSheet.create({
   },
   plusBtn: {
     paddingRight: "3%",
-  },
-  assignment: {
-    //backgroundColor: "red",
   },
   addBtnContainer: {
     alignItems: "center",
