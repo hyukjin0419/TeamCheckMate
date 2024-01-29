@@ -172,9 +172,9 @@ const TeamItem = (props) => {
                   {/* 모달창 상단 팀 이름 표시 */}
                   <Text style={styles.modalTitle}>{title}</Text>
                   {/* 참여 코드 */}
-                  <View style={styles.joinCode}>
+                  <TouchableOpacity style={styles.joinCode}>
                     <Text>참여 코드: {props.id}</Text>
-                  </View>
+                  </TouchableOpacity>
                   <View flex={1}>
                     <TouchableOpacity
                       onPress={() => {

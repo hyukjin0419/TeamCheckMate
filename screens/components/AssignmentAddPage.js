@@ -1,11 +1,10 @@
 //과제 추가 화면
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
   View,
-  Image,
   TextInput,
   TouchableOpacity,
   Dimensions,
@@ -14,9 +13,10 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../styles/colors";
-import { db, collection, addDoc, auth, doc, setDoc } from "../../firebase";
+import { db, collection, addDoc } from "../../firebase";
 import { useNavigation } from "@react-navigation/core";
 import s from "../styles/css";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -35,47 +35,82 @@ export default AssignmentAddPage = ({ route }) => {
   const [buttonDisabled, setButtonDisabled] = useState(true); //확인버튼 상태 (초기값: 비활성화)
 
   {
-    /*과제 이름, Duedate*/
+    /*과제 이름, 제출기한*/
   }
   const [assignmentName, setAssignmentName] = useState("");
-  const [dueDate, setDueDate] = useState("");
 
-  {
-    /* 과제이름, Duedate가 valid input인지 판별 */
-  }
-  const [assignmentValid, setAssignmentValid] = useState(false);
   const [dueDateValid, setDueDateValid] = useState(false);
+  const [assignmentValid, setAssignmentValid] = useState(false);
 
   {
-    /* 과제이름, Duedate가 둘 다 valid input인 경우 확인버튼 활성화 */
+    /* 과제이름, 제출기한 둘 다 valid input인 경우 확인버튼 활성화 */
   }
-  //과제이름
-  const AssignmentNameInputChange = (text) => {
+
+  const handleNameChange = (text) => {
     setAssignmentName(text);
-    if (text.length > 0) {
+    if (text.length > 0 && dueDateValid == true) {
+      setButtonDisabled(false);
+      setConfirmBtnColor(color.activated);
       setAssignmentValid(true);
     } else {
-      setAssignmentValid(false);
-    }
-    if (assignmentValid && dueDateValid) {
-      setButtonDisabled(false);
-      setConfirmBtnColor(color.activated);
+      setButtonDisabled(true);
+      setConfirmBtnColor(color.deactivated);
     }
   };
-  //DueDate
-  const dueDateInputChange = (text) => {
-    setDueDate(text);
-    if (text.length > 0) {
-      setDueDateValid(true);
-    } else {
-      setDueDateValid(false);
+  //제출기한
+  const [date, setDate] = useState(new Date());
+  const [dueDate, setDueDate] = useState("Due Date");
+
+  //날짜, 시간 선택 시 정보 저장
+  const onChange = (e, selectedDate) => {
+    setDate(selectedDate);
+
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(selectedDate.getDate()).padStart(2, "0");
+    const weekday = new Intl.DateTimeFormat("ko-KR", {
+      weekday: "short",
+    }).format(selectedDate);
+    const hour = String(selectedDate.getHours() % 12 || 12).padStart(2, "0");
+    const minute = String(selectedDate.getMinutes()).padStart(2, "0");
+    const ampm = selectedDate.getHours() >= 12 ? "오후" : "오전";
+
+    //제출기한 string
+    const formattedDate = `${year}.${month}.${day}.(${weekday}) ${ampm} ${hour}:${minute}`;
+    {
+      /* dueDate에 제출기한 string 저장 */
     }
-    if (assignmentValid && dueDateValid) {
+    setDueDate(formattedDate);
+    setTextStyle(styles.dueDateTextAfterSelectingDate);
+    setDueDateValid(true);
+
+    // 제출날짜와 시간의 길이 체크, valid input인지 판별
+    if (assignmentName.length > 0 && formattedDate.length > 0) {
       setButtonDisabled(false);
       setConfirmBtnColor(color.activated);
+      setAssignmentValid(true);
+    } else {
+      setButtonDisabled(true);
+      setConfirmBtnColor(color.deactivated);
+      setAssignmentValid(false);
     }
   };
 
+  {
+    /* 제출기한 입력창 터치 시 캘린더 화면에 표시 */
+  }
+  const [show, setShow] = useState(false);
+  const handleDueDatePress = () => {
+    setShow(!show);
+  };
+
+  const [textStyle, setTextStyle] = useState(
+    styles.dueDateTextBeforeSelectingDate
+  );
+
+  {
+    /* 과제 추가 함수 */
+  }
   const addAssignment = async () => {
     try {
       const teamCollectionRef = collection(db, "team", teamid, "과제 list");
@@ -97,7 +132,6 @@ export default AssignmentAddPage = ({ route }) => {
           title: title,
           fileColor: fileColor,
           teamid: teamid,
-          //assignmentId: assignmentDocRef.id,
         });
       } else {
         console.error("assignmentDocRef.id 값이 유효하지 않습니다.");
@@ -148,19 +182,30 @@ export default AssignmentAddPage = ({ route }) => {
         <View style={s.inputTextContainer}>
           <TextInput
             placeholder="과제 이름"
-            onChangeText={AssignmentNameInputChange}
+            onChangeText={handleNameChange}
             value={assignmentName}
             style={s.textInput}
           ></TextInput>
-
-          {/* DueDate TimePicker */}
-
-          <TextInput
-            placeholder="Due Date"
-            onChangeText={dueDateInputChange}
-            value={dueDate}
-            style={s.textInput}
-          ></TextInput>
+          {/* 제출기한 입력창 (터치 시 date time picker 표시) */}
+          <TouchableOpacity
+            style={styles.dueDateTextInputBox}
+            onPress={handleDueDatePress}
+          >
+            <Text style={textStyle}>{dueDate}</Text>
+          </TouchableOpacity>
+          {/* DatePicker */}
+          {show && (
+            <View style={styles.pickerContainer}>
+              <DateTimePicker
+                value={date}
+                mode="datetime"
+                display="inline"
+                style={styles.dueDateBox}
+                onChange={onChange}
+                themeVariant="light"
+              />
+            </View>
+          )}
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -168,55 +213,35 @@ export default AssignmentAddPage = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: "5%",
-    backgroundColor: "white",
+  dueDateTextInputBox: {
+    height: 60,
+    borderBottomWidth: 2,
+    justifyContent: "center",
   },
-  inputContainer: {
-    flex: 1,
-    justifyContent: "flex-start",
-    //backgroundColor: "skyblue",
-  },
-  TextInput: {
-    height: 50,
-    fontSize: 15,
-    fontWeight: "500",
-    marginLeft: "1%",
+  dueDateTextBeforeSelectingDate: {
+    color: color.placeholdergrey,
+    fontSize: 16,
+    fontFamily: "SUIT-Regular",
     marginTop: "5%",
-    paddingTop: "2%",
   },
-  TextInputContainer: {
-    borderBottomWidth: 1,
-  },
-  headerContainer: {
+  dueDateTextAfterSelectingDate: {
+    color: "black",
+    fontSize: 16,
+    fontFamily: "SUIT-Regular",
     marginTop: "5%",
-    flex: 0.15,
+  },
+  pickerContainer: {
+    marginTop: "5%",
     alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
+    //flexDirection: "row",
+    justifyContent: "center",
     //backgroundColor: "red",
+    width: "100%",
   },
-  backBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: "center",
-    marginLeft: "3%",
-  },
-  confirmBtn: {
-    flex: 1,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginRight: "3%",
-  },
-  headerText: {
-    fontSize: 19,
-    fontWeight: "500",
+  dueDateBox: {
+    //backgroundColor: "skyblue",
+    textDecorationColor: "red",
+    width: "100%",
+    height: "100%",
   },
 });
