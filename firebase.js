@@ -17,6 +17,8 @@ import {
   setDoc,
   orderBy,
   query,
+  arrayUnion,
+  deleteField,
 } from "firebase/firestore";
 //import { getDatabase } from "firebase/database";
 // Uncomment the line below if you need to use Firebase Analytics
@@ -57,4 +59,6 @@ export {
   updateDoc,
   deleteDoc,
   onAuthStateChanged,
+  arrayUnion,
+  deleteField,
 };

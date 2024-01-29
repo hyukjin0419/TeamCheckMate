@@ -28,8 +28,9 @@ import {
   collection,
   addDoc,
   auth,
+  deleteField,
 } from "../../../firebase";
-import { query, orderBy } from "firebase/firestore";
+import { query, orderBy, arrayRemove } from "firebase/firestore";
 import * as React from "react";
 import { showToast, toastConfig } from "../Toast";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
@@ -95,7 +96,11 @@ export default TeamPage = () => {
 
   //팀 삭제 코드
   const deleteTeamItem = async (id) => {
-    await deleteDoc(doc(db, "team", id));
+    const teamRef = doc(db, "team", id);
+    await updateDoc(teamRef, {
+      member_id_array: arrayRemove(user.email),
+    });
+    // await deleteDoc(doc(db, "team", id));
     await deleteDoc(doc(doc(db, "user", user.email), "teamList", id));
     getTeamList();
   };
