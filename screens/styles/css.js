@@ -1,6 +1,7 @@
 import * as Font from "expo-font";
 import { useEffect } from "react";
 import { StyleSheet, Dimensions } from "react-native";
+import { color } from "./colors";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -116,7 +117,7 @@ const commonStyles = StyleSheet.create({
   },
   twoBtnContainerRight: {
     flex: 1,
-    backgroundColor: "#EFEFEF",
+    backgroundColor: color.deletegrey,
     padding: 15,
     marginLeft: 5,
     borderRadius: 7,

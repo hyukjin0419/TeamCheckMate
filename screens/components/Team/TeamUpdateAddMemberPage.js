@@ -153,14 +153,7 @@ export default function TeamUpdateAddMemberPage({ route }) {
       <KeyboardAvoidingView style={s.container}>
         {/* 헤더부분 */}
         <View style={s.headContainer}>
-          <TouchableOpacity
-            style={s.headBtn}
-            onPress={() => navigation.goBack()}
-          >
-            <AntDesign name="left" size={20} color="black" />
-          </TouchableOpacity>
           <Text style={s.title}>팀 메이트 초대</Text>
-          <View style={s.titleRightBtn} />
         </View>
 
         {/* 검색창 */}
@@ -248,7 +241,7 @@ export default function TeamUpdateAddMemberPage({ route }) {
                     ...s.twoBtnContainerLeft,
                     backgroundColor:
                       addedUserEmailArray.length > 0
-                        ? "#050026"
+                        ? color.activated
                         : confirmBtnColor,
                   }}
                   onPress={() => {
@@ -266,7 +259,7 @@ export default function TeamUpdateAddMemberPage({ route }) {
                     navigation.navigate("TeamPage", { teamAdded: false });
                   }}
                 >
-                  <Text style={s.twoBtnContainerRightText}>취소</Text>
+                  <Text style={styles.twoBtnContainerRightText}>취소</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -355,6 +348,13 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginLeft: 5,
     marginBottom: 10,
+  },
+  //삭제버튼 {취소} 텍스트
+  twoBtnContainerRightText: {
+    fontFamily: "SUIT-Medium",
+    textAlign: "center",
+    fontSize: 13,
+    color: color.redpink,
   },
 });
 
