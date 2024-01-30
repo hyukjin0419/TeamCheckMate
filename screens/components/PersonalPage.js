@@ -15,41 +15,30 @@ const PersonalPage = () => {
 
   return (
     <View style={styles.container}>
-      <Button title="Open Modal" onPress={openModal} />
+      <Button title="Open Modal" onPress={toggleModal} />
       {/* modal code */}
-      <Modal 
+      <Modal
         onBackdropPress={() => setIsModalVisible(false)}
         isVisible={isModalVisible}
         swipeDirection="down"
-        onSwipeComplete={openModal}
+        onSwipeComplete={toggleModal}
         animationIn="slideInUp"
         animationOut="slideOutDown"
         animationInTiming={200}
-        animationOutTiming={500}  
-        backdropTransitionInTiming={200} 
+        animationOutTiming={500}
+        backdropTransitionInTiming={200}
         backdropTransitionOutTiming={0}
-        style={{justifyContent: "flex-end", margin: 0, flex: 1}}
-        > 
-          {/* Modal content container */}
-          <View style={styles.modalContent}>
-            {/* Center Text */}
-            <View style={styles.center}>
-              {/* Style for the bar on top of modal */}
-              <View style={styles.barIcon} />
-                <Text style={styles.text}>LMS 파인 제출하기</Text>
-            </View>
-            {/* Container for 2 buttons */}
-            <View style={{flexDirection: "row", justifyContent: "space-between", marginTop: 50, alignItems: "center"}}>
-              {/* 수정 button */}
-              <TouchableOpacity style={styles.tbutton} >
-                <Text style={styles.buttonText}>수정</Text>
-              </TouchableOpacity>
-              {/* 팀 나가기 button */}
-              <TouchableOpacity style={styles.sbutton}>
-                <Text style={{...styles.buttonText, color: "red"}}>팀 나가기</Text>
-              </TouchableOpacity>
-            </View>
+        style={{ justifyContent: "flex-end", margin: 0, flex: 1 }}
+      >
+        {/* Modal content container */}
+        <View style={styles.modalContent}>
+          {/* Center Text */}
+          <View style={styles.center}>
+            {/* Style for the bar on top of modal */}
+            <View style={styles.barIcon} />
+            <Text style={styles.text}>LMS 파인 제출하기</Text>
           </View>
+          {/* Container for 2 buttons */}
           <View
             style={{
               flexDirection: "row",
@@ -58,15 +47,34 @@ const PersonalPage = () => {
               alignItems: "center",
             }}
           >
+            {/* 수정 button */}
             <TouchableOpacity style={styles.tbutton}>
               <Text style={styles.buttonText}>수정</Text>
             </TouchableOpacity>
+            {/* 팀 나가기 button */}
             <TouchableOpacity style={styles.sbutton}>
               <Text style={{ ...styles.buttonText, color: "red" }}>
                 팀 나가기
               </Text>
             </TouchableOpacity>
           </View>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 50,
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity style={styles.tbutton}>
+            <Text style={styles.buttonText}>수정</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.sbutton}>
+            <Text style={{ ...styles.buttonText, color: "red" }}>
+              팀 나가기
+            </Text>
+          </TouchableOpacity>
         </View>
       </Modal>
     </View>
@@ -118,7 +126,7 @@ const styles = StyleSheet.create({
     marginBottom: "3%",
     backgroundColor: "#050026",
     width: 170,
-    height: "90%"
+    height: "90%",
   },
   sbutton: {
     borderRadius: 9,
@@ -127,7 +135,7 @@ const styles = StyleSheet.create({
     marginBottom: "3%",
     backgroundColor: "#EFEFEF",
     width: 170,
-    height: "90%"
+    height: "90%",
   },
   buttonText: {
     fontSize: 17,
