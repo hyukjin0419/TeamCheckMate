@@ -10,11 +10,9 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
-
   Alert,
   KeyboardAvoidingView,
   Keyboard,
-
 } from "react-native";
 import { useState, useEffect } from "react";
 import s from "../../styles/css";
@@ -28,6 +26,7 @@ import {
   getDocs,
   collection,
   auth,
+  updateDoc,
   deleteField,
 } from "../../../firebase";
 import { query, orderBy, arrayRemove } from "firebase/firestore";
@@ -246,7 +245,6 @@ export default TeamPage = () => {
             fileColor={item.fileImage}
             leaveTeam={leaveTeam}
             //getTeamList={getTeamList}
-
           ></TeamItem>
         )}
         keyExtractor={(item) => item.id}

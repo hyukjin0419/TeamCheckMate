@@ -123,7 +123,6 @@ const TeamItem = (props) => {
     SetTeamOptionModalVisible(!TeamOptionModalVisible);
   };
 
-
   const copyToClipboard = async (teamCode) => {
     await Clipboard.setStringAsync(teamCode);
     Alert.alert("참여코드가 클립보드에 복사 되었습니다.");
@@ -166,7 +165,6 @@ const TeamItem = (props) => {
           backdropTransitionOutTiming={0}
           style={{ justifyContent: "flex-end", margin: 0 }}
         >
-
           {/* 팀 설정 모달창 */}
           <View style={styles.modalView}>
             {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
@@ -179,7 +177,6 @@ const TeamItem = (props) => {
               <TouchableOpacity onPress={() => copyToClipboard(props.id)}>
                 <View style={styles.joinCode}>
                   <Text>참여 코드: {props.id}</Text>
-
                 </View>
               </TouchableOpacity>
               <View flex={1}>
@@ -222,7 +219,7 @@ const TeamItem = (props) => {
                 {/* 팀 삭제 버튼 */}
                 <TouchableOpacity
                   style={styles.teamDeleteBtn}
-                  onPress={deleteItem}
+                  onPress={leavingtheTeam}
                 >
                   {/* 터치 시 팀 삭제 */}
                   <Text style={styles.teamDeleteText}>팀 삭제</Text>
