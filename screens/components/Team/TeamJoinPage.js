@@ -22,9 +22,12 @@ import {
   doc,
   setDoc,
   getDocs,
+  getDoc,
   updateDoc,
 } from "../../../firebase";
 import { arrayUnion } from "firebase/firestore";
+import { showToast, toastConfig } from "../Toast";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 
 export default function TeamJoinPage() {
   const navigation = useNavigation();
@@ -60,21 +63,35 @@ export default function TeamJoinPage() {
         return;
       }
       setIsButtonClicked(true);
-      //팀코드 -> 유저 페이지에 추가
-      const userDocRef = doc(db, "user", email);
-      const teamListCollectionRef = collection(userDocRef, "teamList");
-      await setDoc(doc(teamListCollectionRef, teamCode), {
-        teamID: teamCode,
-      });
 
-      //팀 페이지 -> 유저 이메일 추가
       const teamDocRef = doc(db, "team", teamCode);
-      await updateDoc(teamDocRef, {
-        member_id_array: arrayUnion(email),
-      });
+      const teamDocSnapshot = await getDoc(teamDocRef);
+
+      if (!teamDocSnapshot.exists) {
+        console.log("[TeamJoingPage] 등록되지 않은 팀에 참여하려함.");
+        showToast("success", "등록되지 않은 팀입니다");
+      } else if (teamDocSnapshot.data().member_id_array.includes(email)) {
+        console.log("[TeamJoingPage] 이미 등록된 팀에 참여하려함.");
+        showToast("success", "이미 참여중인 팀입니다");
+      } else {
+        await updateDoc(teamDocRef, {
+          member_id_array: arrayUnion(email),
+        });
+
+        // 팀코드 -> 유저 페이지에 추가
+        const userDocRef = doc(db, "user", email);
+        const teamListCollectionRef = collection(userDocRef, "teamList");
+        await setDoc(doc(teamListCollectionRef, teamCode), {
+          teamID: teamCode,
+        });
+
+        // 토스트 메시지: 팀 등록 완료
+        showToast("success", "팀 참여 완료! 이번 팀플도 파이팅하세요 :)");
+      }
     } catch (e) {
       console.error("[TeamJoinPage] Error adding document: ", e);
     }
+
     navigation.navigate("TeamPage");
   };
 

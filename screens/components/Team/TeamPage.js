@@ -11,6 +11,7 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
   Alert,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useState, useEffect } from "react";
 import * as Font from "expo-font";
@@ -46,14 +47,18 @@ export default TeamPage = () => {
   const route = useRoute();
   const teamAdded = route.params?.teamAdded; //true
   //Toast.js 사용. 토스트 함수 생성
-  const handleShowToast = () => {
-    console.log("TeamPage: Toast 작동중");
+  const teamAddedToast = () => {
+    console.log("TeamPage: Toast Added Toast 작동중");
     showToast("success", "  ✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
+  };
+  const teamAlreadyThereToast = () => {
+    console.log("TeamPage: Team Already There Toast 작동중");
+    showToast("success", "  이미 등록된 팀입니다.");
   };
 
   //회원정보 가져오기
   const user = auth.currentUser;
-  console.log("TeamPage: 이걸로도 갖올 수 있는겨?" + user.email);
+  // console.log("TeamPage: 이걸로도 갖올 수 있는겨?" + user.email);
   //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
   const [showModal, setShowModal] = useState(false);
   const handlePress = () => {
@@ -95,7 +100,7 @@ export default TeamPage = () => {
     }
   };
 
-  //팀 삭제 코드
+  //팀 나가기 코드
   const leaveTeam = async (id) => {
     const teamRef = doc(db, "team", id);
     const teamDoc = await getDoc(teamRef);
@@ -131,12 +136,12 @@ export default TeamPage = () => {
 
   //화면 렌더링 시 TeamPage에서 넘어온 teamAdded 변수가 true인지 확인하고 토스트 띄우기
   useEffect(() => {
-    console.log("TeamPage", teamAdded);
+    // console.log("TeamPage", teamAdded);
     if (teamAdded) {
-      handleShowToast();
+      teamAddedToast();
       navigation.setParams({ teamAdded: false });
     }
-  }, [handleShowToast, teamAdded]);
+  }, [teamAddedToast, teamAdded]);
 
   return (
     <View style={styles.container}>
