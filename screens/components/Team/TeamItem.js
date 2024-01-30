@@ -162,7 +162,7 @@ const TeamItem = (props) => {
           animationInTiming={200}
           animationOutTiming={200}
           backdropTransitionInTiming={200}
-          backdropTransitionOutTiming={200}
+          backdropTransitionOutTiming={0}
           style={{ justifyContent: "flex-end", margin: 0 }}
         >
           {/* 팀 설정 모달창 */}

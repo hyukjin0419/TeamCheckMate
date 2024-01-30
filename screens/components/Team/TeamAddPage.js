@@ -178,7 +178,7 @@ export default TeamAddPage_origin = () => {
             animationInTiming={200}
             animationOutTiming={200}
             backdropTransitionInTiming={200}
-            backdropTransitionOutTiming={200}
+            backdropTransitionOutTiming={0}
             style={{ margin: 0 }}
           >
             <View style={styles.modalView}>

@@ -10,7 +10,6 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
-  Alert,
 } from "react-native";
 import { useState, useEffect } from "react";
 import s from "../../styles/css";
@@ -19,11 +18,9 @@ import TeamItem from "./TeamItem";
 import {
   db,
   doc,
-  updateDoc,
   deleteDoc,
   getDocs,
   collection,
-  addDoc,
   auth,
 } from "../../../firebase";
 import { query, orderBy } from "firebase/firestore";
@@ -141,6 +138,7 @@ export default TeamPage = () => {
               <TouchableOpacity
                 style={styles.AddBtnContainer}
                 onPress={handlePress}
+                activeOpacity={1}
               >
                 <Image
                   style={styles.addOrCloseBtn}
