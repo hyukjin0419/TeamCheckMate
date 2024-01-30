@@ -17,7 +17,6 @@ import s from "../../styles/css";
 import {
   db,
   collection,
-  addDoc,
   auth,
   doc,
   setDoc,
@@ -124,14 +123,16 @@ export default function TeamJoinPage() {
               pressHeadBtn();
             }}
           >
-            <Text style={s.titleRightText}>확인</Text>
+            <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
+              확인
+            </Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.inputContainer}>
+        <View style={s.inputTextContainer}>
           <TextInput
             placeholder="참여 코드"
             onChangeText={activatedHeadBtn}
-            style={styles.inputContainerText}
+            style={s.textInput}
           ></TextInput>
         </View>
       </KeyboardAvoidingView>

@@ -10,26 +10,23 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
+
   Alert,
   KeyboardAvoidingView,
   Keyboard,
+
 } from "react-native";
 import { useState, useEffect } from "react";
-import * as Font from "expo-font";
 import s from "../../styles/css";
-import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
 import {
   db,
   doc,
-  updateDoc,
   deleteDoc,
   getDoc,
   getDocs,
   collection,
-  addDoc,
   auth,
   deleteField,
 } from "../../../firebase";
@@ -187,6 +184,7 @@ export default TeamPage = () => {
               <TouchableOpacity
                 style={styles.AddBtnContainer}
                 onPress={handlePress}
+                activeOpacity={1}
               >
                 <Image
                   style={styles.addOrCloseBtn}
@@ -248,6 +246,7 @@ export default TeamPage = () => {
             fileColor={item.fileImage}
             leaveTeam={leaveTeam}
             //getTeamList={getTeamList}
+
           ></TeamItem>
         )}
         keyExtractor={(item) => item.id}
