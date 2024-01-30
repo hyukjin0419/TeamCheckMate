@@ -67,10 +67,15 @@ export default function TeamJoinPage() {
       const teamDocRef = doc(db, "team", teamCode);
       const teamDocSnapshot = await getDoc(teamDocRef);
 
-      if (!teamDocSnapshot.exists) {
+      if (!teamDocRef.exists) {
         console.log("[TeamJoingPage] 등록되지 않은 팀에 참여하려함.");
         showToast("success", "등록되지 않은 팀입니다");
-      } else if (teamDocSnapshot.data().member_id_array.includes(email)) {
+      }
+      if (
+        teamDocSnapshot.data() &&
+        teamDocSnapshot.data().member_id_array &&
+        teamDocSnapshot.data().member_id_array.includes(email)
+      ) {
         console.log("[TeamJoingPage] 이미 등록된 팀에 참여하려함.");
         showToast("success", "이미 참여중인 팀입니다");
       } else {
