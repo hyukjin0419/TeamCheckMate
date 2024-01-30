@@ -2,28 +2,26 @@ import { View, Button, StyleSheet, Text, TouchableOpacity } from "react-native";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { EvilIcons } from "@expo/vector-icons";
 import { showToast, toastConfig } from "../components/Toast";
-import Modal from "react-native-modal"
+import Modal from "react-native-modal";
 import { useState } from "react";
 
 const PersonalPage = () => {
   // Visibility of modal
   const [isModalVisible, setIsModalVisible] = useState(false);
-
   const toggleModal = () => {
     // toggle the visibility of modal
     setIsModalVisible(!isModalVisible);
-  }
+  };
 
   return (
     <View style={styles.container}>
-      <Button title='Open Modal' onPress={toggleModal} />
-
+      <Button title="Open Modal" onPress={openModal} />
       {/* modal code */}
       <Modal 
         onBackdropPress={() => setIsModalVisible(false)}
         isVisible={isModalVisible}
         swipeDirection="down"
-        onSwipeComplete={toggleModal}
+        onSwipeComplete={openModal}
         animationIn="slideInUp"
         animationOut="slideOutDown"
         animationInTiming={200}
@@ -52,6 +50,24 @@ const PersonalPage = () => {
               </TouchableOpacity>
             </View>
           </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 50,
+              alignItems: "center",
+            }}
+          >
+            <TouchableOpacity style={styles.tbutton}>
+              <Text style={styles.buttonText}>수정</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.sbutton}>
+              <Text style={{ ...styles.buttonText, color: "red" }}>
+                팀 나가기
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     </View>
   );
@@ -62,9 +78,9 @@ export default PersonalPage;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   modalContent: {
     backgroundColor: "white",
@@ -89,7 +105,6 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    
   },
   text: {
     color: "black",
