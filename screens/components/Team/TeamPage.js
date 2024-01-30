@@ -10,9 +10,8 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
-  Alert,
-  KeyboardAvoidingView,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
 import s from "../../styles/css";
@@ -39,6 +38,8 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamPage = () => {
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(true);
+
   //토스트 창을 사용하기 위해
   //TeamMemberAddPage에서 넘어왔다면 => 팀이 생성 되었다는 뜻.
   const route = useRoute();
@@ -131,20 +132,14 @@ export default TeamPage = () => {
     }, [])
   );
 
-  //키보드 때문에 토스트 메시지 위에 생기는 거 방지
+  //2초동안 로딩창 보여주기
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        Toast.hide();
-      }
-    );
+    const timer = setTimeout(() => {
+      setIsLoading(false); // 2초 후에 로딩 상태 변경
+    }, 2000);
 
-    // clean-up 함수
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
+    return () => clearTimeout(timer); // 컴포넌트가 언마운트되면 타이머 해제
+  }, []); // 빈 배열을 전달하여 컴포넌트가 처음 렌더링될 때만 실행
 
   //화면 렌더링 시 TeamPage에서 넘어온 teamAdded 변수가 true인지 확인하고 토스트 띄우기
   useEffect(() => {
@@ -230,25 +225,28 @@ export default TeamPage = () => {
       </TouchableOpacity>
       {/* 팀 파일 렌더링하는 코드 */}
       {/* 저장된 팀 리스트를 TeamItem페이지로 보내어서 생성하여 생성된 TeamIteam들을 TeamPage화면에 렌더링*/}
-      <FlatList
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        data={teamList}
-        contentContainerStyle={styles.teamListContainer}
-        columnWrapperStyle={{
-          justifyContent: "space-between",
-        }}
-        renderItem={({ item }) => (
-          <TeamItem
-            title={item.title}
-            id={item.id}
-            fileColor={item.fileImage}
-            leaveTeam={leaveTeam}
-            //getTeamList={getTeamList}
-          ></TeamItem>
-        )}
-        keyExtractor={(item) => item.id}
-      />
+      {isLoading ? (
+        <ActivityIndicator style={styles.loadingIndicator} />
+      ) : (
+        <FlatList
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          data={teamList}
+          contentContainerStyle={styles.teamListContainer}
+          columnWrapperStyle={{
+            justifyContent: "space-between",
+          }}
+          renderItem={({ item }) => (
+            <TeamItem
+              title={item.title}
+              id={item.id}
+              fileColor={item.fileImage}
+              leaveTeam={leaveTeam}
+            ></TeamItem>
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      )}
       <Toast
         position="top"
         style={styles.text}
@@ -311,5 +309,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 15,
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    size: "large",
+    color: "#050026",
   },
 });
