@@ -23,9 +23,9 @@ const TeamItem = (props) => {
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
-  //터치시 팀 삭제하는 함수
-  const deleteItem = () => {
-    props.deleteTeamItem(props.id);
+  //터치시 팀 나가는 함수
+  const leavingtheTeam = () => {
+    props.leaveTeam(props.id);
   };
 
   //팀 이름 혹은 파일 아이콘 색상이 변경되었을 때 리-렌더링
@@ -123,6 +123,7 @@ const TeamItem = (props) => {
     SetTeamOptionModalVisible(!TeamOptionModalVisible);
   };
 
+
   const copyToClipboard = async (teamCode) => {
     await Clipboard.setStringAsync(teamCode);
     Alert.alert("참여코드가 클립보드에 복사 되었습니다.");
@@ -165,6 +166,7 @@ const TeamItem = (props) => {
           backdropTransitionOutTiming={0}
           style={{ justifyContent: "flex-end", margin: 0 }}
         >
+
           {/* 팀 설정 모달창 */}
           <View style={styles.modalView}>
             {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
@@ -177,6 +179,7 @@ const TeamItem = (props) => {
               <TouchableOpacity onPress={() => copyToClipboard(props.id)}>
                 <View style={styles.joinCode}>
                   <Text>참여 코드: {props.id}</Text>
+
                 </View>
               </TouchableOpacity>
               <View flex={1}>

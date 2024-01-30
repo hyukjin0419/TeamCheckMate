@@ -10,6 +10,11 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
+
+  Alert,
+  KeyboardAvoidingView,
+  Keyboard,
+
 } from "react-native";
 import { useState, useEffect } from "react";
 import s from "../../styles/css";
@@ -19,11 +24,13 @@ import {
   db,
   doc,
   deleteDoc,
+  getDoc,
   getDocs,
   collection,
   auth,
+  deleteField,
 } from "../../../firebase";
-import { query, orderBy } from "firebase/firestore";
+import { query, orderBy, arrayRemove } from "firebase/firestore";
 import * as React from "react";
 import { showToast, toastConfig } from "../Toast";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
@@ -38,14 +45,18 @@ export default TeamPage = () => {
   const route = useRoute();
   const teamAdded = route.params?.teamAdded; //true
   //Toast.js 사용. 토스트 함수 생성
-  const handleShowToast = () => {
-    console.log("TeamPage: Toast 작동중");
+  const teamAddedToast = () => {
+    console.log("TeamPage: Toast Added Toast 작동중");
     showToast("success", "  ✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
+  };
+  const teamAlreadyThereToast = () => {
+    console.log("TeamPage: Team Already There Toast 작동중");
+    showToast("success", "  이미 등록된 팀입니다.");
   };
 
   //회원정보 가져오기
   const user = auth.currentUser;
-  console.log("TeamPage: 이걸로도 갖올 수 있는겨?" + user.email);
+  // console.log("TeamPage: 이걸로도 갖올 수 있는겨?" + user.email);
   //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
   const [showModal, setShowModal] = useState(false);
   const handlePress = () => {
@@ -87,10 +98,30 @@ export default TeamPage = () => {
     }
   };
 
-  //팀 삭제 코드
-  const deleteTeamItem = async (id) => {
-    await deleteDoc(doc(db, "team", id));
-    await deleteDoc(doc(doc(db, "user", user.email), "teamList", id));
+  //팀 나가기 코드
+  const leaveTeam = async (id) => {
+    const teamRef = doc(db, "team", id);
+    const teamDoc = await getDoc(teamRef);
+    const teamData = teamDoc.data();
+    console.log("------------------>", teamData.member_id_array.length);
+    // updateDoc와 deleteDoc를 병렬로 실행
+    const updatePromise = updateDoc(teamRef, {
+      member_id_array: arrayRemove(user.email),
+    });
+
+    const deletePromise = deleteDoc(
+      doc(doc(db, "user", user.email), "teamList", id)
+    );
+
+    if (teamData.member_id_array.length === 1) {
+      console.log("이건실행이 아예 안되는겨?");
+      try {
+        const deleteTeam = deleteDoc(doc(db, "team", id));
+      } catch (e) {
+        console.log("TeamPage: leavTeam함수 문제발생!!!");
+      }
+    }
+
     getTeamList();
   };
 
@@ -101,14 +132,29 @@ export default TeamPage = () => {
     }, [])
   );
 
+  //키보드 때문에 토스트 메시지 위에 생기는 거 방지
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        Toast.hide();
+      }
+    );
+
+    // clean-up 함수
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   //화면 렌더링 시 TeamPage에서 넘어온 teamAdded 변수가 true인지 확인하고 토스트 띄우기
   useEffect(() => {
-    console.log("TeamPage", teamAdded);
+    // console.log("TeamPage", teamAdded);
     if (teamAdded) {
-      handleShowToast();
+      teamAddedToast();
       navigation.setParams({ teamAdded: false });
     }
-  }, [handleShowToast, teamAdded]);
+  }, [teamAddedToast, teamAdded]);
 
   return (
     <View style={styles.container}>
@@ -198,13 +244,15 @@ export default TeamPage = () => {
             title={item.title}
             id={item.id}
             fileColor={item.fileImage}
-            deleteTeamItem={deleteTeamItem}
+            leaveTeam={leaveTeam}
+            //getTeamList={getTeamList}
+
           ></TeamItem>
         )}
         keyExtractor={(item) => item.id}
       />
       <Toast
-        position="bottom"
+        position="top"
         style={styles.text}
         visibilityTime={2000}
         config={toastConfig}
