@@ -28,7 +28,7 @@ const PersonalPage = () => {
         animationOut="slideOutDown"
         animationInTiming={200}
         animationOutTiming={500}  
-        backdropTransitionInTiming={200}
+        backdropTransitionInTiming={200} 
         backdropTransitionOutTiming={0}
         style={{justifyContent: "flex-end", margin: 0, flex: 1}}
         > 
