@@ -253,7 +253,7 @@ export default TeamPage = () => {
         keyExtractor={(item) => item.id}
       />
       <Toast
-        position="bottom"
+        position="top"
         style={styles.text}
         visibilityTime={2000}
         config={toastConfig}

@@ -27,7 +27,7 @@ export const toastConfig = {
         borderRadius: 15,
         borderLeftWidth: 0,
         borderLeftColor: "#000000BF",
-        position: "absolute",
+        // marginTop: "",
       }}
       contentContainerStyle={{ paddingHorizontal: 15 }}
       text1Style={{
