@@ -59,7 +59,7 @@ export default AssignmentAddPage = ({ route }) => {
   };
   //제출기한
   const [date, setDate] = useState(new Date());
-  const [dueDate, setDueDate] = useState("Due Date");
+  const [dueDate, setDueDate] = useState("제출 기한");
 
   //날짜, 시간 선택 시 정보 저장
   const onChange = (e, selectedDate) => {
