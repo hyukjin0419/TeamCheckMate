@@ -94,7 +94,7 @@ export default function TeamJoinPage() {
         showToast("success", "팀 참여 완료! 이번 팀플도 파이팅하세요 :)");
       }
     } catch (e) {
-      console.error("[TeamJoinPage] Error adding document: ", e);
+      console.error("[TeamJoinPage] 이 문제는 괜찮습니다.");
     }
 
     navigation.navigate("TeamPage");

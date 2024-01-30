@@ -9,6 +9,15 @@ export const showToast = (type, message) => {
   });
 };
 
+export const showToastFromTeamJoingPage = (type, message) => {
+  setTimeout(() => {
+    Toast.show({
+      type: type,
+      text1: message,
+    });
+  }, 5000);
+};
+
 export const toastConfig = {
   success: (props) => (
     <BaseToast
@@ -18,6 +27,7 @@ export const toastConfig = {
         borderRadius: 15,
         borderLeftWidth: 0,
         borderLeftColor: "#000000BF",
+        position: "absolute",
       }}
       contentContainerStyle={{ paddingHorizontal: 15 }}
       text1Style={{

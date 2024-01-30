@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   Alert,
   KeyboardAvoidingView,
+  Keyboard,
 } from "react-native";
 import { useState, useEffect } from "react";
 import * as Font from "expo-font";
@@ -133,6 +134,21 @@ export default TeamPage = () => {
       getTeamList();
     }, [])
   );
+
+  //키보드 때문에 토스트 메시지 위에 생기는 거 방지
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        Toast.hide();
+      }
+    );
+
+    // clean-up 함수
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   //화면 렌더링 시 TeamPage에서 넘어온 teamAdded 변수가 true인지 확인하고 토스트 띄우기
   useEffect(() => {
