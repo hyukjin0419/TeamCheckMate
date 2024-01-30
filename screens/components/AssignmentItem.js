@@ -78,7 +78,7 @@ const AssignmentItem = (props) => {
     <View style={styles.assignmentBox}>
       {/* DueDate와 과제 이름 */}
       <View style={styles.assignmentDataContainer}>
-        <Text style={styles.dueDateText}>제출 기한: {dueDate}</Text>
+        <Text style={styles.dueDateText}>{dueDate}</Text>
         <Text style={styles.assignmentNameText}>{assignmentName}</Text>
       </View>
       {/* 과제 옵션 버튼 (터치 시 모달창 띄움) */}
@@ -94,78 +94,67 @@ const AssignmentItem = (props) => {
       </Pressable>
       {/* 과제 설정 모달창 */}
       <Modal
-        style={styles.modal}
-        visible={assignmentOptionModalVisible}
-        transparent={true}
-        //animationType="fade"
+        onBackButtonPress={handleAssignmentOptionPress}
+        onBackdropPress={handleAssignmentOptionPress}
+        isVisible={assignmentOptionModalVisible}
+        swipeDirection="down"
+        onSwipeComplete={handleAssignmentOptionPress}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        animationInTiming={200}
+        animationOutTiming={200}
+        backdropTransitionInTiming={200}
+        backdropTransitionOutTiming={200}
+        style={{ justifyContent: "flex-end", margin: 0 }}
       >
-        {/* 모달창 회색 배경 */}
-        <View style={styles.background}>
-          {/* 과제 설정 모달창 */}
-          <Modal
-            onSwipeComplete={() => setAssignmentOptionModalVisible(false)}
-            swipeDirection={"down"}
-            animationType="slide"
-            visible={assignmentOptionModalVisible}
-            //모달이 아닌 영역을 터치하면 창을 닫자!
-            onBackdropPress={handleAssignmentOptionPress}
-            //모달 뒷배경 투명도를 0으로 설정
-            backdropOpacity={0}
-            transparent={true}
-          >
-            {/* 과제 설정 모달창 */}
-            <View style={styles.modalView}>
-              {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
-              <View style={styles.modalItemContainter}>
-                {/* 모달창 상단 회색 막대 */}
-                <View style={styles.modalVector}></View>
-                {/* 모달창 상단 과제 이름 표시 */}
-                <View style={styles.modalAssignmentNameTextContainer}>
-                  <Text style={styles.assignmentNameText}>
-                    {assignmentName}
-                  </Text>
-                </View>
-                <Text style={styles.modalDueDateText}>제출기한: {dueDate}</Text>
-                {/* 참여 코드, 팀원 목록 표시 */}
-                <View flex={1}></View>
-                {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
-                <View style={styles.modalTeamBtnContainer}>
-                  {/* 팀 수정 버튼 */}
-                  <TouchableOpacity
-                    style={styles.teamReviseBtn}
-                    onPress={() => {
-                      {
-                        /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
-                      }
-                      navigation.navigate("AssignmentUpdatePage", {
-                        title: props.title,
-                        fileColor: props.fileColor,
-                        teamid: props.teamid,
-                        assignmentName: props.assignmentName,
-                        dueDate: props.dueDate,
-                        assignmentId: props.assignmentId,
-                      });
-                      {
-                        /* 모달 숨기기 */
-                      }
-                      setAssignmentOptionModalVisible(false);
-                    }}
-                  >
-                    <Text style={styles.teamReviseText}>수정</Text>
-                  </TouchableOpacity>
-                  {/* 팀 삭제 버튼 */}
-                  <TouchableOpacity
-                    style={styles.teamDeleteBtn}
-                    onPress={handleDelete}
-                  >
-                    {/* 터치 시 팀 삭제 */}
-                    <Text style={styles.teamDeleteText}>삭제</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+        {/* 과제 설정 모달창 */}
+        <View style={styles.modalView}>
+          {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
+          <View style={styles.modalItemContainter}>
+            {/* 모달창 상단 회색 막대 */}
+            <View style={styles.modalVector}></View>
+            {/* 모달창 상단 과제 이름 표시 */}
+            <View style={styles.modalAssignmentNameTextContainer}>
+              <Text style={styles.assignmentNameText}>{assignmentName}</Text>
             </View>
-          </Modal>
-          <View></View>
+            <Text style={styles.modalDueDateText}>제출기한: {dueDate}</Text>
+            {/* 참여 코드, 팀원 목록 표시 */}
+            <View flex={1}></View>
+            {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
+            <View style={styles.modalTeamBtnContainer}>
+              {/* 팀 수정 버튼 */}
+              <TouchableOpacity
+                style={styles.teamReviseBtn}
+                onPress={() => {
+                  {
+                    /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
+                  }
+                  navigation.navigate("AssignmentUpdatePage", {
+                    title: props.title,
+                    fileColor: props.fileColor,
+                    teamid: props.teamid,
+                    assignmentName: props.assignmentName,
+                    dueDate: props.dueDate,
+                    assignmentId: props.assignmentId,
+                  });
+                  {
+                    /* 모달 숨기기 */
+                  }
+                  setAssignmentOptionModalVisible(false);
+                }}
+              >
+                <Text style={styles.teamReviseText}>수정</Text>
+              </TouchableOpacity>
+              {/* 팀 삭제 버튼 */}
+              <TouchableOpacity
+                style={styles.teamDeleteBtn}
+                onPress={handleDelete}
+              >
+                {/* 터치 시 팀 삭제 */}
+                <Text style={styles.teamDeleteText}>삭제</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </Modal>
     </View>
@@ -177,7 +166,6 @@ export default AssignmentItem;
 const styles = StyleSheet.create({
   modalTeamBtnContainer: {
     width: WINDOW_WIDHT,
-    //backgroundColor:"yellow",
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
@@ -225,10 +213,10 @@ const styles = StyleSheet.create({
   },
   assignmentBox: {
     width: WINDOW_WIDHT * 0.9,
-    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.1 : WINDOW_HEIGHT * 0.12,
+    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
     //backgroundColor: "red",
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 9,
     marginBottom: "5%",
     flexDirection: "row",
   },
@@ -271,30 +259,16 @@ const styles = StyleSheet.create({
   modalItemContainter: {
     flex: 1,
     alignItems: "center",
-    //justifyContent: "space-evenly",
-    //backgroundColor: "red",
     marginBottom: "5%",
   },
-  background: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    height: WINDOW_HEIGHT * 2,
-    width: WINDOW_WIDHT * 2,
-    marginHorizontal: "-50%",
-    marginVertical: "-50%",
-  },
   modalView: {
-    //flex: 1,
     backgroundColor: "white",
-    borderStartStartRadius: 20,
-    borderStartEndRadius: 20,
-    height: 400 /*WINDOW_HEIGHT * 0.6*/,
-    alignSelf: "stretch",
-    alignItems: "center",
-    //marginTop: "70%",
-    marginTop: "auto",
-    marginHorizontal: "-5.5%",
-    marginBottom: "-6%",
+    paddingTop: 12,
+    paddingHorizontal: 12,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    minHeight: "40%", // This property determines the minimum height of the modal
+    paddingBottom: 20,
   },
   file: {
     width: WINDOW_WIDHT * 0.4,

@@ -13,10 +13,7 @@ import {
   Alert,
 } from "react-native";
 import { useState, useEffect } from "react";
-import * as Font from "expo-font";
 import s from "../../styles/css";
-import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
 import {

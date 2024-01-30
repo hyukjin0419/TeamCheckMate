@@ -1,5 +1,4 @@
 import { useNavigation } from "@react-navigation/core";
-import { useFocusEffect } from "@react-navigation/native";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Text,
@@ -10,7 +9,6 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Image,
-  Pressable,
   Alert,
   TouchableWithoutFeedback,
   Keyboard,
