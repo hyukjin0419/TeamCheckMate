@@ -23,6 +23,7 @@ const TeamItem = (props) => {
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
+  const [memberIdArray, setmemberIdArray] = useState(props.member_id_array);
   //터치시 팀 나가는 함수
   const leavingtheTeam = () => {
     props.leaveTeam(props.id);
@@ -173,6 +174,7 @@ const TeamItem = (props) => {
               <View style={styles.modalVector}></View>
               {/* 모달창 상단 팀 이름 표시 */}
               <Text style={styles.modalTitle}>{title}</Text>
+              <Text>{memberIdArray}</Text>
               {/* 참여 코드 */}
               <TouchableOpacity onPress={() => copyToClipboard(props.id)}>
                 <View style={styles.joinCode}>
