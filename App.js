@@ -21,6 +21,7 @@ import PersonalPage from "./screens/components/PersonalPage";
 import GuidancePage from "./screens/components/GuidancePage";
 import SchedulePage from "./screens/components/SchedulePage";
 import TeamMemberAddPage from "./screens/components/Team/TeamMemberAddPage";
+import TeamUpdateAddMemberPage from "./screens/components/Team/TeamUpdateAddMemberPage";
 import UserInfoInputPage from "./screens/logins/UserInfoInputPage";
 import { getDoc } from "firebase/firestore";
 import * as Font from "expo-font";
@@ -62,6 +63,10 @@ function TeamPageTab() {
       <TeamStack.Screen
         name="TeamMemberAddPage"
         component={TeamMemberAddPage}
+      />
+      <TeamStack.Screen
+        name="TeamUpdateAddMemberPage"
+        component={TeamUpdateAddMemberPage}
       />
       <TeamStack.Screen name="AssignmentPage" component={AssignmentPage} />
       <TeamStack.Screen

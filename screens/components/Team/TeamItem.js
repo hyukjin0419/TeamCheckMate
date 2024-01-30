@@ -182,7 +182,7 @@ const TeamItem = (props) => {
               <View flex={1}>
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate("TeamMemberAddPage", {
+                    navigation.navigate("TeamUpdateAddMemberPage", {
                       teamId: props.id,
                     });
                     handleTeamOptionPress();
