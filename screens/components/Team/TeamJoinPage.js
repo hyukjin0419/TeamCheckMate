@@ -67,7 +67,7 @@ export default function TeamJoinPage() {
       const teamDocRef = doc(db, "team", teamCode);
       const teamDocSnapshot = await getDoc(teamDocRef);
 
-      if (!teamDocRef.exists) {
+      if (!teamDocSnapshot.exists) {
         console.log("[TeamJoingPage] 등록되지 않은 팀에 참여하려함.");
         showToast("success", "등록되지 않은 팀입니다");
       }
