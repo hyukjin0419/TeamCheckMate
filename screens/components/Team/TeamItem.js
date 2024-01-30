@@ -12,7 +12,7 @@ import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/core";
 import { color } from "../../styles/colors";
-import * as Clipboard from "expo-clipboard"
+import * as Clipboard from "expo-clipboard";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -24,9 +24,9 @@ const TeamItem = (props) => {
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
-  //터치시 팀 삭제하는 함수
-  const deleteItem = () => {
-    props.deleteTeamItem(props.id);
+  //터치시 팀 나가는 함수
+  const leavingtheTeam = () => {
+    props.leaveTeam(props.id);
   };
 
   //팀 이름 혹은 파일 아이콘 색상이 변경되었을 때 리-렌더링
@@ -127,7 +127,7 @@ const TeamItem = (props) => {
   const copyToClipboard = async (groupCode) => {
     await Clipboard.setStringAsync(groupCode);
     Alert.alert("코드 복사 했습니다");
-  }
+  };
 
   return (
     <TouchableOpacity
@@ -224,10 +224,10 @@ const TeamItem = (props) => {
                     {/* 팀 삭제 버튼 */}
                     <TouchableOpacity
                       style={styles.teamDeleteBtn}
-                      onPress={deleteItem}
+                      onPress={leavingtheTeam}
                     >
                       {/* 터치 시 팀 삭제 */}
-                      <Text style={styles.teamDeleteText}>팀 삭제</Text>
+                      <Text style={styles.teamDeleteText}>팀 나가기</Text>
                     </TouchableOpacity>
                   </View>
                 </View>

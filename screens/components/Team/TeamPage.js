@@ -96,20 +96,29 @@ export default TeamPage = () => {
   };
 
   //팀 삭제 코드
-  const deleteTeamItem = async (id) => {
+  const leaveTeam = async (id) => {
     const teamRef = doc(db, "team", id);
-    const teamDoc = await getDoc(teamRef); // getDocs 대신 getDoc 사용
-    const teamData = teamDoc.data(); // .data() 호출 제거
-
-    await updateDoc(teamRef, {
+    const teamDoc = await getDoc(teamRef);
+    const teamData = teamDoc.data();
+    console.log("------------------>", teamData.member_id_array.length);
+    // updateDoc와 deleteDoc를 병렬로 실행
+    const updatePromise = updateDoc(teamRef, {
       member_id_array: arrayRemove(user.email),
     });
 
-    await deleteDoc(doc(db, "user", user.email), "teamList", id); // doc 함수 수정
+    const deletePromise = deleteDoc(
+      doc(doc(db, "user", user.email), "teamList", id)
+    );
 
-    if (teamData.member_id_array.length === 0) {
-      await deleteDoc(doc(db, "team", id));
+    if (teamData.member_id_array.length === 1) {
+      console.log("이건실행이 아예 안되는겨?");
+      try {
+        const deleteTeam = deleteDoc(doc(db, "team", id));
+      } catch (e) {
+        console.log("TeamPage: leavTeam함수 문제발생!!!");
+      }
     }
+
     getTeamList();
   };
 
@@ -216,7 +225,7 @@ export default TeamPage = () => {
             title={item.title}
             id={item.id}
             fileColor={item.fileImage}
-            deleteTeamItem={deleteTeamItem}
+            leaveTeam={leaveTeam}
             //getTeamList={getTeamList}
           ></TeamItem>
         )}
