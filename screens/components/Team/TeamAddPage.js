@@ -14,7 +14,15 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
-import { db, collection, addDoc, auth, doc, setDoc } from "../../../firebase";
+import {
+  db,
+  collection,
+  addDoc,
+  auth,
+  doc,
+  setDoc,
+  getDoc,
+} from "../../../firebase";
 import Modal from "react-native-modal";
 import s from "../../styles/css";
 import { useNavigation } from "@react-navigation/core";
@@ -77,16 +85,26 @@ export default TeamAddPage_origin = () => {
         return;
       }
       setIsButtonClicked(true);
+
+      //사용자 문서 참조
+      const userRef = doc(db, "user", email);
+      console.log(email, userRef);
+      //사용자 문서 가져오가
+      const userDoc = await getDoc(userRef);
+      console.log("Document data: ", userDoc.data());
+      const userData = userDoc.exists() ? userDoc.data() : {};
+
       const timestamp = new Date();
+
       const teamDocRef = await addDoc(collection(db, "team"), {
         title: textInputValue,
         fileImage: colorConfirmed,
         timestamp: timestamp,
-        member_id_array: [email],
+        members: [userData],
       });
       console.log("TeamAddPage: Document written with ID: ", teamDocRef.id);
-      const userDocRef = doc(db, "user", email);
-      addTeamIdtoUser(userDocRef, teamDocRef.id);
+
+      addTeamIdtoUser(userRef, teamDocRef.id);
 
       navigation.navigate("TeamMemberAddPage", {
         teamID: teamDocRef.id,
