@@ -149,24 +149,6 @@ const PersonalPage = () => {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginTop: 50,
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity style={styles.tbutton}>
-            <Text style={styles.buttonText}>수정</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sbutton}>
-            <Text style={{ ...styles.buttonText, color: "red" }}>
-              팀 나가기
-            </Text>
-          </TouchableOpacity>
-        </View>
       </Modal>
     </View>
   );
