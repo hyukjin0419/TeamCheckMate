@@ -10,26 +10,25 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
-  Alert,
+  Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
-import * as Font from "expo-font";
 import s from "../../styles/css";
-import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
 import {
   db,
   doc,
-  updateDoc,
   deleteDoc,
+  getDoc,
   getDocs,
   collection,
-  addDoc,
   auth,
+  updateDoc,
+  deleteField,
 } from "../../../firebase";
-import { query, orderBy } from "firebase/firestore";
+import { query, orderBy, arrayRemove } from "firebase/firestore";
 import * as React from "react";
 import { showToast, toastConfig } from "../Toast";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
@@ -39,19 +38,21 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamPage = () => {
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(true);
+
   //토스트 창을 사용하기 위해
   //TeamMemberAddPage에서 넘어왔다면 => 팀이 생성 되었다는 뜻.
   const route = useRoute();
   const teamAdded = route.params?.teamAdded; //true
   //Toast.js 사용. 토스트 함수 생성
-  const handleShowToast = () => {
-    console.log("TeamPage: Toast 작동중");
+  const teamAddedToast = () => {
+    console.log("TeamPage: Toast Added Toast 작동중");
     showToast("success", "  ✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
   };
 
   //회원정보 가져오기
   const user = auth.currentUser;
-  console.log("TeamPage: 이걸로도 갖올 수 있는겨?" + user.email);
+  // console.log("TeamPage: 이걸로도 갖올 수 있는겨?" + user.email);
   //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
   const [showModal, setShowModal] = useState(false);
   const handlePress = () => {
@@ -93,11 +94,46 @@ export default TeamPage = () => {
     }
   };
 
-  //팀 삭제 코드
-  const deleteTeamItem = async (id) => {
-    await deleteDoc(doc(db, "team", id));
-    await deleteDoc(doc(doc(db, "user", user.email), "teamList", id));
-    getTeamList();
+  //팀 나가기 코드
+  const leaveTeam = async (id) => {
+    try {
+      const teamRef = doc(db, "team", id);
+      const teamDoc = await getDoc(teamRef);
+
+      if (!teamDoc.exists()) {
+        console.log("팀 문서가 존재하지 않습니다.");
+        return;
+      }
+
+      const membersRef = collection(teamRef, "members");
+      const membersSnapshot = await getDocs(membersRef);
+
+      if (!membersSnapshot.empty) {
+        // 멤버가 존재하면 삭제
+        await deleteDoc(doc(membersRef, user.email));
+        console.log("멤버 삭제 완료");
+      }
+
+      const updatedMembersSnapshot = await getDocs(membersRef);
+      const updatedMembersCount = updatedMembersSnapshot.size;
+      console.log(updatedMembersCount);
+
+      if (updatedMembersCount === 0) {
+        console.log("팀 삭제 작업 수행");
+
+        // 팀 삭제
+        await deleteDoc(teamRef);
+        console.log("팀 삭제 완료");
+      }
+
+      const deletePromise = deleteDoc(
+        doc(doc(db, "user", user.email), "teamList", id)
+      );
+      console.log("leaveTeam 함수 실행 완료");
+      getTeamList();
+    } catch (e) {
+      console.error("leaveTeam 함수에서 오류 발생: ", e);
+    }
   };
 
   //TeamPage에 들어올 시 getTeamList 함수 작동 (새로고침 함수)
@@ -107,14 +143,23 @@ export default TeamPage = () => {
     }, [])
   );
 
+  //2초동안 로딩창 보여주기
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false); // 2초 후에 로딩 상태 변경
+    }, 2000);
+
+    return () => clearTimeout(timer); // 컴포넌트가 언마운트되면 타이머 해제
+  }, []); // 빈 배열을 전달하여 컴포넌트가 처음 렌더링될 때만 실행
+
   //화면 렌더링 시 TeamPage에서 넘어온 teamAdded 변수가 true인지 확인하고 토스트 띄우기
   useEffect(() => {
-    console.log("TeamPage", teamAdded);
+    // console.log("TeamPage", teamAdded);
     if (teamAdded) {
-      handleShowToast();
+      teamAddedToast();
       navigation.setParams({ teamAdded: false });
     }
-  }, [handleShowToast, teamAdded]);
+  }, [teamAddedToast, teamAdded]);
 
   return (
     <View style={styles.container}>
@@ -144,6 +189,7 @@ export default TeamPage = () => {
               <TouchableOpacity
                 style={styles.AddBtnContainer}
                 onPress={handlePress}
+                activeOpacity={1}
               >
                 <Image
                   style={styles.addOrCloseBtn}
@@ -190,29 +236,35 @@ export default TeamPage = () => {
       </TouchableOpacity>
       {/* 팀 파일 렌더링하는 코드 */}
       {/* 저장된 팀 리스트를 TeamItem페이지로 보내어서 생성하여 생성된 TeamIteam들을 TeamPage화면에 렌더링*/}
-      <FlatList
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        data={teamList}
-        contentContainerStyle={styles.teamListContainer}
-        columnWrapperStyle={{
-          justifyContent: "space-between",
-        }}
-        renderItem={({ item }) => (
-          <TeamItem
-            title={item.title}
-            id={item.id}
-            fileColor={item.fileImage}
-            deleteTeamItem={deleteTeamItem}
-          ></TeamItem>
-        )}
-        keyExtractor={(item) => item.id}
-      />
+      {isLoading ? (
+        <ActivityIndicator style={styles.loadingIndicator} />
+      ) : (
+        <FlatList
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          data={teamList}
+          contentContainerStyle={styles.teamListContainer}
+          columnWrapperStyle={{
+            justifyContent: "space-between",
+          }}
+          renderItem={({ item }) => (
+            <TeamItem
+              title={item.title}
+              id={item.id}
+              fileColor={item.fileImage}
+              member_id_array={item.member_id_array}
+              leaveTeam={leaveTeam}
+            ></TeamItem>
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      )}
       <Toast
         position="bottom"
         style={styles.text}
         visibilityTime={2000}
         config={toastConfig}
+        keyboardOffset={null}
       />
     </View>
   );
@@ -270,5 +322,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 15,
+  },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    size: "large",
+    color: "#050026",
   },
 });

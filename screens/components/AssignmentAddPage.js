@@ -59,7 +59,7 @@ export default AssignmentAddPage = ({ route }) => {
   };
   //제출기한
   const [date, setDate] = useState(new Date());
-  const [dueDate, setDueDate] = useState("Due Date");
+  const [dueDate, setDueDate] = useState("제출 기한");
 
   //날짜, 시간 선택 시 정보 저장
   const onChange = (e, selectedDate) => {
@@ -179,13 +179,15 @@ export default AssignmentAddPage = ({ route }) => {
 
         {/* 과제이름 입력란 */}
 
-        <View style={s.inputTextContainer}>
-          <TextInput
-            placeholder="과제 이름"
-            onChangeText={handleNameChange}
-            value={assignmentName}
-            style={s.textInput}
-          ></TextInput>
+        <View style={s.inputContainer}>
+          <View style={s.textInputContainer}>
+            <TextInput
+              placeholder="과제 이름"
+              onChangeText={handleNameChange}
+              value={assignmentName}
+              style={s.textInput}
+            ></TextInput>
+          </View>
           {/* 제출기한 입력창 (터치 시 date time picker 표시) */}
           <TouchableOpacity
             style={styles.dueDateTextInputBox}
@@ -215,7 +217,7 @@ export default AssignmentAddPage = ({ route }) => {
 const styles = StyleSheet.create({
   dueDateTextInputBox: {
     height: 60,
-    borderBottomWidth: 2,
+    borderBottomWidth: 1.5,
     justifyContent: "center",
   },
   dueDateTextBeforeSelectingDate: {
@@ -223,12 +225,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "SUIT-Regular",
     marginTop: "5%",
+    marginLeft: "1%",
   },
   dueDateTextAfterSelectingDate: {
     color: "black",
     fontSize: 16,
     fontFamily: "SUIT-Regular",
     marginTop: "5%",
+    marginLeft: "1%",
   },
   pickerContainer: {
     marginTop: "5%",

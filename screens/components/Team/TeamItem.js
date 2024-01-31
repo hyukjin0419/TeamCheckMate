@@ -12,7 +12,8 @@ import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/core";
 import { color } from "../../styles/colors";
-import * as Clipboard from "expo-clipboard"
+import * as Clipboard from "expo-clipboard";
+import s from "../../styles/css";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -20,13 +21,13 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 const TeamItem = (props) => {
   const navigation = useNavigation();
-  // console.log("teamID:", props.id);
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
-  //터치시 팀 삭제하는 함수
-  const deleteItem = () => {
-    props.deleteTeamItem(props.id);
+  const [memberIdArray, setmemberIdArray] = useState(props.member_id_array);
+  //터치시 팀 나가는 함수
+  const leavingtheTeam = () => {
+    props.leaveTeam(props.id);
   };
 
   //팀 이름 혹은 파일 아이콘 색상이 변경되었을 때 리-렌더링
@@ -124,10 +125,10 @@ const TeamItem = (props) => {
     SetTeamOptionModalVisible(!TeamOptionModalVisible);
   };
 
-  const copyToClipboard = async (groupCode) => {
-    await Clipboard.setStringAsync(groupCode);
-    Alert.alert("코드 복사 했습니다");
-  }
+  const copyToClipboard = async (teamCode) => {
+    await Clipboard.setStringAsync(teamCode);
+    Alert.alert("참여코드가 클립보드에 복사 되었습니다.");
+  };
 
   return (
     <TouchableOpacity
@@ -140,9 +141,9 @@ const TeamItem = (props) => {
       }}
     >
       <ImageBackground style={styles.file} source={imageSource}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{title}</Text>
-        </View>
+        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>
+          {title}
+        </Text>
         {/* 팀 파일 아이콘 옵션 버튼 */}
         <View style={styles.optionContainer}>
           {/* 터치 시 모달창 팀 설정 띄우기 */}
@@ -153,86 +154,81 @@ const TeamItem = (props) => {
         </View>
         {/* 팀 설정 모달창 */}
         <Modal
-          style={styles.modal}
-          visible={TeamOptionModalVisible}
-          transparent={true}
-          // animationType="fade"
+          onBackButtonPress={handleTeamOptionPress}
+          onBackdropPress={handleTeamOptionPress}
+          isVisible={TeamOptionModalVisible}
+          swipeDirection="down"
+          onSwipeComplete={handleTeamOptionPress}
+          animationIn="slideInUp"
+          animationOut="slideOutDown"
+          animationInTiming={200}
+          animationOutTiming={200}
+          backdropTransitionInTiming={200}
+          backdropTransitionOutTiming={0}
+          style={{ justifyContent: "flex-end", margin: 0 }}
         >
-          {/* 모달창 회색 배경 */}
-          <View style={styles.background}>
-            {/* 팀 설정 모달창 */}
-            <Modal
-              swipeDirection={"down"}
-              animationType="slide"
-              visible={TeamOptionModalVisible}
-              onBackdropPress={handleTeamOptionPress}
-              backdropOpacity={0}
-              transparent={true}
-              onSwipeComplete={() => SetTeamOptionModalVisible(false)}
-            >
-              {/* 팀 설정 모달창 */}
-              <View style={styles.modalView}>
-                {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
-                <View style={styles.modalItemContainter}>
-                  {/* 모달창 상단 회색 막대 */}
-                  <View style={styles.modalVector}></View>
-                  {/* 모달창 상단 팀 이름 표시 */}
-                  <Text style={styles.modalTitle}>{title}</Text>
-                  {/* 참여 코드 */}
-                  <TouchableOpacity onPress={() => copyToClipboard(props.id)}>
-                    <View style={styles.joinCode}>
-                      <Text>참여 코드: {props.id}</Text>
-                    </View>
-                  </TouchableOpacity>
-                  <View flex={1}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        navigation.navigate("TeamMemberAddPage", {
-                          teamId: props.id,
-                        });
-                        handleTeamOptionPress();
-                      }}
-                    >
-                      <Image
-                        style={styles.teamInviteBtn}
-                        source={require("../../images/ClassAddBtn.png")}
-                      ></Image>
-                    </TouchableOpacity>
-                  </View>
-                  {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
-                  <View style={styles.modalTeamBtnContainer}>
-                    {/* 팀 수정 버튼 */}
-                    <TouchableOpacity
-                      style={styles.teamReviseBtn}
-                      onPress={() => {
-                        {
-                          /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
-                        }
-                        navigation.navigate("TeamUpdatePage", {
-                          title: title,
-                          fileColor: fileColor,
-                          id: props.id,
-                        });
-                        {
-                          /* 모달 숨기기 */
-                        }
-                        SetTeamOptionModalVisible(false);
-                      }}
-                    >
-                      <Text style={styles.teamReviseText}>팀 수정</Text>
-                    </TouchableOpacity>
-                    {/* 팀 삭제 버튼 */}
-                    <TouchableOpacity
-                      style={styles.teamDeleteBtn}
-                      onPress={deleteItem}
-                    >
-                      {/* 터치 시 팀 삭제 */}
-                      <Text style={styles.teamDeleteText}>팀 삭제</Text>
-                    </TouchableOpacity>
-                  </View>
+          {/* 팀 설정 모달창 */}
+          <View style={s.modalView}>
+            {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
+            <View style={s.modalItemContainter}>
+              {/* 모달창 상단 회색 막대 */}
+              <View style={s.modalVector}></View>
+              {/* 모달창 상단 팀 이름 표시 */}
+              <Text style={s.modalTitle}>{title}</Text>
+              {/* 참여 코드 */}
+              <TouchableOpacity onPress={() => copyToClipboard(props.id)}>
+                <View style={styles.joinCode}>
+                  <Text>참여 코드: {props.id}</Text>
                 </View>
+              </TouchableOpacity>
+              <Text>{memberIdArray}</Text>
+              <View flex={1}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("TeamUpdateAddMemberPage", {
+                      teamId: props.id,
+                    });
+                    handleTeamOptionPress();
+                  }}
+                >
+                  <Image
+                    style={styles.teamInviteBtn}
+                    source={require("../../images/ClassAddBtn.png")}
+                  ></Image>
+                </TouchableOpacity>
               </View>
-            </Modal>
+              {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
+              <View style={s.modalTeamBtnContainer}>
+                {/* 팀 수정 버튼 */}
+                <TouchableOpacity
+                  style={s.teamReviseBtn}
+                  onPress={() => {
+                    {
+                      /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
+                    }
+                    navigation.navigate("TeamUpdatePage", {
+                      title: title,
+                      fileColor: fileColor,
+                      id: props.id,
+                    });
+                    {
+                      /* 모달 숨기기 */
+                    }
+                    SetTeamOptionModalVisible(false);
+                  }}
+                >
+                  <Text style={s.teamReviseText}>팀 수정</Text>
+                </TouchableOpacity>
+                {/* 팀 삭제 버튼 */}
+                <TouchableOpacity
+                  style={s.teamDeleteBtn}
+                  onPress={leavingtheTeam}
+                >
+                  {/* 터치 시 팀 삭제 */}
+                  <Text style={s.teamDeleteText}>팀 나가기</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </Modal>
       </ImageBackground>
@@ -243,57 +239,10 @@ const TeamItem = (props) => {
 export default TeamItem;
 
 const styles = StyleSheet.create({
-  modalTeamBtnContainer: {
-    width: WINDOW_WIDHT,
-    //backgroundColor: "yellow",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    height: WINDOW_HEIGHT * 0.13,
-  },
-  teamReviseBtn: {
-    width: WINDOW_WIDHT * 0.4,
-    height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: color.activated,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  teamReviseText: {
-    color: "white",
-    fontFamily: "SUIT-Medium",
-  },
-  teamDeleteBtn: {
-    width: WINDOW_WIDHT * 0.4,
-    height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: color.deletegrey,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  teamDeleteText: {
-    color: color.redpink,
-    fontFamily: "SUIT-Medium",
-  },
-  modal: {
-    flex: 1,
-  },
-  modalVector: {
-    height: 5,
-    width: 50,
-    backgroundColor: color.deactivated,
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  modalTitle: {
-    marginTop: 30,
-    fontFamily: "SUIT-Medium",
-    fontSize: 16,
-  },
   joinCode: {
     marginTop: 15,
     backgroundColor: color.deletegrey,
-    padding: 10,
+    padding: 8,
     borderRadius: 20,
     marginBottom: "2%",
   },
@@ -301,31 +250,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     marginRight: "2%",
-  },
-  modalItemContainter: {
-    flex: 1,
-    alignItems: "center",
-    //justifyContent: "space-evenly",
-    //backgroundColor: "red",
-    marginBottom: "5%",
-  },
-  background: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    height: WINDOW_HEIGHT * 2,
-    width: WINDOW_WIDHT * 2,
-    marginHorizontal: "-50%",
-    marginVertical: "-50%",
-  },
-  modalView: {
-    //flex: 1,
-    backgroundColor: "white",
-    borderStartStartRadius: 20,
-    borderStartEndRadius: 20,
-    height: 400 /*WINDOW_HEIGHT * 0.6*/,
-    marginTop: "auto",
-    marginHorizontal: "-5.5%",
-    marginBottom: "-6%",
   },
   optionContainer: {
     flex: 1,
@@ -339,18 +263,19 @@ const styles = StyleSheet.create({
   file: {
     width: WINDOW_WIDHT * 0.45,
     height: WINDOW_HEIGHT > 700 ? WINDOW_HEIGHT * 0.15 : WINDOW_HEIGHT * 0.2,
-    // marginHorizontal: WINDOW_WIDHT > 376 ? "1.6%" : "1.7%",
     marginTop: "8%",
   },
   titleContainer: {
     flex: 1,
-    paddingHorizontal: WINDOW_WIDHT > 376 ? 60 : 50,
     marginTop: WINDOW_HEIGHT > 700 ? "20.5%" : "22%",
-    //backgroundColor: "teal",
+    backgroundColor: "teal",
   },
   title: {
     textAlign: "center",
     fontSize: 17,
     fontFamily: "SUIT-Medium",
+    alignSelf: "center",
+    paddingHorizontal: "25%",
+    marginTop: WINDOW_HEIGHT > 700 ? "22.5%" : "25%",
   },
 });

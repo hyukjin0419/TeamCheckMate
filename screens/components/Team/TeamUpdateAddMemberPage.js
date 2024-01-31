@@ -1,3 +1,5 @@
+//팀 파일 아이콘 [팀 정보] 모달창에서 팀원추가버튼 터치 시 이동되는 {팀원 추가 화면}입니다.
+//팀원 추가 하였을 때 팀 생성 토스트 알림이 뜨지 않게 하기 위하여 만든 페이지 입니다.
 import { useNavigation } from "@react-navigation/core";
 import React, { useState, useEffect } from "react";
 import {
@@ -24,11 +26,11 @@ import {
 } from "../../../firebase";
 import { color } from "../../styles/colors";
 
-export default function TeamMemberAddPage({ route }) {
+export default function TeamUpdateAddMemberPage({ route }) {
   const navigation = useNavigation();
   //TeamAddPage에서 풀러오는 TeamID
-  const { teamID } = route.params;
-  const [teamCode, setTeamCode] = useState(teamID);
+  const { teamId } = route.params;
+  const [teamCode, setTeamCode] = useState(teamId);
   //파이어베이스에서 가져온 이메일 배열
   const [userEmailArray, setUserEmailArray] = useState([]);
   //검색창에 입력되는 이메일
@@ -41,10 +43,6 @@ export default function TeamMemberAddPage({ route }) {
   const [addedUserEmailArray, setAddedUserEmailArray] = useState([]);
   //현재 로그인된 유저 정보
   const user = auth.currentUser;
-  //보내기 버튼 활성||비활성
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
-  //확인 버튼 상태 (초기값:비활성화 상태)
-  const [buttonDisabled, setButtonDisabled] = useState(true);
 
   //1. 파이어 베이스에서 이메일 가져오는 함수 (자신의 이메일은 가져오지 x)
   const getUsers = async () => {
@@ -61,8 +59,8 @@ export default function TeamMemberAddPage({ route }) {
   //2.처음 화면 렌더링시 파이어 베이스에서 이메일 가져오기
   useEffect(() => {
     getUsers();
-    setTeamCode(teamID);
-    console.log(teamID);
+    setTeamCode(teamId);
+    console.log(teamId);
   }, []);
 
   //3.검색어 상태 바뀔때마다 실행
@@ -128,7 +126,7 @@ export default function TeamMemberAddPage({ route }) {
 
       // 메일이 성공적으로 전송되었을 때에만 navigate
       if (result.status === "sent") {
-        navigation.navigate("TeamPage", { teamAdded: true });
+        navigation.navigate("TeamPage", { teamAdded: false });
       } else {
         // 사용자가 메일을 취소하거나 전송에 실패한 경우의 처리
         console.log("메일 전송이 취소되었거나 실패했습니다.");
@@ -235,12 +233,13 @@ export default function TeamMemberAddPage({ route }) {
               )}
               <View style={s.twoBtnContainer}>
                 <TouchableOpacity
+                  disabled={addedUserEmailArray.length > 0 ? false : true}
                   style={{
                     ...s.twoBtnContainerLeft,
                     backgroundColor:
                       addedUserEmailArray.length > 0
-                        ? "#050026"
-                        : confirmBtnColor,
+                        ? color.activated
+                        : color.deactivated,
                   }}
                   onPress={() => {
                     if (addedUserEmailArray.length > 0) {
@@ -254,10 +253,10 @@ export default function TeamMemberAddPage({ route }) {
                   style={s.twoBtnContainerRight}
                   onPress={() => {
                     //팀 페이지로 넘어갈 때 토스트 띄우기 위한 boolean
-                    navigation.navigate("TeamPage", { teamAdded: true });
+                    navigation.navigate("TeamPage", { teamAdded: false });
                   }}
                 >
-                  <Text style={s.twoBtnContainerRightText}>건너뛰기</Text>
+                  <Text style={styles.twoBtnContainerRightText}>취소</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -346,6 +345,13 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginLeft: 5,
     marginBottom: 10,
+  },
+  //삭제버튼 {취소} 텍스트
+  twoBtnContainerRightText: {
+    fontFamily: "SUIT-Medium",
+    textAlign: "center",
+    fontSize: 13,
+    color: color.redpink,
   },
 });
 

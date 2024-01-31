@@ -21,6 +21,7 @@ import s from "../styles/css.js"
 import PersonalPageBtn from "./PersonalPageFolder/PersonalPageBtn";
 import WeeklyCalendar from "./PersonalPageFolder/WeeklyCalendar";
 
+
 const PersonalPage = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -30,11 +31,10 @@ const PersonalPage = () => {
 
     // Visibility of modal
   const [isModalVisible, setIsModalVisible] = useState(false);
-
   const toggleModal = () => {
     // toggle the visibility of modal
     setIsModalVisible(!isModalVisible);
-  }
+  };
 
   const handlePress = () => {
     setShowModal(!showModal);
@@ -114,8 +114,9 @@ const PersonalPage = () => {
           style={s.textInput}
         />
       </View> */}
+
       {/* modal code */}
-      <Modal 
+      <Modal
         onBackdropPress={() => setIsModalVisible(false)}
         isVisible={isModalVisible}
         swipeDirection="down"
@@ -148,6 +149,24 @@ const PersonalPage = () => {
               </TouchableOpacity>
             </View>
           </View>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: 50,
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity style={styles.tbutton}>
+            <Text style={styles.buttonText}>수정</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.sbutton}>
+            <Text style={{ ...styles.buttonText, color: "red" }}>
+              팀 나가기
+            </Text>
+          </TouchableOpacity>
+        </View>
       </Modal>
     </View>
   );
@@ -239,7 +258,6 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    
   },
   text: {
     color: "black",
@@ -253,7 +271,7 @@ const styles = StyleSheet.create({
     marginBottom: "3%",
     backgroundColor: "#050026",
     width: 170,
-    height: "90%"
+    height: "90%",
   },
   sbutton: {
     borderRadius: 9,
@@ -262,7 +280,7 @@ const styles = StyleSheet.create({
     marginBottom: "3%",
     backgroundColor: "#EFEFEF",
     width: 170,
-    height: "90%"
+    height: "90%",
   },
   buttonText: {
     fontSize: 17,

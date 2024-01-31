@@ -14,16 +14,10 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../styles/colors";
-import {
-  db,
-  collection,
-  addDoc,
-  auth,
-  doc,
-  setDoc,
-  updateDoc,
-} from "../../firebase";
+import { db, collection, doc, updateDoc } from "../../firebase";
 import { useNavigation } from "@react-navigation/core";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import s from "../styles/css";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -46,13 +40,43 @@ export default AssignmentUpdatePage = ({ route }) => {
     /*과제 이름, Duedate*/
   }
   const [name, setAssignmentName] = useState(assignmentName);
-  const [date, setDueDate] = useState(dueDate);
+  const [date, setDate] = useState(new Date()); // Assuming 'dueDate' is a valid date string
 
-  {
-    /* 과제이름, Duedate가 valid input인지 판별 */
-  }
-  const [assignmentValid, setAssignmentValid] = useState(false);
-  const [dueDateValid, setDueDateValid] = useState(false);
+  const [dueDateTime, setDueDateTime] = useState(dueDate);
+
+  //날짜, 시간 선택 시 정보 저장
+  const onChange = (e, selectedDate) => {
+    setDate(selectedDate);
+
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(selectedDate.getDate()).padStart(2, "0");
+    const weekday = new Intl.DateTimeFormat("ko-KR", {
+      weekday: "short",
+    }).format(selectedDate);
+    const hour = String(selectedDate.getHours() % 12 || 12).padStart(2, "0");
+    const minute = String(selectedDate.getMinutes()).padStart(2, "0");
+    const ampm = selectedDate.getHours() >= 12 ? "오후" : "오전";
+
+    //제출기한 string
+    const formattedDate = `${year}.${month}.${day}.(${weekday}) ${ampm} ${hour}:${minute}`;
+    {
+      /* dueDate에 제출기한 string 저장 */
+    }
+    setDueDateTime(formattedDate);
+    setTextStyle(styles.dueDateTextAfterSelectingDate);
+
+    // 제출날짜와 시간의 길이 체크, valid input인지 판별
+    if (assignmentName.length > 0 && formattedDate.length > 0) {
+      setButtonDisabled(false);
+      setConfirmBtnColor(color.activated);
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+      setConfirmBtnColor(color.deactivated);
+      setButtonDisabled(true);
+    }
+  };
 
   {
     /* 과제이름, Duedate가 둘 다 valid input인 경우 확인버튼 활성화 */
@@ -61,26 +85,11 @@ export default AssignmentUpdatePage = ({ route }) => {
   const AssignmentNameInputChange = (text) => {
     setAssignmentName(text);
     if (text.length > 0) {
-      setAssignmentValid(true);
-    } else {
-      setAssignmentValid(false);
-    }
-    if (assignmentValid && dueDateValid) {
       setButtonDisabled(false);
       setConfirmBtnColor(color.activated);
-    }
-  };
-  //DueDate
-  const dueDateInputChange = (text) => {
-    setDueDate(text);
-    if (text.length > 0) {
-      setDueDateValid(true);
     } else {
-      setDueDateValid(false);
-    }
-    if (assignmentValid && dueDateValid) {
-      setButtonDisabled(false);
-      setConfirmBtnColor(color.activated);
+      setButtonDisabled(true);
+      setConfirmBtnColor(color.deactivated);
     }
   };
 
@@ -97,7 +106,7 @@ export default AssignmentUpdatePage = ({ route }) => {
       // Update document with new values
       await updateDoc(assignmentDocRef, {
         assignmentName: name,
-        dueDate: date,
+        dueDate: dueDateTime,
       });
 
       // Navigate back after successful update
@@ -107,15 +116,24 @@ export default AssignmentUpdatePage = ({ route }) => {
     }
   };
 
+  const [show, setShow] = useState(false);
+  const handleDueDatePress = () => {
+    setShow(!show);
+  };
+
+  const [textStyle, setTextStyle] = useState(
+    styles.dueDateTextBeforeSelectingDate
+  );
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
+      <View style={s.container}>
         <StatusBar style={"dark"}></StatusBar>
         {/* 헤더 (뒤로가기 버튼, 과제추가 헤더, 확인버튼) */}
-        <View style={styles.headerContainer}>
+        <View style={s.headContainer}>
           {/* 뒤로가기 버튼 */}
           <TouchableOpacity
-            style={styles.backBtn}
+            style={s.headBtn}
             onPress={() => {
               navigation.navigate("AssignmentPage", {
                 title: title,
@@ -126,18 +144,18 @@ export default AssignmentUpdatePage = ({ route }) => {
           >
             <AntDesign name="left" size={20} color="black" />
           </TouchableOpacity>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerText}>과제 수정</Text>
-          </View>
+
+          <Text style={s.title}>과제 수정</Text>
+
           {/* 확인 버튼 */}
           <TouchableOpacity
-            style={styles.confirmBtn}
+            style={s.titleRightBtn}
             disabled={buttonDisabled}
             onPress={() => {
               handleUpdate();
             }}
           >
-            <Text style={{ ...styles.headerText, color: confirmBtnColor }}>
+            <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
               확인
             </Text>
           </TouchableOpacity>
@@ -146,21 +164,32 @@ export default AssignmentUpdatePage = ({ route }) => {
         <View style={styles.inputContainer}>
           <View style={styles.TextInputContainer}>
             <TextInput
-              placeholder="과제 이름"
+              placeholder={assignmentName}
               onChangeText={AssignmentNameInputChange}
               value={name}
               style={styles.TextInput}
             ></TextInput>
           </View>
-          {/* DueDate TimePicker */}
-          <View style={styles.TextInputContainer}>
-            <TextInput
-              placeholder="Due Date"
-              onChangeText={dueDateInputChange}
-              value={date}
-              style={styles.TextInput}
-            ></TextInput>
-          </View>
+          {/* 제출기한 입력창 (터치 시 date time picker 표시) */}
+          <TouchableOpacity
+            style={styles.dueDateTextInputBox}
+            onPress={handleDueDatePress}
+          >
+            <Text style={textStyle}>{dueDateTime}</Text>
+          </TouchableOpacity>
+          {/* DatePicker */}
+          {show && (
+            <View style={styles.pickerContainer}>
+              <DateTimePicker
+                value={date}
+                mode="datetime"
+                display="inline"
+                style={styles.dueDateBox}
+                onChange={onChange}
+                themeVariant="light"
+              />
+            </View>
+          )}
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -176,47 +205,47 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     justifyContent: "flex-start",
-    //backgroundColor: "skyblue",
   },
   TextInput: {
     height: 50,
-    fontSize: 15,
-    fontWeight: "500",
+    fontSize: 16,
+    fontFamily: "SUIT-Regular",
     marginLeft: "1%",
     marginTop: "5%",
     paddingTop: "2%",
   },
   TextInputContainer: {
-    borderBottomWidth: 1,
+    borderBottomWidth: 1.5,
   },
-  headerContainer: {
+  dueDateTextInputBox: {
+    height: 60,
+    borderBottomWidth: 2,
+    justifyContent: "center",
+  },
+  dueDateTextBeforeSelectingDate: {
+    color: color.placeholdergrey,
+    fontSize: 16,
+    fontFamily: "SUIT-Regular",
+    marginTop: "4%",
+    marginLeft: "1%",
+  },
+  dueDateTextAfterSelectingDate: {
+    color: "black",
+    fontSize: 16,
+    fontFamily: "SUIT-Regular",
+    marginTop: "4%",
+    marginLeft: "1%",
+  },
+  pickerContainer: {
     marginTop: "5%",
-    flex: 0.15,
     alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
+    //flexDirection: "row",
+    justifyContent: "center",
     //backgroundColor: "red",
+    width: "100%",
   },
-  backBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: "center",
-    marginLeft: "3%",
-  },
-  confirmBtn: {
-    flex: 1,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginRight: "3%",
-  },
-  headerText: {
-    fontSize: 19,
-    fontWeight: "500",
+  dueDateBox: {
+    width: "100%",
+    height: "100%",
   },
 });

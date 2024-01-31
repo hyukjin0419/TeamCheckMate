@@ -1,6 +1,7 @@
 import * as Font from "expo-font";
 import { useEffect } from "react";
 import { StyleSheet, Dimensions } from "react-native";
+import { color } from "./colors";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -49,24 +50,30 @@ const commonStyles = StyleSheet.create({
     // backgroundColor: "blue",
   },
   titleRightText: {
-    fontWeight: "bold",
     fontSize: 16,
     alignSelf: "flex-end", // 오른쪽 정렬
     fontFamily: "SUIT-Medium",
   },
-  //로그인 화면에서 쓰이는 textBox
-  inputTextContainer: {
-    marginTop: "%",
+  //------------------------TextInput---------------------------
+  //입력창을 감싸는 컨테이너
+  inputContainer: {
+    flex: 1,
+    justifyContent: "flex-start",
   },
-  //로그인 화면에서 쓰이는 textInput
+  //textInput
   textInput: {
-    marginTop: "10%",
+    height: 50,
     fontSize: 16,
-    borderBottomColor: "#050026",
-    borderBottomWidth: 2,
-    paddingBottom: 10,
     fontFamily: "SUIT-Regular",
+    marginLeft: "1%",
+    marginTop: "5%",
+    paddingTop: "2%",
   },
+  //입력창 밑줄
+  textInputContainer: {
+    borderBottomWidth: 1.5,
+  },
+
   //버튼 기본 디자인
   button: {
     borderRadius: 9,
@@ -104,7 +111,7 @@ const commonStyles = StyleSheet.create({
   },
   twoBtnContainerLeft: {
     flex: 1,
-    backgroundColor: "#050026",
+    backgroundColor: color.activated,
     padding: 15,
     marginRight: 5,
     borderRadius: 7,
@@ -117,7 +124,7 @@ const commonStyles = StyleSheet.create({
   },
   twoBtnContainerRight: {
     flex: 1,
-    backgroundColor: "#EFEFEF",
+    backgroundColor: color.deletegrey,
     padding: 15,
     marginLeft: 5,
     borderRadius: 7,
@@ -126,6 +133,65 @@ const commonStyles = StyleSheet.create({
     fontFamily: "SUIT-Medium",
     textAlign: "center",
     fontSize: 13,
+  },
+  // -----------------------모달창--------------------------------------
+  modalTeamBtnContainer: {
+    width: WINDOW_WIDHT,
+    //backgroundColor: "yellow",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    height: WINDOW_HEIGHT * 0.1,
+  },
+  teamReviseBtn: {
+    width: WINDOW_WIDHT * 0.45,
+    height: 65,
+    backgroundColor: color.activated,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  teamReviseText: {
+    color: "white",
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+  },
+  teamDeleteBtn: {
+    width: WINDOW_WIDHT * 0.45,
+    height: 65,
+    backgroundColor: color.deletegrey,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  teamDeleteText: {
+    color: color.redpink,
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+  },
+  modalVector: {
+    height: 5,
+    width: 50,
+    backgroundColor: color.deactivated,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    marginTop: 20,
+    fontFamily: "SUIT-Medium",
+    fontSize: 16,
+  },
+  modalItemContainter: {
+    flex: 1,
+    alignItems: "center",
+    marginBottom: "5%",
+  },
+  modalView: {
+    backgroundColor: "white",
+    paddingTop: 12,
+    paddingHorizontal: 12,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    minHeight: 400, // This property determines the minimum height of the modal
   },
 });
 
