@@ -178,8 +178,8 @@ const AssignmentPage = () => {
         {/* 팀메이트 추가 버튼 */}
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("TeamMemberAddPage", {
-              teamid: teamid,
+            navigation.navigate("TeamUpdateAddMemberPage", {
+              teamId: teamid,
             });
           }}
         >
