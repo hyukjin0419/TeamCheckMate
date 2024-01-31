@@ -438,10 +438,10 @@ const styles = StyleSheet.create({
   modalConfirmBtn: {
     borderRadius: 10,
     width: WINDOW_WIDHT * 0.9,
-    height: WINDOW_HEIGHT * 0.06,
+    height: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 10,
     backgroundColor: color.deletegrey,
   },
   modalVector: {
