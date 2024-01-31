@@ -113,6 +113,7 @@ export default function UserInfoInputPage({ route }) {
         />
         {!name.trim() && (
           <Text style={{ color: "red", position: "absolute", marginTop: "8%" }}>
+
             *
           </Text>
         )}
@@ -137,8 +138,10 @@ export default function UserInfoInputPage({ route }) {
           onChangeText={(text) => setschool(text)}
           style={s.textInput}
         />
+
       </View>
       <View style={s.textInputContainer}>
+
         {/*학번 입력창*/}
         <TextInput
           placeholder="학번"

@@ -96,29 +96,44 @@ export default TeamPage = () => {
 
   //팀 나가기 코드
   const leaveTeam = async (id) => {
-    const teamRef = doc(db, "team", id);
-    const teamDoc = await getDoc(teamRef);
-    const teamData = teamDoc.data();
-    console.log("------------------>", teamData.member_id_array.length);
-    // updateDoc와 deleteDoc를 병렬로 실행
-    const updatePromise = updateDoc(teamRef, {
-      member_id_array: arrayRemove(user.email),
-    });
+    try {
+      const teamRef = doc(db, "team", id);
+      const teamDoc = await getDoc(teamRef);
 
-    const deletePromise = deleteDoc(
-      doc(doc(db, "user", user.email), "teamList", id)
-    );
-
-    if (teamData.member_id_array.length === 1) {
-      console.log("이건실행이 아예 안되는겨?");
-      try {
-        const deleteTeam = deleteDoc(doc(db, "team", id));
-      } catch (e) {
-        console.log("TeamPage: leavTeam함수 문제발생!!!");
+      if (!teamDoc.exists()) {
+        console.log("팀 문서가 존재하지 않습니다.");
+        return;
       }
-    }
 
-    getTeamList();
+      const membersRef = collection(teamRef, "members");
+      const membersSnapshot = await getDocs(membersRef);
+
+      if (!membersSnapshot.empty) {
+        // 멤버가 존재하면 삭제
+        await deleteDoc(doc(membersRef, user.email));
+        console.log("멤버 삭제 완료");
+      }
+
+      const updatedMembersSnapshot = await getDocs(membersRef);
+      const updatedMembersCount = updatedMembersSnapshot.size;
+      console.log(updatedMembersCount);
+
+      if (updatedMembersCount === 0) {
+        console.log("팀 삭제 작업 수행");
+
+        // 팀 삭제
+        await deleteDoc(teamRef);
+        console.log("팀 삭제 완료");
+      }
+
+      const deletePromise = deleteDoc(
+        doc(doc(db, "user", user.email), "teamList", id)
+      );
+      console.log("leaveTeam 함수 실행 완료");
+      getTeamList();
+    } catch (e) {
+      console.error("leaveTeam 함수에서 오류 발생: ", e);
+    }
   };
 
   //TeamPage에 들어올 시 getTeamList 함수 작동 (새로고침 함수)
