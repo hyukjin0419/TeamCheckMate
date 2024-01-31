@@ -141,9 +141,9 @@ const TeamItem = (props) => {
       }}
     >
       <ImageBackground style={styles.file} source={imageSource}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{title}</Text>
-        </View>
+        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>
+          {title}
+        </Text>
         {/* 팀 파일 아이콘 옵션 버튼 */}
         <View style={styles.optionContainer}>
           {/* 터치 시 모달창 팀 설정 띄우기 */}
@@ -263,18 +263,20 @@ const styles = StyleSheet.create({
   file: {
     width: WINDOW_WIDHT * 0.45,
     height: WINDOW_HEIGHT > 700 ? WINDOW_HEIGHT * 0.15 : WINDOW_HEIGHT * 0.2,
-    // marginHorizontal: WINDOW_WIDHT > 376 ? "1.6%" : "1.7%",
     marginTop: "8%",
   },
   titleContainer: {
     flex: 1,
-    paddingHorizontal: WINDOW_WIDHT > 376 ? 60 : 50,
+    //paddingHorizontal: WINDOW_WIDHT > 376 ? 60 : 50,
     marginTop: WINDOW_HEIGHT > 700 ? "20.5%" : "22%",
-    //backgroundColor: "teal",
+    backgroundColor: "teal",
   },
   title: {
     textAlign: "center",
     fontSize: 17,
     fontFamily: "SUIT-Medium",
+    alignSelf: "center",
+    paddingHorizontal: "25%",
+    marginTop: WINDOW_HEIGHT > 700 ? "20.5%" : "22%",
   },
 });
