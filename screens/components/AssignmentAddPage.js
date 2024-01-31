@@ -179,13 +179,15 @@ export default AssignmentAddPage = ({ route }) => {
 
         {/* 과제이름 입력란 */}
 
-        <View style={s.inputTextContainer}>
-          <TextInput
-            placeholder="과제 이름"
-            onChangeText={handleNameChange}
-            value={assignmentName}
-            style={s.textInput}
-          ></TextInput>
+        <View style={s.inputContainer}>
+          <View style={s.textInputContainer}>
+            <TextInput
+              placeholder="과제 이름"
+              onChangeText={handleNameChange}
+              value={assignmentName}
+              style={s.textInput}
+            ></TextInput>
+          </View>
           {/* 제출기한 입력창 (터치 시 date time picker 표시) */}
           <TouchableOpacity
             style={styles.dueDateTextInputBox}
@@ -223,12 +225,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "SUIT-Regular",
     marginTop: "5%",
+    marginLeft: "1%",
   },
   dueDateTextAfterSelectingDate: {
     color: "black",
     fontSize: 16,
     fontFamily: "SUIT-Regular",
     marginTop: "5%",
+    marginLeft: "1%",
   },
   pickerContainer: {
     marginTop: "5%",

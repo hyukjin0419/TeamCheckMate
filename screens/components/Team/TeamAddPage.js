@@ -360,7 +360,6 @@ const styles = StyleSheet.create({
   colorTextInput: {
     height: 50,
     fontSize: 16,
-    fontWeight: "500",
     marginLeft: "1%",
     fontFamily: "SUIT-Regular",
     paddingTop: "2%",

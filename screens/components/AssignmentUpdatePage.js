@@ -205,7 +205,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     justifyContent: "flex-start",
-    //backgroundColor: "skyblue",
   },
   TextInput: {
     height: 50,
