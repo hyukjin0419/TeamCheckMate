@@ -127,6 +127,66 @@ const commonStyles = StyleSheet.create({
     textAlign: "center",
     fontSize: 13,
   },
+  // -----------------------모달창--------------------------------------
+  modalTeamBtnContainer: {
+    width: WINDOW_WIDHT,
+    //backgroundColor: "yellow",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    height: WINDOW_HEIGHT * 0.13,
+  },
+  teamReviseBtn: {
+    width: WINDOW_WIDHT * 0.45,
+    height: 65,
+    backgroundColor: color.activated,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  teamReviseText: {
+    color: "white",
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+  },
+  teamDeleteBtn: {
+    width: WINDOW_WIDHT * 0.45,
+    height: 65,
+    backgroundColor: color.deletegrey,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  teamDeleteText: {
+    color: color.redpink,
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+  },
+  modalVector: {
+    height: 5,
+    width: 50,
+    backgroundColor: color.deactivated,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    marginTop: 20,
+    fontFamily: "SUIT-Medium",
+    fontSize: 16,
+  },
+  modalItemContainter: {
+    flex: 1,
+    alignItems: "center",
+    marginBottom: "5%",
+  },
+  modalView: {
+    backgroundColor: "white",
+    paddingTop: 12,
+    paddingHorizontal: 12,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    minHeight: 400, // This property determines the minimum height of the modal
+    paddingBottom: 20,
+  },
 });
 
 export default commonStyles;

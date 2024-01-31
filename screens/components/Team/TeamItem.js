@@ -13,6 +13,7 @@ import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/core";
 import { color } from "../../styles/colors";
 import * as Clipboard from "expo-clipboard";
+import s from "../../styles/css";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -167,20 +168,20 @@ const TeamItem = (props) => {
           style={{ justifyContent: "flex-end", margin: 0 }}
         >
           {/* 팀 설정 모달창 */}
-          <View style={styles.modalView}>
+          <View style={s.modalView}>
             {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
-            <View style={styles.modalItemContainter}>
+            <View style={s.modalItemContainter}>
               {/* 모달창 상단 회색 막대 */}
-              <View style={styles.modalVector}></View>
+              <View style={s.modalVector}></View>
               {/* 모달창 상단 팀 이름 표시 */}
-              <Text style={styles.modalTitle}>{title}</Text>
-              <Text>{memberIdArray}</Text>
+              <Text style={s.modalTitle}>{title}</Text>
               {/* 참여 코드 */}
               <TouchableOpacity onPress={() => copyToClipboard(props.id)}>
                 <View style={styles.joinCode}>
                   <Text>참여 코드: {props.id}</Text>
                 </View>
               </TouchableOpacity>
+              <Text>{memberIdArray}</Text>
               <View flex={1}>
                 <TouchableOpacity
                   onPress={() => {
@@ -197,10 +198,10 @@ const TeamItem = (props) => {
                 </TouchableOpacity>
               </View>
               {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
-              <View style={styles.modalTeamBtnContainer}>
+              <View style={s.modalTeamBtnContainer}>
                 {/* 팀 수정 버튼 */}
                 <TouchableOpacity
-                  style={styles.teamReviseBtn}
+                  style={s.teamReviseBtn}
                   onPress={() => {
                     {
                       /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
@@ -216,15 +217,15 @@ const TeamItem = (props) => {
                     SetTeamOptionModalVisible(false);
                   }}
                 >
-                  <Text style={styles.teamReviseText}>팀 수정</Text>
+                  <Text style={s.teamReviseText}>팀 수정</Text>
                 </TouchableOpacity>
                 {/* 팀 삭제 버튼 */}
                 <TouchableOpacity
-                  style={styles.teamDeleteBtn}
+                  style={s.teamDeleteBtn}
                   onPress={leavingtheTeam}
                 >
                   {/* 터치 시 팀 삭제 */}
-                  <Text style={styles.teamDeleteText}>팀 삭제</Text>
+                  <Text style={s.teamDeleteText}>팀 나가기</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -238,54 +239,10 @@ const TeamItem = (props) => {
 export default TeamItem;
 
 const styles = StyleSheet.create({
-  modalTeamBtnContainer: {
-    width: WINDOW_WIDHT,
-    //backgroundColor: "yellow",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    height: WINDOW_HEIGHT * 0.13,
-  },
-  teamReviseBtn: {
-    width: WINDOW_WIDHT * 0.4,
-    height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: color.activated,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  teamReviseText: {
-    color: "white",
-    fontFamily: "SUIT-Medium",
-  },
-  teamDeleteBtn: {
-    width: WINDOW_WIDHT * 0.4,
-    height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: color.deletegrey,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  teamDeleteText: {
-    color: color.redpink,
-    fontFamily: "SUIT-Medium",
-  },
-  modalVector: {
-    height: 5,
-    width: 50,
-    backgroundColor: color.deactivated,
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  modalTitle: {
-    marginTop: 30,
-    fontFamily: "SUIT-Medium",
-    fontSize: 16,
-  },
   joinCode: {
     marginTop: 15,
     backgroundColor: color.deletegrey,
-    padding: 10,
+    padding: 8,
     borderRadius: 20,
     marginBottom: "2%",
   },
@@ -293,20 +250,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     marginRight: "2%",
-  },
-  modalItemContainter: {
-    flex: 1,
-    alignItems: "center",
-    marginBottom: "5%",
-  },
-  modalView: {
-    backgroundColor: "white",
-    paddingTop: 12,
-    paddingHorizontal: 12,
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
-    minHeight: "40%", // This property determines the minimum height of the modal
-    paddingBottom: 20,
   },
   optionContainer: {
     flex: 1,
