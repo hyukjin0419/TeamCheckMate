@@ -169,7 +169,9 @@ const AssignmentPage = () => {
           <AntDesign name="left" size={20} color="black"></AntDesign>
         </TouchableOpacity>
         <ImageBackground source={openedFileImage} style={styles.openedFile}>
-          <Text>{title}</Text>
+          <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>
+            {title}
+          </Text>
         </ImageBackground>
       </View>
       {/* 팀메이트 보여주는 남색 칸 */}
@@ -277,5 +279,13 @@ const styles = StyleSheet.create({
   addBtn: {
     width: 40,
     height: 40,
+  },
+  title: {
+    textAlign: "center",
+    fontSize: 17,
+    fontFamily: "SUIT-Medium",
+    alignSelf: "center",
+    paddingHorizontal: "25%",
+    marginTop: WINDOW_HEIGHT > 700 ? "15%" : "15.5%",
   },
 });
