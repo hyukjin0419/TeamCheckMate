@@ -217,7 +217,7 @@ export default AssignmentAddPage = ({ route }) => {
 const styles = StyleSheet.create({
   dueDateTextInputBox: {
     height: 60,
-    borderBottomWidth: 2,
+    borderBottomWidth: 1.5,
     justifyContent: "center",
   },
   dueDateTextBeforeSelectingDate: {

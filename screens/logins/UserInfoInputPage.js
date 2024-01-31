@@ -103,16 +103,17 @@ export default function UserInfoInputPage({ route }) {
         <View style={s.titleRightBtn}></View>
       </View>
       {/*입력창*/}
-      <View style={s.textBox}>
+      <View style={s.textInputContainer}>
         {/*이름 입력창*/}
         <TextInput
-          placeholder="  이름/닉네임"
+          placeholder="이름/닉네임"
           value={name}
           onChangeText={(text) => isNameEmpty(text)}
           style={s.textInput}
         />
         {!name.trim() && (
-          <Text style={{ color: "red", position: "absolute", marginTop: "9%" }}>
+          <Text style={{ color: "red", position: "absolute", marginTop: "8%" }}>
+
             *
           </Text>
         )}
@@ -128,25 +129,31 @@ export default function UserInfoInputPage({ route }) {
             이름/닉네임을 반드시 입력해주세요!
           </Text>
         )}
-
+      </View>
+      <View style={s.textInputContainer}>
         {/*학교 입력창*/}
         <TextInput
-          placeholder=" 학교"
+          placeholder="학교"
           value={school}
           onChangeText={(text) => setschool(text)}
           style={s.textInput}
         />
 
+      </View>
+      <View style={s.textInputContainer}>
+
         {/*학번 입력창*/}
         <TextInput
-          placeholder=" 학번"
+          placeholder="학번"
           value={studentNumber}
           onChangeText={(text) => setstudentNumber(text)}
           style={s.textInput}
         />
+      </View>
+      <View style={s.textInputContainer}>
         {/*전화번호 입력창*/}
         <TextInput
-          placeholder=" 전화번호"
+          placeholder="전화번호"
           value={phoneNumber}
           onChangeText={(text) => setphoneNumber(text)}
           style={s.textInput}
