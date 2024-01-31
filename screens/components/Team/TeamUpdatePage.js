@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
     borderStartStartRadius: 20,
     borderStartEndRadius: 20,
     marginTop: "auto",
-    minHeight: "50%",
+    minHeight: 460,
   },
   circle: {
     height: 30,

@@ -12,6 +12,7 @@ import Modal from "react-native-modal";
 import { useNavigation } from "@react-navigation/core";
 import { color } from "../styles/colors";
 import { db, collection, doc, deleteDoc } from "../../firebase";
+import s from "../styles/css";
 
 //스크린의 높이, 넓이 불러오기
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -108,11 +109,11 @@ const AssignmentItem = (props) => {
         style={{ justifyContent: "flex-end", margin: 0 }}
       >
         {/* 과제 설정 모달창 */}
-        <View style={styles.modalView}>
+        <View style={s.modalView}>
           {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
-          <View style={styles.modalItemContainter}>
+          <View style={s.modalItemContainter}>
             {/* 모달창 상단 회색 막대 */}
-            <View style={styles.modalVector}></View>
+            <View style={s.modalVector}></View>
             {/* 모달창 상단 과제 이름 표시 */}
             <View style={styles.modalAssignmentNameTextContainer}>
               <Text style={styles.assignmentNameText}>{assignmentName}</Text>
@@ -121,10 +122,10 @@ const AssignmentItem = (props) => {
             {/* 참여 코드, 팀원 목록 표시 */}
             <View flex={1}></View>
             {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
-            <View style={styles.modalTeamBtnContainer}>
+            <View style={s.modalTeamBtnContainer}>
               {/* 팀 수정 버튼 */}
               <TouchableOpacity
-                style={styles.teamReviseBtn}
+                style={s.teamReviseBtn}
                 onPress={() => {
                   {
                     /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
@@ -143,15 +144,12 @@ const AssignmentItem = (props) => {
                   setAssignmentOptionModalVisible(false);
                 }}
               >
-                <Text style={styles.teamReviseText}>수정</Text>
+                <Text style={s.teamReviseText}>팀 수정</Text>
               </TouchableOpacity>
               {/* 팀 삭제 버튼 */}
-              <TouchableOpacity
-                style={styles.teamDeleteBtn}
-                onPress={handleDelete}
-              >
+              <TouchableOpacity style={s.teamDeleteBtn} onPress={handleDelete}>
                 {/* 터치 시 팀 삭제 */}
-                <Text style={styles.teamDeleteText}>삭제</Text>
+                <Text style={s.teamDeleteText}>팀 나가기</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -164,13 +162,6 @@ const AssignmentItem = (props) => {
 export default AssignmentItem;
 
 const styles = StyleSheet.create({
-  modalTeamBtnContainer: {
-    width: WINDOW_WIDHT,
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    height: WINDOW_HEIGHT * 0.13,
-  },
   assignmentDataContainer: {
     flex: 1,
     marginLeft: "7%",
@@ -220,55 +211,8 @@ const styles = StyleSheet.create({
     marginBottom: "5%",
     flexDirection: "row",
   },
-  teamReviseBtn: {
-    width: WINDOW_WIDHT * 0.4,
-    height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: color.activated,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  teamReviseText: {
-    color: "white",
-    fontFamily: "SUIT-Medium",
-    fontSize: 14,
-  },
-  teamDeleteBtn: {
-    width: WINDOW_WIDHT * 0.4,
-    height: WINDOW_HEIGHT * 0.07,
-    backgroundColor: color.deletegrey,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  teamDeleteText: {
-    color: color.redpink,
-    fontFamily: "SUIT-Medium",
-    fontSize: 14,
-  },
   modal: {
     flex: 1,
-  },
-  modalVector: {
-    height: 5,
-    width: 50,
-    backgroundColor: color.deactivated,
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  modalItemContainter: {
-    flex: 1,
-    alignItems: "center",
-    marginBottom: "5%",
-  },
-  modalView: {
-    backgroundColor: "white",
-    paddingTop: 12,
-    paddingHorizontal: 12,
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
-    minHeight: "40%", // This property determines the minimum height of the modal
-    paddingBottom: 20,
   },
   file: {
     width: WINDOW_WIDHT * 0.4,
