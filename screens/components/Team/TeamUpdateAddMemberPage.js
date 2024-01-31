@@ -29,8 +29,8 @@ import { color } from "../../styles/colors";
 export default function TeamUpdateAddMemberPage({ route }) {
   const navigation = useNavigation();
   //TeamAddPage에서 풀러오는 TeamID
-  const { teamID } = route.params;
-  const [teamCode, setTeamCode] = useState(teamID);
+  const { teamId } = route.params;
+  const [teamCode, setTeamCode] = useState(teamId);
   //파이어베이스에서 가져온 이메일 배열
   const [userEmailArray, setUserEmailArray] = useState([]);
   //검색창에 입력되는 이메일
@@ -43,10 +43,6 @@ export default function TeamUpdateAddMemberPage({ route }) {
   const [addedUserEmailArray, setAddedUserEmailArray] = useState([]);
   //현재 로그인된 유저 정보
   const user = auth.currentUser;
-  //보내기 버튼 활성||비활성
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
-  //확인 버튼 상태 (초기값:비활성화 상태)
-  const [buttonDisabled, setButtonDisabled] = useState(true);
 
   //1. 파이어 베이스에서 이메일 가져오는 함수 (자신의 이메일은 가져오지 x)
   const getUsers = async () => {
@@ -63,8 +59,8 @@ export default function TeamUpdateAddMemberPage({ route }) {
   //2.처음 화면 렌더링시 파이어 베이스에서 이메일 가져오기
   useEffect(() => {
     getUsers();
-    setTeamCode(teamID);
-    console.log(teamID);
+    setTeamCode(teamId);
+    console.log(teamId);
   }, []);
 
   //3.검색어 상태 바뀔때마다 실행
@@ -237,12 +233,13 @@ export default function TeamUpdateAddMemberPage({ route }) {
               )}
               <View style={s.twoBtnContainer}>
                 <TouchableOpacity
+                  disabled={addedUserEmailArray.length > 0 ? false : true}
                   style={{
                     ...s.twoBtnContainerLeft,
                     backgroundColor:
                       addedUserEmailArray.length > 0
                         ? color.activated
-                        : confirmBtnColor,
+                        : color.deactivated,
                   }}
                   onPress={() => {
                     if (addedUserEmailArray.length > 0) {
