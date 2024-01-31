@@ -267,7 +267,6 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flex: 1,
-    //paddingHorizontal: WINDOW_WIDHT > 376 ? 60 : 50,
     marginTop: WINDOW_HEIGHT > 700 ? "20.5%" : "22%",
     backgroundColor: "teal",
   },
@@ -277,6 +276,6 @@ const styles = StyleSheet.create({
     fontFamily: "SUIT-Medium",
     alignSelf: "center",
     paddingHorizontal: "25%",
-    marginTop: WINDOW_HEIGHT > 700 ? "20.5%" : "22%",
+    marginTop: WINDOW_HEIGHT > 700 ? "22.5%" : "25%",
   },
 });

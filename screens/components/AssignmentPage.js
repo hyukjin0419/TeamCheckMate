@@ -286,6 +286,6 @@ const styles = StyleSheet.create({
     fontFamily: "SUIT-Medium",
     alignSelf: "center",
     paddingHorizontal: "25%",
-    marginTop: WINDOW_HEIGHT > 700 ? "15%" : "15.5%",
+    marginTop: WINDOW_HEIGHT > 700 ? "10%" : "10.5%",
   },
 });

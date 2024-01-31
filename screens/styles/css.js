@@ -111,7 +111,7 @@ const commonStyles = StyleSheet.create({
   },
   twoBtnContainerLeft: {
     flex: 1,
-    backgroundColor: "#050026",
+    backgroundColor: color.activated,
     padding: 15,
     marginRight: 5,
     borderRadius: 7,
@@ -141,7 +141,7 @@ const commonStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
-    height: WINDOW_HEIGHT * 0.13,
+    height: WINDOW_HEIGHT * 0.1,
   },
   teamReviseBtn: {
     width: WINDOW_WIDHT * 0.45,
@@ -192,7 +192,6 @@ const commonStyles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     minHeight: 400, // This property determines the minimum height of the modal
-    paddingBottom: 20,
   },
 });
 
