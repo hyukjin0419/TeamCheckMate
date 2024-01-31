@@ -26,6 +26,7 @@ import {
 import Modal from "react-native-modal";
 import s from "../../styles/css";
 import { useNavigation } from "@react-navigation/core";
+import { showToast } from "../Toast";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -85,22 +86,38 @@ export default TeamAddPage_origin = () => {
         return;
       }
       setIsButtonClicked(true);
-
+      const timestamp = new Date();
       //사용자 문서 참조
       const userRef = doc(db, "user", email);
-      console.log(email, userRef);
       //사용자 문서 가져오가
       const userDoc = await getDoc(userRef);
-      console.log("Document data: ", userDoc.data());
-      const userData = userDoc.exists() ? userDoc.data() : {};
-
-      const timestamp = new Date();
+      let name, phoneNumber, school, studentNumber;
+      let userObject;
+      //사용자 문서에서 정보 추출하기
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        name = userData.name;
+        phoneNumber = userData.phoneNumber;
+        school = userData.school;
+        studentNumber = userData.studentNumber;
+        userObject = {
+          name: name || "undefined",
+          email: email || "undefined",
+          phoneNumber: phoneNumber || "undefined",
+          school: school || "undefined",
+          studentNumber: studentNumber || "undefined",
+          joinedTime: timestamp,
+          updateTime: null,
+        };
+      } else {
+        console.log("사용자 문서가 존재하지 않습니다.");
+      }
 
       const teamDocRef = await addDoc(collection(db, "team"), {
         title: textInputValue,
         fileImage: colorConfirmed,
         timestamp: timestamp,
-        members: [userData],
+        members: [userObject],
       });
       console.log("TeamAddPage: Document written with ID: ", teamDocRef.id);
 
