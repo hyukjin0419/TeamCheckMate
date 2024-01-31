@@ -17,14 +17,16 @@ import s from "../../styles/css";
 import {
   db,
   collection,
-  addDoc,
   auth,
   doc,
   setDoc,
   getDocs,
+  getDoc,
   updateDoc,
 } from "../../../firebase";
 import { arrayUnion } from "firebase/firestore";
+import { showToast, toastConfig } from "../Toast";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 
 export default function TeamJoinPage() {
   const navigation = useNavigation();
@@ -56,26 +58,44 @@ export default function TeamJoinPage() {
   //확인 버튼 누르면 팀 코드가, 자신의 teamList 문서에 추가된다
   const pressHeadBtn = async () => {
     try {
-      if (isButtonClicked) {
-        return;
-      }
-      setIsButtonClicked(true);
-      //팀코드 -> 유저 페이지에 추가
-      const userDocRef = doc(db, "user", email);
-      const teamListCollectionRef = collection(userDocRef, "teamList");
-      await setDoc(doc(teamListCollectionRef, teamCode), {
-        teamID: teamCode,
-      });
+      Keyboard.dismiss();
 
-      //팀 페이지 -> 유저 이메일 추가
       const teamDocRef = doc(db, "team", teamCode);
-      await updateDoc(teamDocRef, {
-        member_id_array: arrayUnion(email),
-      });
+      const teamDocSnapshot = await getDoc(teamDocRef);
+
+      // if (!teamDocSnapshot.exists) {
+      //   console.log("[TeamJoingPage] 등록되지 않은 팀에 참여하려함.");
+      //   showToast("success", "   등록되지 않은 팀입니다");
+      // }
+      if (
+        teamDocSnapshot.data() &&
+        teamDocSnapshot.data().member_id_array &&
+        teamDocSnapshot.data().member_id_array.includes(email)
+      ) {
+        console.log("[TeamJoingPage] 이미 등록된 팀에 참여하려함.");
+        setTimeout(() => showToast("success", "  이미 참여중인 팀입니다"), 300);
+      } else {
+        await updateDoc(teamDocRef, {
+          member_id_array: arrayUnion(email),
+        });
+
+        // 팀코드 -> 유저 페이지에 추가
+        const userDocRef = doc(db, "user", email);
+        const teamListCollectionRef = collection(userDocRef, "teamList");
+        await setDoc(doc(teamListCollectionRef, teamCode), {
+          teamID: teamCode,
+        });
+
+        // 토스트 메시지: 팀 등록 완료
+        navigation.navigate("TeamPage");
+        showToast("success", " ✓  팀 참여 완료! 이번 팀플도 파이팅하세요 :)");
+      }
     } catch (e) {
-      console.error("[TeamJoinPage] Error adding document: ", e);
+      // console.error("[TeamJoinPage] 이 문제는 괜찮습니다.");
+      showToast("success", "  등록되지 않은 팀입니다");
     }
-    navigation.navigate("TeamPage");
+
+    // navigation.navigate("TeamPage");
   };
 
   return (
@@ -101,16 +121,24 @@ export default function TeamJoinPage() {
               pressHeadBtn();
             }}
           >
-            <Text style={s.titleRightText}>확인</Text>
+            <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
+              확인
+            </Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.inputContainer}>
+        <View style={s.inputTextContainer}>
           <TextInput
             placeholder="참여 코드"
             onChangeText={activatedHeadBtn}
-            style={styles.inputContainerText}
+            style={s.textInput}
           ></TextInput>
         </View>
+        <Toast
+          position="bottom"
+          visibilityTime={2000}
+          config={toastConfig}
+          keyboardOffset={null}
+        />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

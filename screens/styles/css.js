@@ -1,6 +1,7 @@
 import * as Font from "expo-font";
 import { useEffect } from "react";
 import { StyleSheet, Dimensions } from "react-native";
+import { color } from "./colors";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -49,7 +50,6 @@ const commonStyles = StyleSheet.create({
     // backgroundColor: "blue",
   },
   titleRightText: {
-    fontWeight: "bold",
     fontSize: 16,
     alignSelf: "flex-end", // 오른쪽 정렬
     fontFamily: "SUIT-Medium",
@@ -60,7 +60,7 @@ const commonStyles = StyleSheet.create({
   },
   //로그인 화면에서 쓰이는 textInput
   textInput: {
-    marginTop: "8%",
+    marginTop: "10%",
     fontSize: 16,
     borderBottomColor: "#050026",
     borderBottomWidth: 2,
@@ -117,7 +117,7 @@ const commonStyles = StyleSheet.create({
   },
   twoBtnContainerRight: {
     flex: 1,
-    backgroundColor: "#EFEFEF",
+    backgroundColor: color.deletegrey,
     padding: 15,
     marginLeft: 5,
     borderRadius: 7,
@@ -126,6 +126,66 @@ const commonStyles = StyleSheet.create({
     fontFamily: "SUIT-Medium",
     textAlign: "center",
     fontSize: 13,
+  },
+  // -----------------------모달창--------------------------------------
+  modalTeamBtnContainer: {
+    width: WINDOW_WIDHT,
+    //backgroundColor: "yellow",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    height: WINDOW_HEIGHT * 0.13,
+  },
+  teamReviseBtn: {
+    width: WINDOW_WIDHT * 0.45,
+    height: 65,
+    backgroundColor: color.activated,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  teamReviseText: {
+    color: "white",
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+  },
+  teamDeleteBtn: {
+    width: WINDOW_WIDHT * 0.45,
+    height: 65,
+    backgroundColor: color.deletegrey,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  teamDeleteText: {
+    color: color.redpink,
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+  },
+  modalVector: {
+    height: 5,
+    width: 50,
+    backgroundColor: color.deactivated,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    marginTop: 20,
+    fontFamily: "SUIT-Medium",
+    fontSize: 16,
+  },
+  modalItemContainter: {
+    flex: 1,
+    alignItems: "center",
+    marginBottom: "5%",
+  },
+  modalView: {
+    backgroundColor: "white",
+    paddingTop: 12,
+    paddingHorizontal: 12,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    minHeight: 400, // This property determines the minimum height of the modal
+    paddingBottom: 20,
   },
 });
 
