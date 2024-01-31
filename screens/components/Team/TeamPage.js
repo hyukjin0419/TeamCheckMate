@@ -49,10 +49,6 @@ export default TeamPage = () => {
     console.log("TeamPage: Toast Added Toast 작동중");
     showToast("success", "  ✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
   };
-  const teamAlreadyThereToast = () => {
-    console.log("TeamPage: Team Already There Toast 작동중");
-    showToast("success", "  이미 등록된 팀입니다.");
-  };
 
   //회원정보 가져오기
   const user = auth.currentUser;
@@ -249,10 +245,11 @@ export default TeamPage = () => {
         />
       )}
       <Toast
-        position="top"
+        position="bottom"
         style={styles.text}
         visibilityTime={2000}
         config={toastConfig}
+        keyboardOffset={null}
       />
     </View>
   );

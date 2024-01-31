@@ -15,7 +15,7 @@ export const showToastFromTeamJoingPage = (type, message) => {
       type: type,
       text1: message,
     });
-  }, 5000);
+  });
 };
 
 export const toastConfig = {

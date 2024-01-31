@@ -58,25 +58,22 @@ export default function TeamJoinPage() {
   //확인 버튼 누르면 팀 코드가, 자신의 teamList 문서에 추가된다
   const pressHeadBtn = async () => {
     try {
-      if (isButtonClicked) {
-        return;
-      }
-      setIsButtonClicked(true);
+      Keyboard.dismiss();
 
       const teamDocRef = doc(db, "team", teamCode);
       const teamDocSnapshot = await getDoc(teamDocRef);
 
-      if (!teamDocSnapshot.exists) {
-        console.log("[TeamJoingPage] 등록되지 않은 팀에 참여하려함.");
-        showToast("success", "등록되지 않은 팀입니다");
-      }
+      // if (!teamDocSnapshot.exists) {
+      //   console.log("[TeamJoingPage] 등록되지 않은 팀에 참여하려함.");
+      //   showToast("success", "   등록되지 않은 팀입니다");
+      // }
       if (
         teamDocSnapshot.data() &&
         teamDocSnapshot.data().member_id_array &&
         teamDocSnapshot.data().member_id_array.includes(email)
       ) {
         console.log("[TeamJoingPage] 이미 등록된 팀에 참여하려함.");
-        showToast("success", "이미 참여중인 팀입니다");
+        setTimeout(() => showToast("success", "  이미 참여중인 팀입니다"), 300);
       } else {
         await updateDoc(teamDocRef, {
           member_id_array: arrayUnion(email),
@@ -90,14 +87,15 @@ export default function TeamJoinPage() {
         });
 
         // 토스트 메시지: 팀 등록 완료
-        showToast("success", "팀 참여 완료! 이번 팀플도 파이팅하세요 :)");
+        navigation.navigate("TeamPage");
+        showToast("success", " ✓  팀 참여 완료! 이번 팀플도 파이팅하세요 :)");
       }
     } catch (e) {
       // console.error("[TeamJoinPage] 이 문제는 괜찮습니다.");
-      showToast("success", "등록되지 않은 팀입니다");
+      showToast("success", "  등록되지 않은 팀입니다");
     }
 
-    navigation.navigate("TeamPage");
+    // navigation.navigate("TeamPage");
   };
 
   return (
@@ -135,6 +133,12 @@ export default function TeamJoinPage() {
             style={s.textInput}
           ></TextInput>
         </View>
+        <Toast
+          position="bottom"
+          visibilityTime={2000}
+          config={toastConfig}
+          keyboardOffset={null}
+        />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
