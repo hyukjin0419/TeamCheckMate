@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   colorTextInputContainer: {
     flexDirection: "row",
     //backgroundColor: "blue",
-    borderBottomWidth: 2,
+    borderBottomWidth: 1.5,
     marginTop: "3%",
   },
   colorTextInput: {

@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     paddingTop: "2%",
   },
   TextInputContainer: {
-    borderBottomWidth: 2,
+    borderBottomWidth: 1.5,
   },
   dueDateTextInputBox: {
     height: 60,
