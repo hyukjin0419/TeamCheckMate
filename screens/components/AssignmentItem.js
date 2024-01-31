@@ -144,12 +144,12 @@ const AssignmentItem = (props) => {
                   setAssignmentOptionModalVisible(false);
                 }}
               >
-                <Text style={s.teamReviseText}>팀 수정</Text>
+                <Text style={s.teamReviseText}>수정</Text>
               </TouchableOpacity>
               {/* 팀 삭제 버튼 */}
               <TouchableOpacity style={s.teamDeleteBtn} onPress={handleDelete}>
                 {/* 터치 시 팀 삭제 */}
-                <Text style={s.teamDeleteText}>팀 나가기</Text>
+                <Text style={s.teamDeleteText}>삭제</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -54,19 +54,26 @@ const commonStyles = StyleSheet.create({
     alignSelf: "flex-end", // 오른쪽 정렬
     fontFamily: "SUIT-Medium",
   },
-  //로그인 화면에서 쓰이는 textBox
-  inputTextContainer: {
-    marginTop: "%",
+  //------------------------TextInput---------------------------
+  //입력창을 감싸는 컨테이너
+  inputContainer: {
+    flex: 1,
+    justifyContent: "flex-start",
   },
-  //로그인 화면에서 쓰이는 textInput
+  //textInput
   textInput: {
-    marginTop: "10%",
+    height: 50,
     fontSize: 16,
-    borderBottomColor: "#050026",
-    borderBottomWidth: 2,
-    paddingBottom: 10,
     fontFamily: "SUIT-Regular",
+    marginLeft: "1%",
+    marginTop: "5%",
+    paddingTop: "2%",
   },
+  //입력창 밑줄
+  textInputContainer: {
+    borderBottomWidth: 2,
+  },
+
   //버튼 기본 디자인
   button: {
     borderRadius: 9,

@@ -126,12 +126,14 @@ export default function TeamJoinPage() {
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={s.inputTextContainer}>
-          <TextInput
-            placeholder="참여 코드"
-            onChangeText={activatedHeadBtn}
-            style={s.textInput}
-          ></TextInput>
+        <View style={s.inputContainer}>
+          <View style={s.textInputContainer}>
+            <TextInput
+              placeholder="참여 코드"
+              onChangeText={activatedHeadBtn}
+              style={s.textInput}
+            ></TextInput>
+          </View>
         </View>
         <Toast
           position="bottom"
