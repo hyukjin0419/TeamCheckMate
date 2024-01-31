@@ -86,20 +86,20 @@ export default TeamAddPage_origin = () => {
         return;
       }
       setIsButtonClicked(true);
+
       const timestamp = new Date();
+
       //사용자 문서 참조
       const userRef = doc(db, "user", email);
       //사용자 문서 가져오가
       const userDoc = await getDoc(userRef);
-      let name, phoneNumber, school, studentNumber;
+
       let userObject;
       //사용자 문서에서 정보 추출하기
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        name = userData.name;
-        phoneNumber = userData.phoneNumber;
-        school = userData.school;
-        studentNumber = userData.studentNumber;
+        const { name, phoneNumber, school, studentNumber } = userData;
+
         userObject = {
           name: name || "undefined",
           email: email || "undefined",
@@ -117,9 +117,10 @@ export default TeamAddPage_origin = () => {
         title: textInputValue,
         fileImage: colorConfirmed,
         timestamp: timestamp,
-        members: [userObject],
       });
       console.log("TeamAddPage: Document written with ID: ", teamDocRef.id);
+      const memberDocRef = doc(collection(teamDocRef, "members"), email);
+      await setDoc(memberDocRef, userObject);
 
       addTeamIdtoUser(userRef, teamDocRef.id);
 
