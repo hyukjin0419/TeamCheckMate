@@ -164,7 +164,7 @@ export default function TeamJoinPage() {
         </View>
         <Toast
           position="bottom"
-          visibilityTime={2000}
+          visibilityTime={800}
           config={toastConfig}
           keyboardOffset={null}
         />
