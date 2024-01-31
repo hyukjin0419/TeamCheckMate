@@ -71,7 +71,7 @@ const commonStyles = StyleSheet.create({
   },
   //입력창 밑줄
   textInputContainer: {
-    borderBottomWidth: 2,
+    borderBottomWidth: 1.5,
   },
 
   //버튼 기본 디자인

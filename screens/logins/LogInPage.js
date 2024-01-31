@@ -45,7 +45,7 @@ export default function LogInPage({ route }) {
 
   //로그인 관련 함수
   const handleLogin = () => {
-    if(isButtonClicked) {
+    if (isButtonClicked) {
       return;
     }
     setIsButtonClicked(true);
@@ -85,7 +85,7 @@ export default function LogInPage({ route }) {
           <View style={s.titleRightBtn}></View>
         </View>
 
-        <View style={s.inputTextContainer}>
+        <View style={s.textInputContainer}>
           <TextInput
             placeholder="이메일"
             autoCapitalize="none"
@@ -94,6 +94,8 @@ export default function LogInPage({ route }) {
             style={s.textInput}
             keyboardType="email-address"
           />
+        </View>
+        <View style={s.textInputContainer}>
           <TextInput
             placeholder="비밀번호"
             value={password}
