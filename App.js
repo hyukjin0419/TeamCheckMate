@@ -303,7 +303,7 @@ export default function App() {
                 },
                 headerShown: false,
                 tabBarStyle: { height: "10%", borderTopWidth: 0 }, //탭 바의 스타일을 설정한다.
-                tabBarLabelStyle: { paddingBottom: 7 }, //탭 바 라벨의 스타일을 설정한다.
+                tabBarLabelStyle: { paddingBottom: "7%" }, //탭 바 라벨의 스타일을 설정한다.
                 tabBarActiveTintColor: "black", //활성화된 탭의 텍스트 색상을 설정한다.
                 tabBarInactiveTintColor: "black", //비활성화된 탭의 텍스트 색상을 설정한다.
               })}
