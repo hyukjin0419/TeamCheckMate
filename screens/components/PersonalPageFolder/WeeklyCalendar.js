@@ -17,9 +17,6 @@ const WeeklyCalendar = (props) => {
     const [isCalendarReady, setCalendarReady] = useState(false)
     const [date, setDate] = useState(new Date());
     const [isModalVisible, setIsModalVisible] = useState(false);
-      // Set minimum and maximum dates to limit the range
-  const minimumDate = new Date(date.getFullYear(), 0, 1); // January 1st of the current year
-  const maximumDate = new Date(date.getFullYear(), 11, 31); // December 31st of the current year
     
     useEffect(() => { // only first mount
         // When this is set to true, display calendar
@@ -192,6 +189,14 @@ const WeeklyCalendar = (props) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[0]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
+                            {/* Visuals for adding checks in weekly schedule */}
+                            <View style={{position: "absolute"}}>
+                                <View style={{marginTop: "250%", flexDirection: "row", }}>
+                                    <Entypo name="check" size={12} color="#D7D2FF" />
+                                    <Entypo name="check" size={12} color="#F7FF99" />
+                                    <Entypo name="check" size={12} color="#A8EC9A" />
+                                </View>
+                            </View>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.weekDayNumber} >
                             <View style={isCalendarReady && isSelectedDate(weekdays[1]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
