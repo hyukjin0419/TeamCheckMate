@@ -71,7 +71,7 @@ export default PersonalPageBtn = () => {
                 <TouchableOpacity
                   style={styles.addCategoryBtn}
                   onPress={() => {
-                    navigation.navigate("CategoryAdd"), setShowModal(false);
+                    navigation.navigate(), setShowModal(false);
                   }}
                 >
                   <Text style={styles.categoryManageText}>카테고리 등록</Text>
