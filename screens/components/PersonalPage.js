@@ -74,7 +74,7 @@ const PersonalPage = () => {
         <Text style={{marginTop: 100, marginLeft: 20, fontSize: 20}}>{userName} 님 환영합니다</Text>
         <PersonalPageBtn />
       </View> */}
-      <Text style={{marginTop: 100, marginLeft: 20, fontSize: 20}}>{userName} 님 환영합니다</Text>
+      <Text style={styles.titleHeader}>{userName} 님 환영합니다</Text>
       <WeeklyCalendar style={{marginBottom: "10%"}}/>
       <TouchableOpacity
         style={styles.categoryClassBtn}
@@ -104,7 +104,7 @@ const PersonalPage = () => {
         />
           <Text style={styles.checkText}>그래프 1 완성</Text>
           <TouchableOpacity onPress={toggleModal} style={styles.optionSelect}>
-            <Text style={{fontWeight: "bold", fontSize: 20}}>. . .</Text>
+            <Text style={{fontWeight: "bold", fontSize: 18}}>. . .</Text>
           </TouchableOpacity>
       </View>
       <PersonalPageBtn />
@@ -160,6 +160,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+  },
+  titleHeader: {
+    marginTop: 100, 
+    marginLeft: 20, 
+    fontFamily: "SUIT-Regular",
+    fontSize: 20
   },
   AddBtnContainer: {
     alignItems: "flex-end",
@@ -275,10 +281,11 @@ const styles = StyleSheet.create({
   },
   checkText: {
     marginLeft: "3%",
+    fontFamily: "SUIT-Regular"
   },
   optionSelect: {
     marginRight: "6%",
-    fontSize: 20,
+    fontSize: 18,
     position: "absolute",
     right: 0,
     top: -7
