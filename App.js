@@ -27,6 +27,7 @@ import { getDoc } from "firebase/firestore";
 import * as Font from "expo-font";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import CategoryAdd from "./screens/components/Category/CategoryAdd";
+import TeamCheckPage from "./screens/components/TeamCheckPage";
 
 const Stack = createNativeStackNavigator();
 // - 스택 형태로 화면 전환을 관리한다
@@ -79,6 +80,7 @@ function TeamPageTab() {
         name="AssignmentUpdatePage"
         component={AssignmentUpdatePage}
       />
+      <TeamStack.Screen name="TeamCheckPage" component={TeamCheckPage} />
     </TeamStack.Navigator>
   );
 }

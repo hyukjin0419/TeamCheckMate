@@ -20,12 +20,15 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 const AssignmentItem = (props) => {
   const navigation = useNavigation();
-
-  //과제 이름 (AssignmentPage에서 전달받음)
+  const [teamCode, setTeamCode] = useState(props.teamCode);
+  const [title, setTitle] = useState(props.title);
+  const [fileColor, setFileColor] = useState(props.fileColor);
+  const [memberInfo, setMemberInfo] = useState(props.memberInfo);
+  const [memberNames, setMemberNames] = useState(props.memberNames);
   const [assignmentName, setAssignmentName] = useState(props.assignmentName);
-  //dueDate (AssignmentPage에서 전달받음)
+  const [assignmentId, setAssignmentId] = useState(props.assignmentId);
   const [dueDate, setDueDate] = useState(props.dueDate);
-
+  console.log("[AssignmentItem] teamCode", teamCode, "여기까지는 로드 됨");
   const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
     useState(false);
 
@@ -76,7 +79,21 @@ const AssignmentItem = (props) => {
 
   return (
     //과제 아이템 박스
-    <View style={styles.assignmentBox}>
+    <TouchableOpacity
+      style={styles.assignmentBox}
+      onPress={() => {
+        navigation.navigate("TeamCheckPage", {
+          teamCode: teamCode,
+          title: title,
+          fileColor: fileColor,
+          memberInfo: memberInfo,
+          memberNames: memberNames,
+          assignmentName: assignmentName,
+          assignmentId: assignmentId,
+          dueDate: dueDate,
+        });
+      }}
+    >
       {/* DueDate와 과제 이름 */}
       <View style={styles.assignmentDataContainer}>
         <Text style={styles.dueDateText}>{dueDate}</Text>
@@ -155,7 +172,7 @@ const AssignmentItem = (props) => {
           </View>
         </View>
       </Modal>
-    </View>
+    </TouchableOpacity>
   );
 };
 

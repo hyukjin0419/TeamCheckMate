@@ -36,7 +36,6 @@ const TeamItem = (props) => {
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
-  const [memberIdArray, setmemberIdArray] = useState(props.member_id_array);
   const [teamCode, setTeamCode] = useState(props.id);
   //멤버 정보 객체 배열
   const [memberInfo, setMemberInfo] = useState([]);
@@ -198,7 +197,9 @@ const TeamItem = (props) => {
         navigation.navigate("AssignmentPage", {
           title: title,
           fileColor: fileColor,
-          teamid: props.id,
+          teamCode: teamCode,
+          memberInfo: memberInfo,
+          memberNames: memberNames,
         });
       }}
     >

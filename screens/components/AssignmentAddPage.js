@@ -27,7 +27,7 @@ export default AssignmentAddPage = ({ route }) => {
   {
     /* AssignmentPage에서 팀 이름, 파일 아이콘 색상, 팀 id 불러오기 */
   }
-  const { title, fileColor, teamid } = route.params;
+  const { title, fileColor, teamCode } = route.params;
   {
     /* 과제추가 확인버튼 상태 변경 코드 */
   }
@@ -113,10 +113,12 @@ export default AssignmentAddPage = ({ route }) => {
   }
   const addAssignment = async () => {
     try {
-      const teamCollectionRef = collection(db, "team", teamid, "과제 list");
+      const teamCollectionRef = collection(db, "team", teamCode, "과제 list");
       const assignmentDocRef = await addDoc(teamCollectionRef, {
         assignmentName: assignmentName,
         dueDate: dueDate,
+        regDate: new Date(),
+        modDate: null,
       });
 
       console.log(
@@ -131,7 +133,7 @@ export default AssignmentAddPage = ({ route }) => {
         navigation.navigate("AssignmentPage", {
           title: title,
           fileColor: fileColor,
-          teamid: teamid,
+          teamCode: teamCode,
         });
       } else {
         console.error("assignmentDocRef.id 값이 유효하지 않습니다.");
@@ -154,7 +156,7 @@ export default AssignmentAddPage = ({ route }) => {
               navigation.navigate("AssignmentPage", {
                 title: title,
                 fileColor: fileColor,
-                teamid: teamid,
+                teamCode: teamCode,
               });
             }}
           >
