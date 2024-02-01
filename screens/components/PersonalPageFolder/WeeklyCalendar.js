@@ -179,8 +179,8 @@ const WeeklyCalendar = (props) => {
                         </View>
                     </View>
                     {/* Days of the week day numbers */}
-                    <View style={styles.weekdayNumberContainer} onPress={onDayPress.bind(this, weekdays[0], 0)}>
-                        <TouchableOpacity style={styles.weekDayNumber} >
+                    <View style={styles.weekdayNumberContainer}>
+                        <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[0], 0)}>
                             <View style={isCalendarReady && isSelectedDate(weekdays[0]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
                                 <Text style={isCalendarReady && isSelectedDate(weekdays[0]) ? styles.weekDayNumberTextToday : { color: props.themeColor, fontSize: 17, fontFamily: "SUIT-Medium", }}>
                                     {isCalendarReady ? weekdays[0].date() : ''}
