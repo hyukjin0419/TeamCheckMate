@@ -26,6 +26,7 @@ import UserInfoInputPage from "./screens/logins/UserInfoInputPage";
 import { getDoc } from "firebase/firestore";
 import * as Font from "expo-font";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import CategoryAdd from "./screens/components/Category/CategoryAdd";
 
 const Stack = createNativeStackNavigator();
 // - 스택 형태로 화면 전환을 관리한다
@@ -50,6 +51,7 @@ function PersonalPageTab() {
   return (
     <PersonalStack.Navigator screenOptions={{ headerShown: false }}>
       <PersonalStack.Screen name="PersonalPage" component={PersonalPage} />
+      <PersonalStack.Screen name="CategoryAdd" component={CategoryAdd} />
     </PersonalStack.Navigator>
   );
 }

@@ -17,6 +17,9 @@ const WeeklyCalendar = (props) => {
     const [isCalendarReady, setCalendarReady] = useState(false)
     const [date, setDate] = useState(new Date());
     const [isModalVisible, setIsModalVisible] = useState(false);
+      // Set minimum and maximum dates to limit the range
+  const minimumDate = new Date(date.getFullYear(), 0, 1); // January 1st of the current year
+  const maximumDate = new Date(date.getFullYear(), 11, 31); // December 31st of the current year
     
     useEffect(() => { // only first mount
         // When this is set to true, display calendar
