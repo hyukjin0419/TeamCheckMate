@@ -29,7 +29,7 @@ const AssignmentPage = () => {
 
   //TeamItem에서 정보 가져오기
   const route = useRoute();
-  const { title, fileColor, teamid } = route.params;
+  const { title, fileColor, teamCode, memberInfo, memberNames } = route.params;
 
   const [openedFileImage, setOpenedFileImage] = useState(
     require("../images/OpenedFileColor/9CB1BB.png")
@@ -118,7 +118,7 @@ const AssignmentPage = () => {
       // "team" collection에 접근
       const teamCollectionRef = collection(db, "team");
       // "team" collection에 있는 document에 접근
-      const teamDocumentRef = doc(teamCollectionRef, teamid);
+      const teamDocumentRef = doc(teamCollectionRef, teamCode);
       // "과제List" collection에 접근하여 모든 문서 가져오기
       const querySnapshot = await getDocs(
         collection(teamDocumentRef, "과제 list")
@@ -180,9 +180,7 @@ const AssignmentPage = () => {
         {/* 팀메이트 추가 버튼 */}
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("TeamUpdateAddMemberPage", {
-              teamId: teamid,
-            });
+            navigation.navigate("TeamUpdateAddMemberPage", {});
           }}
         >
           <AntDesign
@@ -199,12 +197,14 @@ const AssignmentPage = () => {
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <AssignmentItem
-            assignmentName={item.assignmentName}
-            dueDate={item.dueDate}
-            teamid={teamid}
+            teamCode={teamCode}
             title={title}
             fileColor={fileColor}
+            memberInfo={memberInfo}
+            memberNames={memberNames}
+            assignmentName={item.assignmentName}
             assignmentId={item.assignmentId}
+            dueDate={item.dueDate}
             getAssignmentList={getAssignmentList}
           ></AssignmentItem>
         )}
@@ -219,7 +219,7 @@ const AssignmentPage = () => {
                 navigation.navigate("AssignmentAddPage", {
                   title: title,
                   fileColor: fileColor,
-                  teamid: teamid,
+                  teamCode: teamCode,
                 });
               }}
             >

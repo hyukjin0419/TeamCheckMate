@@ -252,7 +252,6 @@ export default TeamPage = () => {
               title={item.title}
               id={item.id}
               fileColor={item.fileImage}
-              member_id_array={item.member_id_array}
               leaveTeam={leaveTeam}
             ></TeamItem>
           )}
