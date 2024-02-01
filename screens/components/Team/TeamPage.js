@@ -25,11 +25,10 @@ import {
   getDocs,
   collection,
   auth,
-  updateDoc,
-  deleteField,
 } from "../../../firebase";
 import { query, orderBy, arrayRemove } from "firebase/firestore";
 import * as React from "react";
+import { color } from "../../styles/colors";
 import { showToast, toastConfig } from "../Toast";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 
@@ -165,37 +164,18 @@ export default TeamPage = () => {
     <View style={styles.container}>
       <StatusBar style={"dark"}></StatusBar>
       <View style={s.headContainer}></View>
-      {/* 팀 추가에 점근할 수 있는 버튼 */}
-      <TouchableOpacity style={styles.AddBtnContainer} onPress={handlePress}>
-        <Image
-          style={styles.addOrCloseBtn}
-          source={require("../../images/ClassAddBtn.png")}
-        ></Image>
-
-        {/* 모달 뷰 */}
-        <Modal
-          style={styles.modalView}
-          // animationType="fade"
-          transparent={true}
-          visible={showModal}
-          animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
-          animationOutTiming={20}
-        >
-          <TouchableWithoutFeedback onPress={handlePress}>
-            {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
-            <View style={styles.modalView}>
-              <View style={s.headContainer}></View>
-              {/* 엑스 버튼 */}
-              <TouchableOpacity
-                style={styles.AddBtnContainer}
-                onPress={handlePress}
-                activeOpacity={1}
-              >
-                <Image
-                  style={styles.addOrCloseBtn}
-                  source={require("../../images/CloseClassAddBtn.png")}
-                ></Image>
-              </TouchableOpacity>
+      {/* 모달 뷰 */}
+      <Modal
+        //animationType="fade"
+        transparent={true}
+        visible={showModal}
+        animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
+        animationOutTiming={20}
+      >
+        <TouchableWithoutFeedback onPress={handlePress}>
+          {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
+          <View style={styles.modalView}>
+            <View style={styles.modalInsideView}>
               {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
               <View style={styles.twoBtnContainer} onPress={handlePress}>
                 {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
@@ -230,10 +210,21 @@ export default TeamPage = () => {
                   }}
                 ></TouchableOpacity>
               </View>
+              {/* 엑스 버튼 */}
+              <TouchableOpacity
+                style={styles.closeBtnContainer}
+                onPress={handlePress}
+                activeOpacity={1}
+              >
+                <Image
+                  style={styles.addOrCloseBtn}
+                  source={require("../../images/CloseClassAddBtn.png")}
+                ></Image>
+              </TouchableOpacity>
             </View>
-          </TouchableWithoutFeedback>
-        </Modal>
-      </TouchableOpacity>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
       {/* 팀 파일 렌더링하는 코드 */}
       {/* 저장된 팀 리스트를 TeamItem페이지로 보내어서 생성하여 생성된 TeamIteam들을 TeamPage화면에 렌더링*/}
       {isLoading ? (
@@ -257,8 +248,15 @@ export default TeamPage = () => {
             ></TeamItem>
           )}
           keyExtractor={(item) => item.id}
-        />
+        ></FlatList>
       )}
+      {/* 팀 추가에 점근할 수 있는 버튼 */}
+      <TouchableOpacity style={styles.addBtnContainer} onPress={handlePress}>
+        <Image
+          style={styles.addOrCloseBtn}
+          source={require("../../images/ClassAddBtn.png")}
+        ></Image>
+      </TouchableOpacity>
       <Toast
         position="bottom"
         style={styles.text}
@@ -280,24 +278,36 @@ const styles = StyleSheet.create({
     width: WINDOW_WIDHT * 0.92,
     alignSelf: "center",
   },
-  AddBtnContainer: {
-    alignItems: "flex-end",
-    paddingBottom: "2%",
-    paddingHorizontal: "5%",
+  addBtnContainer: {
+    position: "absolute",
+    right: "1%",
+    bottom: 10,
+    zIndex: 1,
+  },
+  closeBtnContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: "1%",
   },
   addOrCloseBtn: {
-    width: 40,
-    height: 40,
-    marginRight: "2%",
+    width: 80,
+    height: 80,
   },
   modalView: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flexDirection: "column",
+  },
+  modalInsideView: {
+    flexDirection: "column-reverse",
+    flex: 0.9,
   },
   twoBtnContainer: {
+    position: "absolute",
+    bottom: 90,
+    right: 10,
     paddingHorizontal: "6%",
     alignItems: "flex-end",
-    justifyContent: "center",
   },
   addClassBtn: {
     backgroundColor: "white",
@@ -328,6 +338,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     size: "large",
-    color: "#050026",
+    color: color.activated,
   },
 });

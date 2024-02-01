@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   file: {
     width: WINDOW_WIDHT * 0.45,
-    height: WINDOW_HEIGHT > 700 ? WINDOW_HEIGHT * 0.15 : WINDOW_HEIGHT * 0.2,
+    height: WINDOW_HEIGHT > 700 ? WINDOW_HEIGHT * 0.15 : WINDOW_HEIGHT * 0.19,
     marginTop: "8%",
   },
   titleContainer: {
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily: "SUIT-Medium",
     alignSelf: "center",
-    paddingHorizontal: "25%",
+    paddingHorizontal: "30%",
     marginTop: WINDOW_HEIGHT > 700 ? "22.5%" : "25%",
   },
 });

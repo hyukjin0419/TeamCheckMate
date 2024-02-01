@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily: "SUIT-Medium",
     alignSelf: "center",
-    paddingHorizontal: "25%",
+    paddingHorizontal: "30%",
     marginTop: WINDOW_HEIGHT > 700 ? "10%" : "10.5%",
   },
 });
