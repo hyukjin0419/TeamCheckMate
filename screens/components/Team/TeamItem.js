@@ -7,6 +7,7 @@ import {
   Dimensions,
   Image,
   Alert,
+  FlatList,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
@@ -14,6 +15,17 @@ import { useNavigation } from "@react-navigation/core";
 import { color } from "../../styles/colors";
 import * as Clipboard from "expo-clipboard";
 import s from "../../styles/css";
+import {
+  db,
+  doc,
+  deleteDoc,
+  getDoc,
+  getDocs,
+  collection,
+  auth,
+  updateDoc,
+  deleteField,
+} from "../../../firebase";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -25,6 +37,11 @@ const TeamItem = (props) => {
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColr);
   const [memberIdArray, setmemberIdArray] = useState(props.member_id_array);
+  const [teamCode, setTeamCode] = useState(props.id);
+  //멤버 정보 객체 배열
+  const [memberInfo, setMemberInfo] = useState([]);
+  //멤버 이름 문자 배열
+  const [memberNames, setMemberNames] = useState([]);
   //터치시 팀 나가는 함수
   const leavingtheTeam = () => {
     props.leaveTeam(props.id);
@@ -130,6 +147,51 @@ const TeamItem = (props) => {
     Alert.alert("참여코드가 클립보드에 복사 되었습니다.");
   };
 
+  //팀원 정보 불러오기
+  const getMembers = async () => {
+    try {
+      const teamRef = doc(db, "team", teamCode);
+      const teamDoc = await getDoc(teamRef);
+
+      if (teamDoc.exists()) {
+        const memberRef = collection(teamRef, "members");
+        const memberSnapshot = await getDocs(memberRef);
+
+        const memberList = memberSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const name = data.name;
+          const phoneNumber = data.phoneNumber || null;
+          const school = data.school || null;
+          const studentNumber = data.studentNumber || null;
+
+          return { id: doc.id, name, phoneNumber, school, studentNumber };
+        });
+
+        // 상태 업데이트
+        setMemberInfo(memberList);
+
+        const memberNameList = memberList.map((member) => member.name || null);
+        setMemberNames(memberNameList);
+
+        // 이제 memberInfo에는 members 컬렉션에 있는 문서들이 객체 배열로 저장되어 있습니다.
+        // console.log(memberInfo);
+        // console.log(memberNames);
+      } else {
+        console.log("팀 문서가 존재하지 않습니다.");
+        throw new Error("팀 문서가 존재하지 않습니다."); // 또는 다른 적절한 처리
+      }
+    } catch (error) {
+      console.error("데이터를 불러오는 중 오류가 발생했습니다.", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    getMembers();
+    console.log(memberInfo);
+    console.log(memberNames);
+  }, []);
+
   return (
     <TouchableOpacity
       onPress={() => {
@@ -181,7 +243,11 @@ const TeamItem = (props) => {
                   <Text>참여 코드: {props.id}</Text>
                 </View>
               </TouchableOpacity>
-              <Text>{memberIdArray}</Text>
+              <FlatList
+                data={memberNames}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => <Text>{item}</Text>}
+              />
               <View flex={1}>
                 <TouchableOpacity
                   onPress={() => {
