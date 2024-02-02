@@ -17,7 +17,8 @@ const styles = StyleSheet.create({
     },
     title: {
         color: 'black',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontFamily: "SUIT-Medium"
     },
     week: {
         width: '100%',
@@ -35,7 +36,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     weekdayLabelText: {
-        color: 'grey'
+        color: 'black',
+        fontFamily: "SUIT-Regular",
+        fontSize: 11
     }, 
     weekdayNumberContainer: {
         flexDirection: 'row',
@@ -58,7 +61,9 @@ const styles = StyleSheet.create({
         borderRadius: 30/2,
     },
     weekDayNumberTextToday : {
-        color: 'white'
+        color: 'white',
+        fontFamily: "SUIT-Medium",
+        fontSize: 17
     },
     schedule: {
         width: '100%'

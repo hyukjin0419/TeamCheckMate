@@ -190,7 +190,9 @@ const TeamItem = (props) => {
         navigation.navigate("AssignmentPage", {
           title: title,
           fileColor: fileColor,
-          teamid: props.id,
+          teamCode: teamCode,
+          memberInfo: memberInfo,
+          memberNames: memberNames,
         });
       }}
     >
