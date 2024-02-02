@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   FlatList,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
@@ -223,12 +224,13 @@ const TeamItem = (props) => {
           animationOutTiming={200}
           backdropTransitionInTiming={200}
           backdropTransitionOutTiming={0}
+          propagateSwipe={true}
           style={{ justifyContent: "flex-end", margin: 0 }}
         >
           {/* 팀 설정 모달창 */}
           <View style={s.modalView}>
             {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
-            <View style={s.modalItemContainter}>
+            <View style={styles.modalItemContainter}>
               {/* 모달창 상단 회색 막대 */}
               <View style={s.modalVector}></View>
               {/* 모달창 상단 팀 이름 표시 */}
@@ -236,7 +238,7 @@ const TeamItem = (props) => {
               {/* 참여 코드 */}
               <TouchableOpacity onPress={() => copyToClipboard(props.id)}>
                 <View style={styles.joinCode}>
-                  <Text>참여 코드 복사하기 </Text>
+                  <Text style={styles.joinCodeText}>참여 코드 복사하기 </Text>
                   <Feather name="copy" size={15} color="black" />
                 </View>
               </TouchableOpacity>
@@ -257,29 +259,28 @@ const TeamItem = (props) => {
                 ></Image>
               </TouchableOpacity>
             </View>
-            <FlatList
-              //backgroundColor="red"
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingLeft: 20,
-                height: 10,
-              }}
-              horizontal={true}
+            <ScrollView
+              width={WINDOW_WIDHT * 0.9}
               alignSelf="center"
-              width={WINDOW_WIDHT * 1}
-              data={memberNames}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={{
-                    ...styles.teamMateBtn,
-                    borderColor: props.fileColor,
-                  }}
-                >
-                  <Text style={styles.teamMateBtnText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
+              scrollEnabled={false}
+            >
+              <FlatList
+                showsHorizontalScrollIndicator={false}
+                horizontal={true}
+                data={memberNames}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={{
+                      ...styles.teamMateBtn,
+                      borderColor: props.fileColor,
+                    }}
+                  >
+                    <Text style={styles.teamMateBtnText}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </ScrollView>
             {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
             <View style={s.modalTeamBtnContainer}>
               {/* 팀 수정 버튼 */}
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
-    marginBottom: 10,
+    marginBottom: 5,
     paddingHorizontal: 15,
   },
   teamMateAddText: {
@@ -358,6 +359,10 @@ const styles = StyleSheet.create({
     backgroundColor: color.deletegrey,
     padding: 8,
     borderRadius: 20,
+  },
+  joinCodeText: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 11,
   },
   optionContainer: {
     flex: 1,
@@ -380,5 +385,10 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: "30%",
     marginTop: WINDOW_HEIGHT > 700 ? "22.5%" : "25%",
+  },
+  modalItemContainter: {
+    flex: 1,
+    alignItems: "center",
+    marginBottom: "10%",
   },
 });
