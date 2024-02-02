@@ -18,14 +18,28 @@ export default TeamCheckPage = (props) => {
 
   console.log(teamCode);
   console.log("whatthe");
+  console.log(memberInfo);
+        console.log(memberNames);
   return (
     <View style={styles.container}>
       <Text style={styles.text}>안녕 팀 체크 페이지에 온걸 환영해 :0</Text>
       <Text>{teamCode}</Text>
       <Text>{title}</Text>
       <Text>{fileColor}</Text>
-      <Text>{memberInfo}</Text>
-      <Text>{memberNames}</Text>
+      {memberInfo && memberInfo.length > 0 && (
+        <View>
+          <Text>Testing</Text>
+          {memberInfo.map((member) => (
+            <View key={member.id}>
+              <Text>{member.name}</Text>
+              <Text>{member.phoneNumber}</Text>
+              <Text>{member.school}</Text>
+              <Text>{member.studentNumber}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+      {memberNames && <Text>{memberNames.join(", ")}</Text>}
       <Text>{assignmentName}</Text>
       <Text>{assignmentId}</Text>
       <Text>{dueDate}</Text>
