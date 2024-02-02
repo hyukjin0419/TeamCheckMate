@@ -132,20 +132,16 @@ const AssignmentItem = (props) => {
             {/* 모달창 상단 회색 막대 */}
             <View style={s.modalVector}></View>
             {/* 모달창 상단 과제 이름 표시 */}
-            <View style={styles.modalAssignmentNameTextContainer}>
-              <Text style={styles.assignmentNameText}>{assignmentName}</Text>
-            </View>
+            <Text style={styles.assignmentNameText}>{assignmentName}</Text>
             <Text style={styles.modalDueDateText}>제출기한: {dueDate}</Text>
-            {/* 참여 코드, 팀원 목록 표시 */}
-            <View flex={1}></View>
             {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
             <View style={s.modalTeamBtnContainer}>
-              {/* 팀 수정 버튼 */}
+              {/* 수정 버튼 */}
               <TouchableOpacity
                 style={s.teamReviseBtn}
                 onPress={() => {
                   {
-                    /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
+                    /* 터치 시 과제 수정 화면으로 이동 */
                   }
                   navigation.navigate("AssignmentUpdatePage", {
                     title: props.title,
@@ -163,9 +159,9 @@ const AssignmentItem = (props) => {
               >
                 <Text style={s.teamReviseText}>수정</Text>
               </TouchableOpacity>
-              {/* 팀 삭제 버튼 */}
+              {/* 삭제 버튼 */}
               <TouchableOpacity style={s.teamDeleteBtn} onPress={handleDelete}>
-                {/* 터치 시 팀 삭제 */}
+                {/* 터치 시 과제 삭제 */}
                 <Text style={s.teamDeleteText}>삭제</Text>
               </TouchableOpacity>
             </View>
@@ -190,22 +186,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "SUIT-Regular",
   },
-  modalAssignmentNameTextContainer: {
-    flex: 1,
-    marginTop: "7%",
-  },
   modalDueDateText: {
     flex: 1,
     alignSelf: "flex-start",
     marginHorizontal: "10%",
     color: color.redpink,
     fontSize: 14,
-    fontFamily: "SUIT-Regular",
+    fontFamily: "SUIT-Medium",
+    marginTop: 20,
   },
   assignmentNameText: {
     color: color.activated,
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: "SUIT-Regular",
+    marginTop: 20,
   },
   assignmentOptionBtnContainer: {
     flex: 0.05,

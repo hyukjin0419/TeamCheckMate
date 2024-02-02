@@ -120,7 +120,7 @@ const commonStyles = StyleSheet.create({
     color: "white",
     fontFamily: "SUIT-Medium",
     textAlign: "center",
-    fontSize: 13,
+    fontSize: 14,
   },
   twoBtnContainerRight: {
     flex: 1,
@@ -132,7 +132,7 @@ const commonStyles = StyleSheet.create({
   twoBtnContainerRightText: {
     fontFamily: "SUIT-Medium",
     textAlign: "center",
-    fontSize: 13,
+    fontSize: 14,
   },
   // -----------------------모달창--------------------------------------
   modalTeamBtnContainer: {
