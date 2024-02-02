@@ -137,14 +137,15 @@ const commonStyles = StyleSheet.create({
   // -----------------------모달창--------------------------------------
   modalTeamBtnContainer: {
     width: WINDOW_WIDHT,
-    //backgroundColor: "yellow",
+    alignSelf: "center",
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
     height: WINDOW_HEIGHT * 0.1,
+    marginBottom: 15,
   },
   teamReviseBtn: {
-    width: WINDOW_WIDHT * 0.45,
+    width: WINDOW_WIDHT * 0.41,
     height: 65,
     backgroundColor: color.activated,
     borderRadius: 10,
@@ -157,7 +158,7 @@ const commonStyles = StyleSheet.create({
     fontSize: 14,
   },
   teamDeleteBtn: {
-    width: WINDOW_WIDHT * 0.45,
+    width: WINDOW_WIDHT * 0.41,
     height: 65,
     backgroundColor: color.deletegrey,
     borderRadius: 10,
@@ -183,7 +184,6 @@ const commonStyles = StyleSheet.create({
   modalItemContainter: {
     flex: 1,
     alignItems: "center",
-    marginBottom: "5%",
   },
   modalView: {
     backgroundColor: "white",
@@ -191,7 +191,7 @@ const commonStyles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    minHeight: 400, // This property determines the minimum height of the modal
+    minHeight: 360, // This property determines the minimum height of the modal
   },
 });
 

@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   FlatList,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
@@ -15,17 +16,7 @@ import { useNavigation } from "@react-navigation/core";
 import { color } from "../../styles/colors";
 import * as Clipboard from "expo-clipboard";
 import s from "../../styles/css";
-import {
-  db,
-  doc,
-  deleteDoc,
-  getDoc,
-  getDocs,
-  collection,
-  auth,
-  updateDoc,
-  deleteField,
-} from "../../../firebase";
+import { db, doc, getDoc, getDocs, collection } from "../../../firebase";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -35,7 +26,7 @@ const TeamItem = (props) => {
   const navigation = useNavigation();
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
-  const [fileColor, setFileColor] = useState(props.fileColr);
+  const [fileColor, setFileColor] = useState(props.fileColor);
   const [memberIdArray, setmemberIdArray] = useState(props.member_id_array);
   const [teamCode, setTeamCode] = useState(props.id);
   //멤버 정보 객체 배열
@@ -145,6 +136,7 @@ const TeamItem = (props) => {
   const copyToClipboard = async (teamCode) => {
     await Clipboard.setStringAsync(teamCode);
     Alert.alert("참여코드가 클립보드에 복사 되었습니다.");
+    console.log(teamCode);
   };
 
   //팀원 정보 불러오기
@@ -243,57 +235,71 @@ const TeamItem = (props) => {
                   <Text>참여 코드: {props.id}</Text>
                 </View>
               </TouchableOpacity>
-              <FlatList
-                data={memberNames}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <Text>{item}</Text>}
-              />
-              <View flex={1}>
+            </View>
+            <View style={styles.teamMateAddContainer}>
+              <Text style={styles.teamMateAddText}>팀 메이트</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("TeamUpdateAddMemberPage", {
+                    teamId: props.id,
+                  });
+                  handleTeamOptionPress();
+                }}
+              >
+                <Image
+                  style={styles.teamInviteBtn}
+                  source={require("../../images/ClassAddBtn.png")}
+                ></Image>
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              paddingHorizontal={20}
+              alignSelf="center"
+              width={WINDOW_WIDHT}
+              horizontal={true}
+              data={memberNames}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
                 <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("TeamUpdateAddMemberPage", {
-                      teamId: props.id,
-                    });
-                    handleTeamOptionPress();
+                  style={{
+                    ...styles.teamMateBtn,
+                    borderColor: props.fileColor,
                   }}
                 >
-                  <Image
-                    style={styles.teamInviteBtn}
-                    source={require("../../images/ClassAddBtn.png")}
-                  ></Image>
+                  <Text style={styles.teamMateBtnText}>{item}</Text>
                 </TouchableOpacity>
-              </View>
-              {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
-              <View style={s.modalTeamBtnContainer}>
-                {/* 팀 수정 버튼 */}
-                <TouchableOpacity
-                  style={s.teamReviseBtn}
-                  onPress={() => {
-                    {
-                      /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
-                    }
-                    navigation.navigate("TeamUpdatePage", {
-                      title: title,
-                      fileColor: fileColor,
-                      id: props.id,
-                    });
-                    {
-                      /* 모달 숨기기 */
-                    }
-                    SetTeamOptionModalVisible(false);
-                  }}
-                >
-                  <Text style={s.teamReviseText}>팀 수정</Text>
-                </TouchableOpacity>
-                {/* 팀 삭제 버튼 */}
-                <TouchableOpacity
-                  style={s.teamDeleteBtn}
-                  onPress={leavingtheTeam}
-                >
-                  {/* 터치 시 팀 삭제 */}
-                  <Text style={s.teamDeleteText}>팀 나가기</Text>
-                </TouchableOpacity>
-              </View>
+              )}
+            />
+            {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
+            <View style={s.modalTeamBtnContainer}>
+              {/* 팀 수정 버튼 */}
+              <TouchableOpacity
+                style={s.teamReviseBtn}
+                onPress={() => {
+                  {
+                    /* 터치 시 팀 수정 화면으로 이동 (팀 이름, 색상, id까지 함꼐 전송) */
+                  }
+                  navigation.navigate("TeamUpdatePage", {
+                    title: title,
+                    fileColor: fileColor,
+                    id: props.id,
+                  });
+                  {
+                    /* 모달 숨기기 */
+                  }
+                  handleTeamOptionPress();
+                }}
+              >
+                <Text style={s.teamReviseText}>팀 수정</Text>
+              </TouchableOpacity>
+              {/* 팀 삭제 버튼 */}
+              <TouchableOpacity
+                style={s.teamDeleteBtn}
+                onPress={leavingtheTeam}
+              >
+                {/* 터치 시 팀 삭제 */}
+                <Text style={s.teamDeleteText}>팀 나가기</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
@@ -305,17 +311,40 @@ const TeamItem = (props) => {
 export default TeamItem;
 
 const styles = StyleSheet.create({
+  teamMateBtn: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 80,
+    height: 45,
+    borderWidth: 1,
+    borderRadius: 23,
+    marginHorizontal: 4,
+    marginTop: 10,
+  },
+  teamMateBtnText: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 12,
+  },
+  teamMateAddContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginTop: 30,
+    paddingHorizontal: 15,
+  },
+  teamMateAddText: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 12,
+  },
+  teamInviteBtn: {
+    width: 25,
+    height: 25,
+  },
   joinCode: {
-    marginTop: 15,
+    marginVertical: 10,
     backgroundColor: color.deletegrey,
     padding: 8,
     borderRadius: 20,
-    marginBottom: "2%",
-  },
-  teamInviteBtn: {
-    width: 40,
-    height: 40,
-    marginRight: "2%",
   },
   optionContainer: {
     flex: 1,
@@ -330,11 +359,6 @@ const styles = StyleSheet.create({
     width: WINDOW_WIDHT * 0.45,
     height: WINDOW_HEIGHT > 700 ? WINDOW_HEIGHT * 0.15 : WINDOW_HEIGHT * 0.19,
     marginTop: "8%",
-  },
-  titleContainer: {
-    flex: 1,
-    marginTop: WINDOW_HEIGHT > 700 ? "20.5%" : "22%",
-    backgroundColor: "teal",
   },
   title: {
     textAlign: "center",
