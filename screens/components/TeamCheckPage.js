@@ -26,9 +26,10 @@ export default TeamCheckPage = (props) => {
       <Text>{teamCode}</Text>
       <Text>{title}</Text>
       <Text>{fileColor}</Text>
+
+      {/* Member is an array so we must print each value inside the array individually */}
       {memberInfo && memberInfo.length > 0 && (
         <View>
-          <Text>Testing</Text>
           {memberInfo.map((member) => (
             <View key={member.id}>
               <Text>{member.name}</Text>
