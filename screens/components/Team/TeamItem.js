@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/core";
 import { color } from "../../styles/colors";
 import * as Clipboard from "expo-clipboard";
 import s from "../../styles/css";
+import { Feather } from "@expo/vector-icons";
 import { db, doc, getDoc, getDocs, collection } from "../../../firebase";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
@@ -135,7 +136,9 @@ const TeamItem = (props) => {
 
   const copyToClipboard = async (teamCode) => {
     await Clipboard.setStringAsync(teamCode);
-    Alert.alert("참여코드가 클립보드에 복사 되었습니다.");
+    Alert.alert(
+      "참여코드가 클립보드에 복사 되었습니다!\n" + "(" + props.id + ")"
+    );
     console.log(teamCode);
   };
 
@@ -234,7 +237,8 @@ const TeamItem = (props) => {
               {/* 참여 코드 */}
               <TouchableOpacity onPress={() => copyToClipboard(props.id)}>
                 <View style={styles.joinCode}>
-                  <Text>참여 코드: {props.id}</Text>
+                  <Text>참여 코드 복사하기 </Text>
+                  <Feather name="copy" size={15} color="black" />
                 </View>
               </TouchableOpacity>
             </View>
@@ -255,11 +259,15 @@ const TeamItem = (props) => {
               </TouchableOpacity>
             </View>
             <FlatList
+              //backgroundColor="red"
               showsHorizontalScrollIndicator={false}
-              paddingHorizontal={20}
+              contentContainerStyle={{
+                paddingLeft: 20,
+                height: 10,
+              }}
               horizontal={true}
               alignSelf="center"
-              width={WINDOW_WIDHT}
+              width={WINDOW_WIDHT * 1}
               data={memberNames}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
@@ -332,7 +340,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
-    marginTop: 30,
+    marginBottom: 10,
     paddingHorizontal: 15,
   },
   teamMateAddText: {
@@ -344,7 +352,10 @@ const styles = StyleSheet.create({
     height: 25,
   },
   joinCode: {
+    alignItems: "center",
+    flexDirection: "row",
     marginVertical: 10,
+    paddingHorizontal: 15,
     backgroundColor: color.deletegrey,
     padding: 8,
     borderRadius: 20,
