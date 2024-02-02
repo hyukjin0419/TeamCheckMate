@@ -213,8 +213,8 @@ const TeamItem = (props) => {
           onBackButtonPress={handleTeamOptionPress}
           onBackdropPress={handleTeamOptionPress}
           isVisible={TeamOptionModalVisible}
-          swipeDirection="down"
-          onSwipeComplete={handleTeamOptionPress}
+          //swipeDirection="down"
+          //onSwipeComplete={handleTeamOptionPress}
           animationIn="slideInUp"
           animationOut="slideOutDown"
           animationInTiming={200}
@@ -255,10 +255,11 @@ const TeamItem = (props) => {
               </TouchableOpacity>
             </View>
             <FlatList
+              showsHorizontalScrollIndicator={false}
               paddingHorizontal={20}
+              horizontal={true}
               alignSelf="center"
               width={WINDOW_WIDHT}
-              horizontal={true}
               data={memberNames}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
