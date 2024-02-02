@@ -8,7 +8,6 @@ import {
   Image,
   Alert,
   FlatList,
-  ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
@@ -216,8 +215,8 @@ const TeamItem = (props) => {
           onBackButtonPress={handleTeamOptionPress}
           onBackdropPress={handleTeamOptionPress}
           isVisible={TeamOptionModalVisible}
-          //swipeDirection="down"
-          //onSwipeComplete={handleTeamOptionPress}
+          swipeDirection="down"
+          onSwipeComplete={handleTeamOptionPress}
           animationIn="slideInUp"
           animationOut="slideOutDown"
           animationInTiming={200}

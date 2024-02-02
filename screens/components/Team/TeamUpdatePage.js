@@ -71,6 +71,7 @@ export default TeamUpdatePage = ({ route }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const handleModalPress = () => {
     setIsModalVisible(!isModalVisible);
+    setSelectedColor(colorConfirmed);
   };
 
   /* 팀이름, 색상 firebase에 업데이트 */
