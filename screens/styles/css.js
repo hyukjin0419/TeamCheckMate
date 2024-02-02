@@ -191,7 +191,7 @@ const commonStyles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    minHeight: 360, // This property determines the minimum height of the modal
+    minHeight: 350, // This property determines the minimum height of the modal
   },
 });
 
