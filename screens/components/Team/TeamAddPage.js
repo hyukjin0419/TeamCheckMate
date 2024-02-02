@@ -42,6 +42,7 @@ export default TeamAddPage_origin = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const handleModalPress = () => {
     setIsModalVisible(!isModalVisible);
+    setSelectedColor(colorConfirmed);
   };
 
   // 색상 옵션 (확정된 색상 아님) (초기값: 기본 색상)
