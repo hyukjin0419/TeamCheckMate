@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  ScrollView,
+  FlatList,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/core";
@@ -67,44 +69,64 @@ export default TeamCheckPage = (props) => {
         <View style={s.titleRightBtn}></View>
       </View>
       {/* Code that shows the assignment that user selected */}
-      <View style={styles.assignmentBox}>
-        <View style={styles.assignmentDataContainer}>
+      <View style={styles.assignmentTitleContainer}>
+        <View style={styles.assignmentTitleInfoContainer}>
           <Text style={styles.dueDateText}>{dueDate}</Text>
-          <Text style={styles.assignmentNameText}>{assignmentName}</Text>
+          <Text style={styles.assignmentTitleText}>{assignmentName}</Text>
         </View>
       </View>
       {/* Code for displaying team members under assignment */}
-      <View style={styles.teamNameContainer}>
+
+      <View style={styles.teamMembersNamesArrayContainer}>
         {/* Display the 팀메이트 */}
+
         <View
           style={{
-            ...styles.teamCircle,
-            ...styles.teamNameContainer,
+            ...styles.teamMateContainer,
             backgroundColor: fileColor,
             borderColor: fileColor,
             marginRight: "3%",
           }}
         >
-          <Text style={{ ...styles.teamName }}>팀메이트</Text>
+          <Text style={{ ...styles.teamMateText }}>팀메이트</Text>
         </View>
         {/* Display each member in the memberInfo array by using map */}
-        {memberInfo.map((member) => (
-          <View
-            key={member.id}
-            style={{
-              ...styles.teamCircle,
-              ...styles.teamNameContainer,
-              marginRight: "3%",
-              borderColor: fileColor,
-            }}
-          >
-            <Text style={styles.teamName}>{member.name}</Text>
-          </View>
-        ))}
+
+        <FlatList
+          data={memberInfo}
+          // horizontal={true}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={{
+                ...styles.teamMembersNamesContainer,
+                ...styles.teamNameContainer,
+                marginRight: "3%",
+                borderColor: fileColor,
+              }}
+            >
+              <Text style={styles.teamName}>{item.name}</Text>
+            </TouchableOpacity>
+          )}
+        />
+
+        {/* {memberInfo.map((member) => (
+            <View
+              key={member.id}
+              style={{
+                ...styles.teamMembersNamesContainer,
+                ...styles.teamNameContainer,
+                marginRight: "3%",
+                borderColor: fileColor,
+              }}
+            >
+              <Text style={styles.teamName}>{member.name}</Text>
+            </View>
+          ))} */}
       </View>
 
       {/* Code for displaying name and add button to add tasks */}
-      <View
+      {/* <View
         style={{
           position: "absolute",
           marginTop: "70%",
@@ -121,6 +143,7 @@ export default TeamCheckPage = (props) => {
                 ...styles.teamNameAssignments,
                 flexDirection: "row",
                 borderColor: fileColor,
+                backgroundColor: "violet",
               }}
             >
               <Text style={{ ...styles.teamName, marginLeft: "10%" }}>
@@ -133,62 +156,67 @@ export default TeamCheckPage = (props) => {
             </View>
           </TouchableOpacity>
         ))}
-      </View>
+      </View> */}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
+  // --------------과제 타이틀 영역-----------------
+  assignmentTitleContainer: {
+    width: WINDOW_WIDHT * 0.9,
+    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
+    //backgroundColor: "red",
+    borderWidth: 1,
+    borderRadius: 9,
+    marginTop: "5%",
+    marginBottom: "5%",
+    flexDirection: "row",
+    backgroundColor: "yellow",
   },
-  assignmentDataContainer: {
+  assignmentTitleInfoContainer: {
     flex: 1,
     marginLeft: "7%",
     justifyContent: "space-evenly",
     paddingVertical: "5%",
+    backgroundColor: "grey",
   },
   dueDateText: {
     color: color.redpink,
     fontSize: 12,
     fontFamily: "SUIT-Regular",
   },
-  assignmentNameText: {
+  assignmentTitleText: {
     color: color.activated,
     fontSize: 20,
     fontFamily: "SUIT-Regular",
   },
-  assignmentBox: {
-    width: WINDOW_WIDHT * 0.9,
-    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
-    //backgroundColor: "red",
-    borderWidth: 1,
-    borderRadius: 9,
-    marginBottom: "5%",
-    flexDirection: "row",
-  },
-  teamNameContainer: {
+  // --------------------중간 팀 멤버 이름 영역----------------
+  teamMembersNamesArrayContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "green",
   },
+  teamMateContainer: {
+    width: 62,
+    height: 33,
+    borderRadius: 20,
+    borderWidth: 1,
+    backgroundColor: "yellow",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  teamMateText: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 12,
+  },
+
   teamNameAssignments: {
     justifyContent: "space-between",
     alignItems: "center",
     height: "45%",
     width: "40%",
-  },
-  teamName: {
-    fontFamily: "SUIT-Regular",
-    fontSize: 12,
-  },
-  teamCircle: {
-    width: "15%",
-    height: "150%",
-    borderRadius: 30,
-    borderWidth: 1,
-    backgroundColor: "blue",
+    backgroundColor: "violet",
   },
 });
