@@ -193,6 +193,56 @@ const commonStyles = StyleSheet.create({
     borderTopLeftRadius: 20,
     minHeight: 350, // This property determines the minimum height of the modal
   },
+  modalInsideView: {
+    flexDirection: "column-reverse",
+    flex: 0.9,
+  },
+  BtnContainer: {
+    position: "absolute",
+    bottom: 90,
+    right: 10,
+    paddingHorizontal: "6%",
+    alignItems: "flex-end",
+  },
+  addClassBtn: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginBottom: 12,
+    marginTop: "2%",
+  },
+  addClassBtnText: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    paddingHorizontal: 1,
+    marginRight: 3,
+  },
+  joinClassBtn: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+  },
+  addBtnContainer: {
+    position: "absolute",
+    right: "1%",
+    bottom: 10,
+    zIndex: 1,
+  },
+  closeBtnContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: "1%",
+  },
+  addOrCloseBtn: {
+    width: 80,
+    height: 80,
+  },
 });
 
 export default commonStyles;
