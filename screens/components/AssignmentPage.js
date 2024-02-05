@@ -247,28 +247,41 @@ const AssignmentPage = () => {
         </TouchableWithoutFeedback>
       </Modal>
       <ScrollView
-        marginTop={135}
-        width={WINDOW_WIDHT}
-        marginLeft={20}
         alignSelf="center"
         scrollEnabled={false}
+        style={{
+          marginLeft: 20,
+          marginTop: 135,
+          width: WINDOW_WIDHT,
+        }}
       >
-        <FlatList
-          showsHorizontalScrollIndicator={false}
-          horizontal={true}
-          data={memberNames}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={{
-                ...styles.teamMateBtn,
-                borderColor: fileColor,
-              }}
-            >
-              <Text style={styles.teamMateBtnText}>{item}</Text>
-            </TouchableOpacity>
-          )}
-        />
+        <View flexDirection="row">
+          <View
+            style={{
+              ...styles.teamMateBtn,
+              borderColor: fileColor,
+              backgroundColor: fileColor,
+            }}
+          >
+            <Text style={styles.teamMateBtnText}>팀 메이트</Text>
+          </View>
+          <FlatList
+            showsHorizontalScrollIndicator={false}
+            horizontal={true}
+            data={memberNames}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={{
+                  ...styles.teamMateBtn,
+                  borderColor: fileColor,
+                }}
+              >
+                <Text style={styles.teamMateBtnText}>{item}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
       </ScrollView>
       {/* Parent View for both FlatLists */}
       <View style={{ flex: 20 }}>

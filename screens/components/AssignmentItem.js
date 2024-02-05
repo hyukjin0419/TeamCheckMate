@@ -132,6 +132,7 @@ const AssignmentItem = (props) => {
               {/* 모달창 상단 과제 이름 표시 */}
               <Text style={styles.assignmentNameText}>{assignmentName}</Text>
               <Text style={styles.modalDueDateText}>제출기한: {dueDate}</Text>
+              <View flex={1}></View>
               {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
               <View style={s.modalTeamBtnContainer}>
                 {/* 수정 버튼 */}
@@ -179,8 +180,7 @@ export default AssignmentItem;
 const styles = StyleSheet.create({
   assignmentDataContainer: {
     flex: 1,
-    marginLeft: "7%",
-    justifyContent: "space-evenly",
+    marginLeft: "10%",
     paddingVertical: "5%",
   },
   dueDateText: {
@@ -198,9 +198,9 @@ const styles = StyleSheet.create({
   },
   assignmentNameText: {
     color: color.activated,
-    fontSize: 16,
+    fontSize: 20,
     fontFamily: "SUIT-Regular",
-    marginTop: 20,
+    marginTop: 5,
   },
   assignmentBox: {
     alignSelf: "center",
