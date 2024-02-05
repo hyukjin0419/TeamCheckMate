@@ -124,7 +124,7 @@ export default TeamCheckPage = (props) => {
             >
               <Text style={styles.memberNameTextTwo}>{item.name}</Text>
               <Image
-                source={require("../images/ClassAddBtn.png")}
+                source={require("../images/ListAddBtn.png")}
                 style={styles.taskAddBtn}
               />
             </TouchableOpacity>
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "green",
   },
   teamMateContainer: {
-    borderRadius: 16,
+    borderRadius: 200,
     borderWidth: 1,
     marginRight: 7,
     alignItems: "center",
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   memberNameContainer: {
     marginRight: 6,
-    borderRadius: 16,
+    borderRadius: 200,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   memberNameContainerTwo: {
     flexDirection: "row",
-    borderRadius: 16,
+    borderRadius: 200,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -222,13 +222,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     // backgroundColor: "yellow",
     padding: 10,
-    paddingLeft: 11,
+    paddingLeft: 7,
     paddingRight: 6,
+    margin: 0,
   },
   taskAddBtn: {
-    width: 20,
-    height: 20,
+    width: 18,
+    height: 18,
     // backgroundColor: "blue",
-    paddingRight: 10,
+    margin: 0,
+    padding: 0,
+    marginRight: 8,
   },
 });
