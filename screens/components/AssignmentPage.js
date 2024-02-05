@@ -277,17 +277,19 @@ const AssignmentPage = () => {
           data={assignmentList}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <AssignmentItem
-              teamCode={teamCode}
-              title={title}
-              fileColor={fileColor}
-              memberInfo={memberInfo}
-              memberNames={memberNames}
-              assignmentName={item.assignmentName}
-              assignmentId={item.assignmentId}
-              dueDate={item.dueDate}
-              getAssignmentList={getAssignmentList}
-            ></AssignmentItem>
+            <View>
+              <AssignmentItem
+                teamCode={teamCode}
+                title={title}
+                fileColor={fileColor}
+                memberInfo={memberInfo}
+                memberNames={memberNames}
+                assignmentName={item.assignmentName}
+                assignmentId={item.assignmentId}
+                dueDate={item.dueDate}
+                getAssignmentList={getAssignmentList}
+              ></AssignmentItem>
+            </View>
           )}
           keyExtractor={(item) => item.id}
         ></FlatList>
