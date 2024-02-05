@@ -93,36 +93,22 @@ export default TeamCheckPage = (props) => {
         {/* Display each member in the memberInfo array by using map */}
 
         <FlatList
-          data={memberInfo}
-          // horizontal={true}
-          keyExtractor={(item) => item.id.toString()}
+          data={memberNames}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={{
-                ...styles.teamMembersNamesContainer,
-                ...styles.teamNameContainer,
-                marginRight: "3%",
+                ...styles.memberNameContainer,
+
                 borderColor: fileColor,
               }}
             >
-              <Text style={styles.teamName}>{item.name}</Text>
+              <Text style={styles.memberNameText}>{item}</Text>
             </TouchableOpacity>
           )}
         />
-
-        {/* {memberInfo.map((member) => (
-            <View
-              key={member.id}
-              style={{
-                ...styles.teamMembersNamesContainer,
-                ...styles.teamNameContainer,
-                marginRight: "3%",
-                borderColor: fileColor,
-              }}
-            >
-              <Text style={styles.teamName}>{member.name}</Text>
-            </View>
-          ))} */}
       </View>
 
       {/* Code for displaying name and add button to add tasks */}
@@ -172,14 +158,14 @@ const styles = StyleSheet.create({
     marginTop: "5%",
     marginBottom: "5%",
     flexDirection: "row",
-    backgroundColor: "yellow",
+    // backgroundColor: "yellow",
   },
   assignmentTitleInfoContainer: {
     flex: 1,
     marginLeft: "7%",
     justifyContent: "space-evenly",
     paddingVertical: "5%",
-    backgroundColor: "grey",
+    // backgroundColor: "grey",
   },
   dueDateText: {
     color: color.redpink,
@@ -196,22 +182,37 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "green",
+    // backgroundColor: "green",
   },
   teamMateContainer: {
-    width: 62,
-    height: 33,
     borderRadius: 20,
     borderWidth: 1,
+    marginRight: 7,
     backgroundColor: "yellow",
     alignItems: "center",
     justifyContent: "center",
   },
   teamMateText: {
+    padding: 9,
+    paddingRight: 10,
+    paddingLeft: 10,
     fontFamily: "SUIT-Medium",
     fontSize: 12,
   },
-
+  memberNameContainer: {
+    marginRight: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  memberNameText: {
+    padding: 9,
+    paddingRight: 13,
+    paddingLeft: 13,
+    fontFamily: "SUIT-Medium",
+    fontSize: 12,
+  },
   teamNameAssignments: {
     justifyContent: "space-between",
     alignItems: "center",
