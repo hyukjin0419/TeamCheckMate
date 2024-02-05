@@ -10,7 +10,6 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
-  Keyboard,
   ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
@@ -204,11 +203,6 @@ export default TeamPage = () => {
                     style={{ width: 16, height: 16 }}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("TeamJoinPage"), setShowModal(false);
-                  }}
-                ></TouchableOpacity>
               </View>
               {/* 엑스 버튼 */}
               <TouchableOpacity
