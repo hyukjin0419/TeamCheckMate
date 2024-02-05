@@ -15,14 +15,13 @@ import { useRoute } from "@react-navigation/native";
 import { color } from "../styles/colors";
 import s from "../styles/css.js";
 import { AntDesign } from "@expo/vector-icons";
+import Checkbox from "expo-checkbox";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamCheckPage = (props) => {
   const navigation = useNavigation();
-  const [inputTask, setInputTask] = useState("");
-  const [tasks, setTasks] = useState([""]);
   const route = useRoute();
   const {
     teamCode,
@@ -35,22 +34,68 @@ export default TeamCheckPage = (props) => {
     dueDate,
   } = route.params;
 
-  const addTasks = () => {
-    // Add new input into array
-    setTasks([...tasks, ""]);
+  /*
+필요한 함수가 뭘까..
+1. 플러스 버튼 눌렀을 때 입력창이 열려야함 -> 입력창 state
+2. 입력창이 입력이 끝났을 때 checklists에 체크박스컨테이너 하나가 추가 되어야함 (addTask)
+3. 만약 체크박스 눌렀을 때 상태가 바뀌어야 함
+4. update 및 delete도 구현해야 함
+*/
+
+  const [checklists, setChecklists] = useState([]);
+  const [newTaskText, setNewTaskText] = useState("");
+  const [isWritingNewTask, setIsWritingNewTask] = useState({});
+
+  const pressAddBtn = (memberName) => {
+    // 플러스 버튼을 누를 때 해당 팀 멤버에 대한 입력 창을 열도록 설정
+    const updatedIsWritingNewTask = { ...isWritingNewTask };
+    updatedIsWritingNewTask[memberName] = true;
+    setIsWritingNewTask(updatedIsWritingNewTask);
   };
 
-  const updateTasks = (text, index) => {
-    // newEmailInputs will contain all the currently added emails
-    const newTasks = [...tasks];
-    // The new index position of the newEmailInputs array will include newly added email
-    newTasks[index] = text;
-    // update emailInputs
-    setTasks(newTasks);
+  const addNewTask = (memberName) => {
+    // 입력이 끝났을 때 checklists에 새로운 체크박스 컨테이너를 추가
+    const updatedChecklists = [...checklists];
+    updatedChecklists.push({
+      writer: memberName,
+      index: updatedChecklists.filter(
+        (checklist) => checklist.writer === memberName
+      ).length,
+      isWriting: false,
+      isChecked: false,
+      content: newTaskText,
+      regDate: new Date(),
+      modDate: new Date(),
+    });
+    setChecklists(updatedChecklists);
+
+    // 입력이 완료되면 입력 상태 초기화
+    const updatedIsWritingNewTask = { ...isWritingNewTask };
+    updatedIsWritingNewTask[memberName] = false;
+    setIsWritingNewTask(updatedIsWritingNewTask);
+
+    // 입력창 비우기
+    setNewTaskText("");
   };
 
-  console.log(teamCode);
+  const handleCheckboxChange = (writer, index, newValue) => {
+    // 체크박스 상태 변경
+    const updatedChecklists = [...checklists];
+    const checklistToUpdate = updatedChecklists.find(
+      (checklist) => checklist.writer === writer && checklist.index === index
+    );
+
+    if (checklistToUpdate) {
+      checklistToUpdate.isChecked = newValue;
+      checklistToUpdate.modDate = new Date();
+      setChecklists(updatedChecklists);
+    }
+  };
+
+  console.log(JSON.stringify(checklists, null, 2));
+
   return (
+    //헤더 부분
     <View style={s.container}>
       <View style={s.headContainer}>
         {/* Header code */}
@@ -68,14 +113,14 @@ export default TeamCheckPage = (props) => {
         <Text style={s.title}>{title}</Text>
         <View style={s.titleRightBtn}></View>
       </View>
-      {/* Code that shows the assignment that user selected */}
+      {/* 과제 제목 부분 */}
       <View style={styles.assignmentTitleContainer}>
         <View style={styles.assignmentTitleInfoContainer}>
           <Text style={styles.dueDateText}>{dueDate}</Text>
           <Text style={styles.assignmentTitleText}>{assignmentName}</Text>
         </View>
       </View>
-      {/* Code for displaying team members under assignment */}
+      {/* 팀원 목록 부분 */}
 
       <View style={styles.teamMembersNamesArrayContainer}>
         {/* Display the 팀메이트 */}
@@ -90,7 +135,6 @@ export default TeamCheckPage = (props) => {
         >
           <Text style={{ ...styles.teamMateText }}>팀메이트</Text>
         </View>
-        {/* Display each member's name by using FlatList */}
 
         <FlatList
           data={memberNames}
@@ -103,6 +147,7 @@ export default TeamCheckPage = (props) => {
                 ...styles.memberNameContainer,
                 borderColor: fileColor,
               }}
+              onPress={() => createChecklist(item.name)}
             >
               <Text style={styles.memberNameText}>{item}</Text>
             </TouchableOpacity>
@@ -110,24 +155,57 @@ export default TeamCheckPage = (props) => {
         />
       </View>
 
-      {/* Code for displaying name and add button to add tasks */}
+      {/* 체크리스트 구현 부분 */}
       <View style={styles.checkContainer}>
         <FlatList
           data={memberInfo}
+          showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={{
-                ...styles.memberNameContainerTwo,
-                borderColor: fileColor,
-              }}
-            >
-              <Text style={styles.memberNameTextTwo}>{item.name}</Text>
-              <Image
-                source={require("../images/ListAddBtn.png")}
-                style={styles.taskAddBtn}
-              />
-            </TouchableOpacity>
+            <View>
+              <TouchableOpacity
+                style={{
+                  ...styles.memberNameContainerTwo,
+                  borderColor: fileColor,
+                }}
+                onPress={() => pressAddBtn(item.name)}
+              >
+                <Text style={styles.memberNameTextTwo}>{item.name}</Text>
+                <Image
+                  source={require("../images/ListAddBtn.png")}
+                  style={styles.taskAddBtn}
+                />
+              </TouchableOpacity>
+
+              {/* 생성된 체크리스트 렌더링 */}
+
+              {/* 체크리스트 항목 추가 입력 창 */}
+              {checklists
+                .filter((checklist) => checklist.writer === item.name)
+                .map((checklist, index) => (
+                  <View key={index} style={styles.checklistItem}>
+                    <Text>{checklist.content}</Text>
+                    <Checkbox
+                      value={checklist.isChecked}
+                      onValueChange={(newValue) =>
+                        handleCheckboxChange(checklist.writer, index, newValue)
+                      }
+                    />
+                  </View>
+                ))}
+
+              {/* 체크리스트 항목 추가 입력 창 */}
+              {isWritingNewTask[item.name] ? (
+                <View>
+                  <TextInput
+                    placeholder="할 일 추가..."
+                    value={newTaskText}
+                    onChangeText={(text) => setNewTaskText(text)}
+                    onSubmitEditing={() => addNewTask(item.name)}
+                  />
+                </View>
+              ) : null}
+            </View>
           )}
         />
       </View>
