@@ -90,7 +90,7 @@ export default TeamCheckPage = (props) => {
         >
           <Text style={{ ...styles.teamMateText }}>팀메이트</Text>
         </View>
-        {/* Display each member in the memberInfo array by using map */}
+        {/* Display each member's name by using FlatList */}
 
         <FlatList
           data={memberNames}
@@ -101,7 +101,6 @@ export default TeamCheckPage = (props) => {
             <TouchableOpacity
               style={{
                 ...styles.memberNameContainer,
-
                 borderColor: fileColor,
               }}
             >
@@ -112,37 +111,26 @@ export default TeamCheckPage = (props) => {
       </View>
 
       {/* Code for displaying name and add button to add tasks */}
-      {/* <View
-        style={{
-          position: "absolute",
-          marginTop: "70%",
-          marginLeft: "5%",
-          left: 0,
-        }}
-      >
-        {memberInfo.map((member) => (
-          <TouchableOpacity>
-            <View
-              key={member.id}
+      <View style={styles.checkContainer}>
+        <FlatList
+          data={memberInfo}
+          keyExtractor={(item) => item.name}
+          renderItem={({ item }) => (
+            <TouchableOpacity
               style={{
-                ...styles.teamCircle,
-                ...styles.teamNameAssignments,
-                flexDirection: "row",
+                ...styles.memberNameContainerTwo,
                 borderColor: fileColor,
-                backgroundColor: "violet",
               }}
             >
-              <Text style={{ ...styles.teamName, marginLeft: "10%" }}>
-                {member.name}
-              </Text>
+              <Text style={styles.memberNameTextTwo}>{item.name}</Text>
               <Image
                 source={require("../images/ClassAddBtn.png")}
-                style={{ width: 20, height: 20, marginRight: "10%" }}
+                style={styles.taskAddBtn}
               />
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View> */}
+            </TouchableOpacity>
+          )}
+        />
+      </View>
     </View>
   );
 };
@@ -185,10 +173,9 @@ const styles = StyleSheet.create({
     // backgroundColor: "green",
   },
   teamMateContainer: {
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
     marginRight: 7,
-    backgroundColor: "yellow",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -201,7 +188,7 @@ const styles = StyleSheet.create({
   },
   memberNameContainer: {
     marginRight: 6,
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -213,11 +200,35 @@ const styles = StyleSheet.create({
     fontFamily: "SUIT-Medium",
     fontSize: 12,
   },
-  teamNameAssignments: {
-    justifyContent: "space-between",
+  // ---------------------체크 리스트 부분--------------------
+  checkContainer: {
+    // backgroundColor: "grey",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    // marginTop: "6%",
+  },
+  memberNameContainerTwo: {
+    flexDirection: "row",
+    borderRadius: 16,
+    borderWidth: 1,
     alignItems: "center",
-    height: "45%",
-    width: "40%",
-    backgroundColor: "violet",
+    justifyContent: "center",
+    // backgroundColor: "red",
+    borderWidth: 1,
+    marginTop: "23%",
+  },
+  memberNameTextTwo: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 12,
+    // backgroundColor: "yellow",
+    padding: 10,
+    paddingLeft: 11,
+    paddingRight: 6,
+  },
+  taskAddBtn: {
+    width: 20,
+    height: 20,
+    // backgroundColor: "blue",
+    paddingRight: 10,
   },
 });
