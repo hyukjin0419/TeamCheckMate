@@ -17,7 +17,7 @@ import { color } from "../styles/colors";
 import s from "../styles/css.js";
 import { AntDesign } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
-import { Entypo } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -56,32 +56,36 @@ export default TeamCheckPage = (props) => {
   };
 
   const addNewTask = (memberName) => {
-    // 입력이 끝났을 때 checklists에 새로운 체크박스 컨테이너를 추가
-    const updatedChecklists = [...checklists];
-    updatedChecklists.push({
-      writer: memberName,
-      index: updatedChecklists.filter(
-        (checklist) => checklist.writer === memberName
-      ).length,
-      isWriting: false,
-      isChecked: false,
-      content: newTaskText,
-      regDate: new Date(),
-      modDate: new Date(),
-    });
-    setChecklists(updatedChecklists);
+    if (newTaskText.trim() !== "") {
+      const updatedChecklists = [...checklists];
+      updatedChecklists.push({
+        writer: memberName,
+        index: updatedChecklists.filter(
+          (checklist) => checklist.writer === memberName
+        ).length,
+        isWriting: false,
+        isChecked: false,
+        content: newTaskText,
+        regDate: new Date(),
+        modDate: new Date(),
+      });
+      setChecklists(updatedChecklists);
 
-    // 입력이 완료되면 입력 상태 초기화
-    const updatedIsWritingNewTask = { ...isWritingNewTask };
-    updatedIsWritingNewTask[memberName] = false;
-    setIsWritingNewTask(updatedIsWritingNewTask);
+      // 입력이 완료되면 입력 상태 초기화
+      const updatedIsWritingNewTask = { ...isWritingNewTask };
+      updatedIsWritingNewTask[memberName] = false;
+      setIsWritingNewTask(updatedIsWritingNewTask);
 
-    // 입력창 비우기
-    setNewTaskText("");
+      // 입력창 비우기
+      setNewTaskText("");
+    } else {
+      setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
+    }
   };
 
   const handleCheckboxChange = (writer, index, newValue) => {
     // 체크박스 상태 변경
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const updatedChecklists = [...checklists];
     const checklistToUpdate = updatedChecklists.find(
       (checklist) => checklist.writer === writer && checklist.index === index
@@ -209,6 +213,7 @@ export default TeamCheckPage = (props) => {
                   </View>
                 ))}
 
+              {/* 입력창 생성 */}
               {isWritingNewTask[item.name] ? (
                 <View style={styles.checkBoxContainer}>
                   <Checkbox style={styles.checkbox} color={fileColor} />
@@ -217,6 +222,8 @@ export default TeamCheckPage = (props) => {
                     placeholder="할 일 추가..."
                     style={styles.checkBoxContent}
                     value={newTaskText}
+                    autoFocus={true}
+                    returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
                     onSubmitEditing={() => addNewTask(item.name)}
                   />
