@@ -10,7 +10,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
 import { color } from "../styles/colors";
@@ -47,12 +47,28 @@ export default TeamCheckPage = (props) => {
   const [checklists, setChecklists] = useState([]);
   const [newTaskText, setNewTaskText] = useState("");
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
+  const TextInputRef = useRef(null);
 
   const pressAddBtn = (memberName) => {
+    // 다른 텍스트 입력 창이 열려있는지 확인하고 있다면 닫기
+    Object.keys(isWritingNewTask).forEach((name) => {
+      if (name !== memberName && isWritingNewTask[name]) {
+        closeTextInput(name);
+      }
+    });
+
     // 플러스 버튼을 누를 때 해당 팀 멤버에 대한 입력 창을 열도록 설정
-    const updatedIsWritingNewTask = { ...isWritingNewTask };
-    updatedIsWritingNewTask[memberName] = true;
-    setIsWritingNewTask(updatedIsWritingNewTask);
+    setIsWritingNewTask((prevIsWritingNewTask) => ({
+      ...prevIsWritingNewTask,
+      [memberName]: true,
+    }));
+  };
+
+  const closeTextInput = (memberName) => {
+    setIsWritingNewTask((prevIsWritingNewTask) => ({
+      ...prevIsWritingNewTask,
+      [memberName]: false,
+    }));
   };
 
   const addNewTask = (memberName) => {
@@ -217,8 +233,8 @@ export default TeamCheckPage = (props) => {
               {isWritingNewTask[item.name] ? (
                 <View style={styles.checkBoxContainer}>
                   <Checkbox style={styles.checkbox} color={fileColor} />
-
                   <TextInput
+                    ref={TextInputRef} // ref 설정
                     placeholder="할 일 추가..."
                     style={styles.checkBoxContent}
                     value={newTaskText}
@@ -227,7 +243,6 @@ export default TeamCheckPage = (props) => {
                     onChangeText={(text) => setNewTaskText(text)}
                     onSubmitEditing={() => addNewTask(item.name)}
                   />
-
                   <TouchableOpacity>
                     <Image
                       source={require("../images/icons/three_dots.png")}
