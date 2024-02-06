@@ -289,7 +289,6 @@ const AssignmentPage = () => {
                 <Text
                   numberOfLines={1}
                   paddingHorizontal={5}
-                  ellipsizeMode="tail"
                   style={styles.teamMateBtnText}
                 >
                   {item}
