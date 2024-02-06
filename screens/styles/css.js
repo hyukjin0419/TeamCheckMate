@@ -42,7 +42,7 @@ const commonStyles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     fontFamily: "SUIT-Medium",
-    // backgroundColor: "violet",
+    //backgroundColor: "violet",
   },
   //헤더 오른쪽 버튼 (안보일 수 있음, 비율 맞추기 위해 존재)
   titleRightBtn: {
