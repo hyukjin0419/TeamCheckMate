@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
 import { color } from "../styles/colors";
 import { db, collection, addDoc } from "../../firebase";
 import { useNavigation } from "@react-navigation/core";
@@ -21,13 +22,20 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default AssignmentAddPage = ({ route }) => {
+export default AssignmentAddPage = () => {
   const navigation = useNavigation();
 
   {
     /* AssignmentPage에서 팀 이름, 파일 아이콘 색상, 팀 id 불러오기 */
   }
-  const { title, fileColor, teamCode } = route.params;
+  const route = useRoute();
+  const {
+    teamCode: teamCode,
+    title: title,
+    fileColor: fileColor,
+    memberInfo: memberInfo,
+    memberNames: memberNames,
+  } = route.params;
   {
     /* 과제추가 확인버튼 상태 변경 코드 */
   }
@@ -131,9 +139,11 @@ export default AssignmentAddPage = ({ route }) => {
       // assignmentDocRef.id 값이 정상적으로 존재할 때에만 navigation.navigate 호출
       if (assignmentDocRef.id) {
         navigation.navigate("AssignmentPage", {
+          teamCode: teamCode,
           title: title,
           fileColor: fileColor,
-          teamCode: teamCode,
+          memberInfo: memberInfo,
+          memberNames: memberNames,
         });
       } else {
         console.error("assignmentDocRef.id 값이 유효하지 않습니다.");
