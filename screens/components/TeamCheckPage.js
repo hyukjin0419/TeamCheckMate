@@ -8,6 +8,7 @@ import {
   TextInput,
   ScrollView,
   FlatList,
+  KeyboardAvoidingView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/core";
@@ -97,7 +98,10 @@ export default TeamCheckPage = (props) => {
 
   return (
     //헤더 부분
-    <View style={s.container}>
+    <KeyboardAvoidingView
+      style={s.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <View style={s.headContainer}>
         {/* Header code */}
         <View style={s.headBtn}>
@@ -208,6 +212,7 @@ export default TeamCheckPage = (props) => {
               {isWritingNewTask[item.name] ? (
                 <View style={styles.checkBoxContainer}>
                   <Checkbox style={styles.checkbox} color={fileColor} />
+
                   <TextInput
                     placeholder="할 일 추가..."
                     style={styles.checkBoxContent}
@@ -215,6 +220,7 @@ export default TeamCheckPage = (props) => {
                     onChangeText={(text) => setNewTaskText(text)}
                     onSubmitEditing={() => addNewTask(item.name)}
                   />
+
                   <TouchableOpacity>
                     <Image
                       source={require("../images/icons/three_dots.png")}
@@ -227,7 +233,7 @@ export default TeamCheckPage = (props) => {
           )}
         />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
