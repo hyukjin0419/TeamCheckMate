@@ -242,6 +242,7 @@ export default TeamCheckPage = (props) => {
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
                     onSubmitEditing={() => addNewTask(item.name)}
+                    onBlur={() => addNewTask(item.name)}
                   />
                   <TouchableOpacity>
                     <Image
