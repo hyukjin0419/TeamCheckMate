@@ -16,6 +16,7 @@ import { color } from "../styles/colors";
 import s from "../styles/css.js";
 import { AntDesign } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
+import { Entypo } from "@expo/vector-icons";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -183,7 +184,7 @@ export default TeamCheckPage = (props) => {
               {checklists
                 .filter((checklist) => checklist.writer === item.name)
                 .map((checklist, index) => (
-                  <View key={index} style={styles.checklistItem}>
+                  <View key={index} style={styles.checkBoxContainer}>
                     <Checkbox
                       value={checklist.isChecked}
                       style={styles.checkbox}
@@ -192,17 +193,33 @@ export default TeamCheckPage = (props) => {
                         handleCheckboxChange(checklist.writer, index, newValue)
                       }
                     />
-                    <Text>{checklist.content}</Text>
+                    <Text style={styles.checkBoxContent}>
+                      {checklist.content}
+                    </Text>
+                    <TouchableOpacity>
+                      <Entypo
+                        name="dots-three-horizontal"
+                        size={20}
+                        color="black"
+                      />
+                    </TouchableOpacity>
                   </View>
                 ))}
 
               {isWritingNewTask[item.name] ? (
-                <View>
+                <View style={styles.checkBoxContainer}>
+                  <Checkbox style={styles.checkbox} color={fileColor} />
                   <TextInput
                     placeholder="할 일 추가..."
+                    style={styles.checkBoxContent}
                     value={newTaskText}
                     onChangeText={(text) => setNewTaskText(text)}
                     onSubmitEditing={() => addNewTask(item.name)}
+                  />
+                  <Entypo
+                    name="dots-three-horizontal"
+                    size={20}
+                    color="black"
                   />
                 </View>
               ) : null}
@@ -280,21 +297,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   // ---------------------FlatList2--------------------
+  //Conainer 부분
   checkContainer: {
     flex: 1,
-    backgroundColor: "grey",
+    // backgroundColor: "grey",
     marginTop: "8%",
   },
   contentContainer: {
     flex: 1,
-
-    backgroundColor: "orange",
+    // backgroundColor: "orange",
     alignItems: "flex-start",
     justifyContent: "flex-start",
   },
   memberNameContainerTwo: {
     flex: 1,
-    backgroundColor: "green",
+    // backgroundColor: "green",
     flexDirection: "row",
     borderRadius: 200,
     borderWidth: 1,
@@ -313,13 +330,34 @@ const styles = StyleSheet.create({
   taskAddBtn: {
     width: 18,
     height: 18,
-    backgroundColor: "blue",
+    // backgroundColor: "blue",
     marginRight: 8,
   },
   // ----------------------------체크 하나-----------------------
-  checklistItem: {
+  checkBoxContainer: {
+    flex: 0.9,
+    width: "90%",
     display: "flex",
     flexDirection: "row",
-    backgroundColor: "violet",
+    // backgroundColor: "violet",
+    marginBottom: "7%",
+    alignSelf: "center",
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+  },
+  checkBoxContent: {
+    flex: 1,
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginLeft: 14,
+    // backgroundColor: "green",
+  },
+  checklistTextInput: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginLeft: 14,
   },
 });
