@@ -130,7 +130,7 @@ const AssignmentItem = (props) => {
               {/* 모달창 상단 회색 막대 */}
               <View style={s.modalVector}></View>
               {/* 모달창 상단 과제 이름 표시 */}
-              <Text style={styles.assignmentNameText}>{assignmentName}</Text>
+              <Text style={s.modalTitle}>{assignmentName}</Text>
               <Text style={styles.modalDueDateText}>제출기한: {dueDate}</Text>
               <View flex={1}></View>
               {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}

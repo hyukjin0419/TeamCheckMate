@@ -276,7 +276,14 @@ const TeamItem = (props) => {
                       borderColor: props.fileColor,
                     }}
                   >
-                    <Text style={styles.teamMateBtnText}>{item}</Text>
+                    <Text
+                      numberOfLines={1}
+                      paddingHorizontal={5}
+                      ellipsizeMode="tail"
+                      style={styles.teamMateBtnText}
+                    >
+                      {item}
+                    </Text>
                   </TouchableOpacity>
                 )}
               />
@@ -325,8 +332,8 @@ const styles = StyleSheet.create({
   teamMateBtn: {
     alignItems: "center",
     justifyContent: "center",
-    width: 80,
-    height: 45,
+    width: 65,
+    height: 35,
     borderWidth: 1,
     borderRadius: 23,
     marginHorizontal: 4,

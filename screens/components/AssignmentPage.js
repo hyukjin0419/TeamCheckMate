@@ -259,7 +259,7 @@ const AssignmentPage = () => {
         scrollEnabled={false}
         style={{
           marginLeft: 20,
-          marginTop: 135,
+          marginTop: 140,
           width: WINDOW_WIDHT,
         }}
       >
@@ -269,6 +269,7 @@ const AssignmentPage = () => {
               ...styles.teamMateBtn,
               borderColor: fileColor,
               backgroundColor: fileColor,
+              marginLeft: 10,
             }}
           >
             <Text style={styles.teamMateBtnText}>팀 메이트</Text>
@@ -285,14 +286,21 @@ const AssignmentPage = () => {
                   borderColor: fileColor,
                 }}
               >
-                <Text style={styles.teamMateBtnText}>{item}</Text>
+                <Text
+                  numberOfLines={1}
+                  paddingHorizontal={5}
+                  ellipsizeMode="tail"
+                  style={styles.teamMateBtnText}
+                >
+                  {item}
+                </Text>
               </TouchableOpacity>
             )}
           />
         </View>
       </ScrollView>
       {/* Parent View for both FlatLists */}
-      <View style={{ flex: 20 }}>
+      <View style={{ flex: 18 }}>
         {/* 과제 리스트 */}
         <FlatList
           data={assignmentList}
@@ -359,12 +367,12 @@ const styles = StyleSheet.create({
   teamMateBtn: {
     alignItems: "center",
     justifyContent: "center",
-    width: 80,
-    height: 45,
+    width: 65,
+    height: 35,
     borderWidth: 1,
     borderRadius: 23,
-    marginHorizontal: 4,
     marginTop: 10,
+    marginLeft: 5,
   },
   teamMateBtnText: {
     fontFamily: "SUIT-Regular",
