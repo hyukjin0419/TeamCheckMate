@@ -148,7 +148,7 @@ export default TeamCheckPage = (props) => {
                 ...styles.memberNameContainer,
                 borderColor: fileColor,
               }}
-              onPress={() => createChecklist(item.name)}
+              // onPress={() => createChecklist(item.name)}
             >
               <Text style={styles.memberNameText}>{item}</Text>
             </TouchableOpacity>
@@ -197,10 +197,9 @@ export default TeamCheckPage = (props) => {
                       {checklist.content}
                     </Text>
                     <TouchableOpacity>
-                      <Entypo
-                        name="dots-three-horizontal"
-                        size={20}
-                        color="black"
+                      <Image
+                        source={require("../images/icons/three_dots.png")}
+                        style={styles.threeDots}
                       />
                     </TouchableOpacity>
                   </View>
@@ -216,11 +215,12 @@ export default TeamCheckPage = (props) => {
                     onChangeText={(text) => setNewTaskText(text)}
                     onSubmitEditing={() => addNewTask(item.name)}
                   />
-                  <Entypo
-                    name="dots-three-horizontal"
-                    size={20}
-                    color="black"
-                  />
+                  <TouchableOpacity>
+                    <Image
+                      source={require("../images/icons/three_dots.png")}
+                      style={styles.threeDots}
+                    />
+                  </TouchableOpacity>
                 </View>
               ) : null}
             </View>
@@ -359,5 +359,9 @@ const styles = StyleSheet.create({
     fontFamily: "SUIT-Regular",
     fontSize: 14,
     marginLeft: 14,
+  },
+  threeDots: {
+    width: 17.5,
+    height: 4,
   },
 });
