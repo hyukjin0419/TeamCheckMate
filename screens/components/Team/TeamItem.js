@@ -200,7 +200,7 @@ const TeamItem = (props) => {
       }}
     >
       <ImageBackground style={styles.file} source={imageSource}>
-        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>
+        <Text numberOfLines={2} style={styles.title}>
           {title}
         </Text>
         {/* 팀 파일 아이콘 옵션 버튼 */}
