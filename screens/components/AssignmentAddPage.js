@@ -164,9 +164,11 @@ export default AssignmentAddPage = () => {
             style={s.headBtn}
             onPress={() => {
               navigation.navigate("AssignmentPage", {
+                teamCode: teamCode,
                 title: title,
                 fileColor: fileColor,
-                teamCode: teamCode,
+                memberInfo: memberInfo,
+                memberNames: memberNames,
               });
             }}
           >
