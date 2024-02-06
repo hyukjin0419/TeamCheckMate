@@ -32,7 +32,13 @@ const AssignmentPage = () => {
 
   //TeamItem에서 정보 가져오기
   const route = useRoute();
-  const { title, fileColor, teamCode, memberInfo, memberNames } = route.params;
+  const {
+    teamCode: teamCode,
+    title: title,
+    fileColor: fileColor,
+    memberInfo: memberInfo,
+    memberNames: memberNames,
+  } = route.params;
 
   const [openedFileImage, setOpenedFileImage] = useState(
     require("../images/OpenedFileColor/9CB1BB.png")
@@ -201,9 +207,11 @@ const AssignmentPage = () => {
                   style={s.addClassBtn}
                   onPress={() => {
                     navigation.navigate("AssignmentAddPage", {
+                      teamCode: teamCode,
                       title: title,
                       fileColor: fileColor,
-                      teamCode: teamCode,
+                      memberInfo: memberInfo,
+                      memberNames: memberNames,
                     });
                     handlePress();
                   }}

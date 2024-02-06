@@ -12,6 +12,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
+import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../styles/colors";
 import { db, collection, doc, updateDoc } from "../../firebase";
@@ -22,14 +23,23 @@ import s from "../styles/css";
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default AssignmentUpdatePage = ({ route }) => {
+export default AssignmentUpdatePage = () => {
   const navigation = useNavigation();
 
   {
     /* 팀 이름, 파일 아이콘 색상, 팀 id 불러오기 */
   }
-  const { title, fileColor, teamid, assignmentName, dueDate, assignmentId } =
-    route.params;
+  const route = useRoute();
+  const {
+    teamCode,
+    title,
+    fileColor,
+    memberInfo,
+    memberNames,
+    assignmentName,
+    assignmentId,
+    dueDate,
+  } = route.params;
   {
     /* 과제 추가 확인 버튼 상태 변경 코드 */
   }
@@ -96,7 +106,7 @@ export default AssignmentUpdatePage = ({ route }) => {
   const handleUpdate = async () => {
     try {
       // Reference to the "team" collection and the specific assignment document
-      const teamDocumentRef = doc(collection(db, "team"), teamid);
+      const teamDocumentRef = doc(collection(db, "team"), teamCode);
       const assignmentListCollectionRef = collection(
         teamDocumentRef,
         "과제 list"
