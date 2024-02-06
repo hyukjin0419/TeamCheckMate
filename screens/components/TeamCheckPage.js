@@ -162,7 +162,7 @@ export default TeamCheckPage = (props) => {
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
-            <View>
+            <View style={styles.contentContainer}>
               <TouchableOpacity
                 style={{
                   ...styles.memberNameContainerTwo,
@@ -184,17 +184,18 @@ export default TeamCheckPage = (props) => {
                 .filter((checklist) => checklist.writer === item.name)
                 .map((checklist, index) => (
                   <View key={index} style={styles.checklistItem}>
-                    <Text>{checklist.content}</Text>
                     <Checkbox
                       value={checklist.isChecked}
+                      style={styles.checkbox}
+                      color={fileColor}
                       onValueChange={(newValue) =>
                         handleCheckboxChange(checklist.writer, index, newValue)
                       }
                     />
+                    <Text>{checklist.content}</Text>
                   </View>
                 ))}
 
-              {/* 체크리스트 항목 추가 입력 창 */}
               {isWritingNewTask[item.name] ? (
                 <View>
                   <TextInput
@@ -278,22 +279,28 @@ const styles = StyleSheet.create({
     fontFamily: "SUIT-Medium",
     fontSize: 12,
   },
-  // ---------------------체크 리스트 부분--------------------
+  // ---------------------FlatList2--------------------
   checkContainer: {
-    // backgroundColor: "grey",
+    flex: 1,
+    backgroundColor: "grey",
+    marginTop: "8%",
+  },
+  contentContainer: {
+    flex: 1,
+
+    backgroundColor: "orange",
     alignItems: "flex-start",
     justifyContent: "flex-start",
-    // marginTop: "6%",
   },
   memberNameContainerTwo: {
+    flex: 1,
+    backgroundColor: "green",
     flexDirection: "row",
     borderRadius: 200,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    // backgroundColor: "red",
-    borderWidth: 1,
-    marginTop: "23%",
+    marginBottom: 20,
   },
   memberNameTextTwo: {
     fontFamily: "SUIT-Medium",
@@ -302,14 +309,17 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingLeft: 7,
     paddingRight: 6,
-    margin: 0,
   },
   taskAddBtn: {
     width: 18,
     height: 18,
-    // backgroundColor: "blue",
-    margin: 0,
-    padding: 0,
+    backgroundColor: "blue",
     marginRight: 8,
+  },
+  // ----------------------------체크 하나-----------------------
+  checklistItem: {
+    display: "flex",
+    flexDirection: "row",
+    backgroundColor: "violet",
   },
 });
