@@ -9,6 +9,8 @@ import {
   ScrollView,
   FlatList,
   KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/core";
@@ -47,10 +49,11 @@ export default TeamCheckPage = (props) => {
   const [checklists, setChecklists] = useState([]);
   const [newTaskText, setNewTaskText] = useState("");
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
-  const TextInputRef = useRef(null);
 
   const pressAddBtn = (memberName) => {
     // 다른 텍스트 입력 창이 열려있는지 확인하고 있다면 닫기
+    Keyboard.dismiss();
+
     Object.keys(isWritingNewTask).forEach((name) => {
       if (name !== memberName && isWritingNewTask[name]) {
         closeTextInput(name);
@@ -140,17 +143,17 @@ export default TeamCheckPage = (props) => {
       </View>
       {/* 과제 제목 부분 */}
       <View style={styles.assignmentTitleContainer}>
-        <View style={styles.assignmentTitleInfoContainer}>
+        <TouchableOpacity style={styles.assignmentTitleInfoContainer}>
           <Text style={styles.dueDateText}>{dueDate}</Text>
           <Text style={styles.assignmentTitleText}>{assignmentName}</Text>
-        </View>
+        </TouchableOpacity>
       </View>
       {/* 팀원 목록 부분 */}
 
       <View style={styles.teamMembersNamesArrayContainer}>
         {/* Display the 팀메이트 */}
 
-        <View
+        <TouchableOpacity
           style={{
             ...styles.teamMateContainer,
             backgroundColor: fileColor,
@@ -158,8 +161,8 @@ export default TeamCheckPage = (props) => {
             marginRight: "3%",
           }}
         >
-          <Text style={{ ...styles.teamMateText }}>팀메이트</Text>
-        </View>
+          <Text style={{ ...styles.teamMateText }}>팀 메이트</Text>
+        </TouchableOpacity>
 
         <FlatList
           data={memberNames}
@@ -177,12 +180,14 @@ export default TeamCheckPage = (props) => {
               <Text style={styles.memberNameText}>{item}</Text>
             </TouchableOpacity>
           )}
+          keyboardShouldPersistTaps="always"
         />
       </View>
 
       {/* 체크리스트 구현 부분 */}
       <View style={styles.checkContainer}>
         <FlatList
+          keyboardShouldPersistTaps="always"
           data={memberInfo}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.name}
@@ -234,7 +239,6 @@ export default TeamCheckPage = (props) => {
                 <View style={styles.checkBoxContainer}>
                   <Checkbox style={styles.checkbox} color={fileColor} />
                   <TextInput
-                    ref={TextInputRef} // ref 설정
                     placeholder="할 일 추가..."
                     style={styles.checkBoxContent}
                     value={newTaskText}
@@ -278,7 +282,7 @@ const styles = StyleSheet.create({
     marginLeft: "7%",
     justifyContent: "space-evenly",
     paddingVertical: "5%",
-    // backgroundColor: "grey",
+    backgroundColor: "grey",
   },
   dueDateText: {
     color: color.redpink,
