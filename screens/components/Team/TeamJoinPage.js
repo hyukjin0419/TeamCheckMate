@@ -35,7 +35,7 @@ export default function TeamJoinPage() {
   //가져온 정보에서 이메일 빼서 저장하기
   const email = user.email;
   //확인 버튼 색상 초기값 (회색)
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey);
   //확인 버튼 상태 초기값 (비활성화 상태)
   const [buttonDisabled, setButtonDisabled] = useState(true);
   //참여코드
@@ -51,7 +51,7 @@ export default function TeamJoinPage() {
       setConfirmBtnColor(color.activated);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
   };
 

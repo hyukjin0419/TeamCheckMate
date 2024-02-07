@@ -55,7 +55,7 @@ export default TeamUpdatePage = ({ route }) => {
   const [maxLength, setMaxLength] = useState(40); // 기본값은 영어일 때의 maxLength
 
   /* 문자 입력 시 확인 버튼 활성화  */
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const onTextInputChange = (text) => {
     setTextInputValue(text);
@@ -64,7 +64,7 @@ export default TeamUpdatePage = ({ route }) => {
       setConfirmBtnColor(color.activated);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
     const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
     setMaxLength(isKorean ? 20 : 40);

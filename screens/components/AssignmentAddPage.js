@@ -39,7 +39,7 @@ export default AssignmentAddPage = () => {
   {
     /* 과제추가 확인버튼 상태 변경 코드 */
   }
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated); //확인버튼 색상 (초기값: 비활성화)
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey); //확인버튼 색상 (초기값: 비활성화)
   const [buttonDisabled, setButtonDisabled] = useState(true); //확인버튼 상태 (초기값: 비활성화)
 
   {
@@ -63,7 +63,7 @@ export default AssignmentAddPage = () => {
       setAssignmentValid(true);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
     const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
     setMaxLength(isKorean ? 20 : 40);
@@ -102,7 +102,7 @@ export default AssignmentAddPage = () => {
       setAssignmentValid(true);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
       setAssignmentValid(false);
     }
   };

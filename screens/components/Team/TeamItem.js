@@ -324,8 +324,11 @@ const TeamItem = (props) => {
               </TouchableOpacity>
             </View>
             <ScrollView
-              width={WINDOW_WIDHT * 0.9}
-              alignSelf="center"
+              style={{
+                width: WINDOW_WIDHT,
+                alignSelf: "center",
+                marginLeft: "10%",
+              }}
               scrollEnabled={false}
             >
               <FlatList
@@ -341,14 +344,7 @@ const TeamItem = (props) => {
                     }}
                     onPress={() => handleTeamMateLabelPress(index)}
                   >
-                    <Text
-                      numberOfLines={1}
-                      paddingHorizontal={5}
-                      ellipsizeMode="tail"
-                      style={styles.teamMateBtnText}
-                    >
-                      {item}
-                    </Text>
+                    <Text style={styles.teamMateBtnText}>{item}</Text>
                   </TouchableOpacity>
                 )}
               />
@@ -412,11 +408,7 @@ const TeamItem = (props) => {
                 }}
                 onPress={() => handleTeamMateLabelPress(index)}
               >
-                <Text
-                  numberOfLines={1}
-                  paddingHorizontal={5}
-                  style={styles.teamMateBtnText}
-                >
+                <Text style={styles.teamMateBtnText}>
                   {selectedTeamMateName}
                 </Text>
               </View>
@@ -467,11 +459,11 @@ const styles = StyleSheet.create({
   teamMateBtn: {
     alignItems: "center",
     justifyContent: "center",
-    width: 65,
     height: 35,
     borderWidth: 1,
     borderRadius: 23,
     marginHorizontal: 4,
+    paddingHorizontal: 15,
     marginTop: 10,
   },
   teamMateBtnText: {
@@ -483,7 +475,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     marginBottom: 5,
-    paddingHorizontal: 15,
+    marginHorizontal: 20,
   },
   teamMateAddText: {
     fontFamily: "SUIT-Medium",

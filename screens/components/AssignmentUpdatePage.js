@@ -43,7 +43,7 @@ export default AssignmentUpdatePage = () => {
   {
     /* 과제 추가 확인 버튼 상태 변경 코드 */
   }
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated); //확인 버튼 색상 (초기값: 비활성화)
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey); //확인 버튼 색상 (초기값: 비활성화)
   const [buttonDisabled, setButtonDisabled] = useState(true); //확인 버튼 상태 (초기값:비활성화 상태)
 
   {
@@ -83,7 +83,7 @@ export default AssignmentUpdatePage = () => {
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
       setButtonDisabled(true);
     }
   };
@@ -100,7 +100,7 @@ export default AssignmentUpdatePage = () => {
       setConfirmBtnColor(color.activated);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
     const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
     setMaxLength(isKorean ? 16 : 28);
@@ -149,9 +149,11 @@ export default AssignmentUpdatePage = () => {
             style={s.headBtn}
             onPress={() => {
               navigation.navigate("AssignmentPage", {
+                teamCode: teamCode,
                 title: title,
                 fileColor: fileColor,
-                teamid: teamid,
+                memberInfo: memberInfo,
+                memberNames: memberNames,
               });
             }}
           >
