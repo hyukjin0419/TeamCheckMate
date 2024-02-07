@@ -6,21 +6,26 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  ScrollView,
+  FlatList,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
 import { color } from "../styles/colors";
 import s from "../styles/css.js";
 import { AntDesign } from "@expo/vector-icons";
+import Checkbox from "expo-checkbox";
+import * as Haptics from "expo-haptics";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamCheckPage = (props) => {
   const navigation = useNavigation();
-  const [inputTask, setInputTask] = useState("");
-  const [tasks, setTasks] = useState([""]);
   const route = useRoute();
   const {
     teamCode,
@@ -33,23 +38,115 @@ export default TeamCheckPage = (props) => {
     dueDate,
   } = route.params;
 
-  const addTasks = () => {
-    // Add new input into array
-    setTasks([...tasks, ""]);
+  /*
+필요한 함수가 뭘까..
+1. 플러스 버튼 눌렀을 때 입력창이 열려야함 -> 입력창 state
+2. 입력창이 입력이 끝났을 때 checklists에 체크박스컨테이너 하나가 추가 되어야함 (addTask)
+3. 만약 체크박스 눌렀을 때 상태가 바뀌어야 함
+4. update 및 delete도 구현해야 함
+*/
+
+  const [checklists, setChecklists] = useState([]);
+  const [newTaskText, setNewTaskText] = useState("");
+  const [isWritingNewTask, setIsWritingNewTask] = useState({});
+
+  const pressAddBtn = (memberName) => {
+    //isWritingNewTask를 순회하면서 현재 선택된 사람이 아니면 textinput을 닫는다.
+    Object.keys(isWritingNewTask).forEach((name) => {
+      if (name !== memberName && isWritingNewTask[name]) {
+        closeTextInput(name);
+      }
+    });
+
+    // 플러스 버튼을 누를 때 해당 팀 멤버에 대한 입력 창을 열도록 설정
+    setIsWritingNewTask((prevIsWritingNewTask) => ({
+      ...prevIsWritingNewTask,
+      [memberName]: true,
+    }));
   };
 
-  const updateTasks = (text, index) => {
-    // newEmailInputs will contain all the currently added emails
-    const newTasks = [...tasks];
-    // The new index position of the newEmailInputs array will include newly added email
-    newTasks[index] = text;
-    // update emailInputs
-    setTasks(newTasks);
+  const closeTextInput = (memberName) => {
+    addNewTask(memberName);
+    setIsWritingNewTask((prevIsWritingNewTask) => ({
+      ...prevIsWritingNewTask,
+      [memberName]: false,
+    }));
   };
 
-  console.log(teamCode);
+  const addNewTask = (memberName) => {
+    if (newTaskText.trim() !== "") {
+      const updatedChecklists = [...checklists];
+      updatedChecklists.push({
+        writer: memberName,
+        index: updatedChecklists.filter(
+          (checklist) => checklist.writer === memberName
+        ).length,
+        isWriting: false,
+        isChecked: false,
+        content: newTaskText,
+        regDate: new Date(),
+        modDate: new Date(),
+      });
+      setChecklists(updatedChecklists);
+
+      const updatedIsWritingNewTask = { ...isWritingNewTask };
+      updatedIsWritingNewTask[memberName] = false;
+      setIsWritingNewTask(updatedIsWritingNewTask);
+
+      // 입력창 비우기
+      setNewTaskText("");
+    } else {
+      setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
+    }
+  };
+
+
+  const continueAddingNewTask = (memberName) => {
+    if (newTaskText.trim() !== "") {
+      const updatedChecklists = [...checklists];
+      updatedChecklists.push({
+        writer: memberName,
+        index: updatedChecklists.filter(
+          (checklist) => checklist.writer === memberName
+        ).length,
+        isWriting: false,
+        isChecked: false,
+        content: newTaskText,
+        regDate: new Date(),
+        modDate: new Date(),
+      });
+      setChecklists(updatedChecklists);
+
+      // 입력창 비우기
+      setNewTaskText("");
+    } else {
+      setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
+    }
+  };
+
+  const handleCheckboxChange = (writer, index, newValue) => {
+    // 체크박스 상태 변경
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    const updatedChecklists = [...checklists];
+    const checklistToUpdate = updatedChecklists.find(
+      (checklist) => checklist.writer === writer && checklist.index === index
+    );
+
+    if (checklistToUpdate) {
+      checklistToUpdate.isChecked = newValue;
+      checklistToUpdate.modDate = new Date();
+      setChecklists(updatedChecklists);
+    }
+  };
+  console.log(JSON.stringify(checklists, null, 2));
+
+
   return (
-    <View style={s.container}>
+    //헤더 부분
+    <KeyboardAvoidingView
+      style={s.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <View style={s.headContainer}>
         {/* Header code */}
         <View style={s.headBtn}>
@@ -59,163 +156,269 @@ export default TeamCheckPage = (props) => {
               navigation.goBack();
             }}
           >
-            <Image
-              style={{
-                width: 8,
-                height: 14,
-              }}
-              source={require("../images/backBtn.png")}
-            />
+            <AntDesign name="left" size={20} color="black" />
           </TouchableOpacity>
         </View>
         {/* Title */}
-        <Text style={{ ...s.title, marginRight: "13%", marginBottom: "5%" }}>
-          {title}
-        </Text>
+        <Text style={s.title}>{title}</Text>
+        <View style={s.titleRightBtn}></View>
       </View>
-      {/* Code that shows the assignment that user selected */}
-      <View style={styles.assignmentBox}>
-        <View style={styles.assignmentDataContainer}>
+      {/* 과제 제목 부분 */}
+      <View style={styles.assignmentTitleContainer}>
+        <TouchableOpacity style={styles.assignmentTitleInfoContainer}>
           <Text style={styles.dueDateText}>{dueDate}</Text>
-          <Text style={styles.assignmentNameText}>{assignmentName}</Text>
-        </View>
+          <Text style={styles.assignmentTitleText}>{assignmentName}</Text>
+        </TouchableOpacity>
       </View>
-      {/* Code for displaying team members under assignment */}
-      <View style={styles.teamNameContainer}>
+      {/* 팀원 목록 부분 */}
+
+      <View style={styles.teamMembersNamesArrayContainer}>
         {/* Display the 팀메이트 */}
-        <View
+
+        <TouchableOpacity
           style={{
-            ...styles.teamCircle,
-            ...styles.teamNameContainer,
+            ...styles.teamMateContainer,
             backgroundColor: fileColor,
             borderColor: fileColor,
             marginRight: "3%",
           }}
         >
-          <Text style={{ ...styles.teamName }}>팀메이트</Text>
-        </View>
-        {/* Display each member in the memberInfo array by using map */}
-        {memberInfo.map((member) => (
-          <View
-            key={member.id}
-            style={{
-              ...styles.teamCircle,
-              ...styles.teamNameContainer,
-              marginRight: "3%",
-              borderColor: fileColor,
-            }}
-          >
-            <Text style={styles.teamName}>{member.name}</Text>
-          </View>
-        ))}
-      </View>
+          <Text style={{ ...styles.teamMateText }}>팀 메이트</Text>
+        </TouchableOpacity>
 
-      {/* Code for displaying name and add button to add tasks */}
-      <View
-        style={{
-          position: "absolute",
-          marginTop: "70%",
-          marginLeft: "5%",
-          left: 0,
-        }}
-      >
-        {memberInfo.map((member) => (
-          <TouchableOpacity>
-            <View
-              key={member.id}
+        <FlatList
+          keyboardShouldPersistTaps="always"
+          data={memberNames}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
               style={{
-                ...styles.teamCircle,
-                ...styles.teamNameAssignments,
-                flexDirection: "row",
+                ...styles.memberNameContainer,
                 borderColor: fileColor,
               }}
+              // onPress={() => createChecklist(item.name)}
             >
-              <Text style={{ ...styles.teamName, marginLeft: "10%" }}>
-                {member.name}
-              </Text>
-              <Image
-                source={require("../images/ClassAddBtn.png")}
-                style={{ width: 20, height: 20, marginRight: "10%" }}
-              />
-            </View>
-          </TouchableOpacity>
-        ))}
+              <Text style={styles.memberNameText}>{item}</Text>
+            </TouchableOpacity>
+          )}
+        />
       </View>
 
-      {/* <Text>{teamCode}</Text>
-      <Text>{title}</Text>
-      <Text>{fileColor}</Text> */}
-      {/* Member is an array so we must print each value inside the array individually */}
-      {/* {memberInfo && memberInfo.length > 0 && (
-        <View>
-          {memberInfo.map((member) => (
-            <View key={member.id}>
-              <Text>{member.name}</Text>
-              <Text>{member.phoneNumber}</Text>
-              <Text>{member.school}</Text>
-              <Text>{member.studentNumber}</Text>
+      {/* 체크리스트 구현 부분 */}
+      <View style={styles.checkContainer}>
+        <FlatList
+          keyboardShouldPersistTaps="handled"
+          data={memberInfo}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item) => item.name}
+          renderItem={({ item }) => (
+            <View style={styles.contentContainer}>
+              <TouchableOpacity
+                style={{
+                  ...styles.memberNameContainerTwo,
+                  borderColor: fileColor,
+                }}
+                onPress={() => pressAddBtn(item.name)}
+              >
+                <Text style={styles.memberNameTextTwo}>{item.name}</Text>
+                <Image
+                  source={require("../images/ListAddBtn.png")}
+                  style={styles.taskAddBtn}
+                />
+              </TouchableOpacity>
+
+              {/* 생성된 체크리스트 렌더링 */}
+
+              {/* 체크리스트 항목 추가 입력 창 */}
+              {checklists
+                .filter((checklist) => checklist.writer === item.name)
+                .map((checklist, index) => (
+                  <View key={index} style={styles.checkBoxContainer}>
+                    <Checkbox
+                      value={checklist.isChecked}
+                      style={styles.checkbox}
+                      color={fileColor}
+                      onValueChange={(newValue) =>
+                        handleCheckboxChange(checklist.writer, index, newValue)
+                      }
+                    />
+                    <Text style={styles.checkBoxContent}>
+                      {checklist.content}
+                    </Text>
+                    <TouchableOpacity>
+                      <Image
+                        source={require("../images/icons/three_dots.png")}
+                        style={styles.threeDots}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+
+              {/* 입력창 생성 */}
+              {isWritingNewTask[item.name] ? (
+                <KeyboardAvoidingView style={styles.checkBoxContainer}>
+                  <Checkbox style={styles.checkbox} color={fileColor} />
+                  <TextInput
+                    placeholder="할 일 추가..."
+                    style={styles.checkBoxContent}
+                    value={newTaskText}
+                    autoFocus={true}
+                    returnKeyType="done"
+                    onChangeText={(text) => setNewTaskText(text)}
+                    onSubmitEditing={() => continueAddingNewTask(item.name)}
+                    onBlur={() => addNewTask(item.name)}
+                    blurOnSubmit={false}
+                  />
+                  <TouchableOpacity>
+                    <Image
+                      source={require("../images/icons/three_dots.png")}
+                      style={styles.threeDots}
+                    />
+                  </TouchableOpacity>
+                </KeyboardAvoidingView>
+              ) : null}
             </View>
-          ))}
-        </View>
-      )}
-      {memberNames && <Text>{memberNames.join(", ")}</Text>}
-      <Text>{assignmentName}</Text>
-      <Text>{assignmentId}</Text>
-      <Text>{dueDate}</Text> */}
-    </View>
+          )}
+        />
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
+  // --------------과제 타이틀 영역-----------------
+  assignmentTitleContainer: {
+    width: WINDOW_WIDHT * 0.9,
+    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
+    //backgroundColor: "red",
+    borderWidth: 1,
+    borderRadius: 9,
+    marginTop: "5%",
+    marginBottom: "5%",
+    flexDirection: "row",
+    // backgroundColor: "yellow",
   },
-  assignmentDataContainer: {
+  assignmentTitleInfoContainer: {
     flex: 1,
     marginLeft: "7%",
     justifyContent: "space-evenly",
     paddingVertical: "5%",
+    // backgroundColor: "grey",
   },
   dueDateText: {
     color: color.redpink,
     fontSize: 12,
     fontFamily: "SUIT-Regular",
   },
-  assignmentNameText: {
+  assignmentTitleText: {
     color: color.activated,
     fontSize: 20,
     fontFamily: "SUIT-Regular",
   },
-  assignmentBox: {
-    width: WINDOW_WIDHT * 0.9,
-    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
-    //backgroundColor: "red",
-    borderWidth: 1,
-    borderRadius: 9,
-    marginBottom: "5%",
-    flexDirection: "row",
-  },
-  teamNameContainer: {
+  // --------------------중간 팀 멤버 이름 영역----------------
+  teamMembersNamesArrayContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    // backgroundColor: "green",
   },
-  teamNameAssignments: {
-    justifyContent: "space-between",
+  teamMateContainer: {
+    borderRadius: 200,
+    borderWidth: 1,
+    marginRight: 7,
     alignItems: "center",
-    height: "45%",
-    width: "40%",
+    justifyContent: "center",
   },
-  teamName: {
-    fontFamily: "SUIT-Regular",
+  teamMateText: {
+    padding: 9,
+    paddingRight: 10,
+    paddingLeft: 10,
+    fontFamily: "SUIT-Medium",
     fontSize: 12,
   },
-  teamCircle: {
-    width: "15%",
-    height: "150%",
-    borderRadius: 30,
+  memberNameContainer: {
+    marginRight: 6,
+    borderRadius: 200,
     borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  memberNameText: {
+    padding: 9,
+    paddingRight: 13,
+    paddingLeft: 13,
+    fontFamily: "SUIT-Medium",
+    fontSize: 12,
+  },
+  // ---------------------FlatList2--------------------
+  //Conainer 부분
+  checkContainer: {
+    flex: 1,
+    // backgroundColor: "grey",
+    marginTop: "8%",
+  },
+  contentContainer: {
+    flex: 1,
+    // backgroundColor: "orange",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+  },
+  memberNameContainerTwo: {
+    flex: 1,
+    // backgroundColor: "green",
+    flexDirection: "row",
+    borderRadius: 200,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  memberNameTextTwo: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 12,
+    // backgroundColor: "yellow",
+    padding: 10,
+    paddingLeft: 7,
+    paddingRight: 6,
+  },
+  taskAddBtn: {
+    width: 18,
+    height: 18,
+    // backgroundColor: "blue",
+    marginRight: 8,
+  },
+  // ----------------------------체크 하나-----------------------
+  checkBoxContainer: {
+    flex: 0.9,
+    width: "90%",
+    display: "flex",
+    flexDirection: "row",
+
+    // backgroundColor: "violet",
+    marginBottom: "7%",
+    alignSelf: "center",
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+  },
+  checkBoxContent: {
+    flex: 1,
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginLeft: 14,
+    // backgroundColor: "green",
+  },
+  checklistTextInput: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginLeft: 14,
+  },
+  threeDots: {
+    width: 17.5,
+    height: 4,
   },
 });
