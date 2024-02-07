@@ -34,6 +34,9 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 export default CategoryAdd = () => {
   const navigation = useNavigation();
   //회원정보 가져오기
+  const user = auth.currentUser;
+  //가져온 정보에서 이메일 빼서 저장하기
+  const email = user.email;
 
   //색상 선택  띄우기/숨기기 (초기값: 숨기기)
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -73,6 +76,34 @@ export default CategoryAdd = () => {
       setConfirmBtnColor(color.deactivated);
     }
   };
+  
+  const addCategoryItem = async() => {
+    try {
+        if (buttonDisabled) {
+          return;
+        }
+        setButtonDisabled(true);
+
+        // Access the document user and go to user email collection
+        const userRef = doc(db, "user", email);
+        // Call the document
+        const userDoc = await getDoc(userRef);
+
+        if(userDoc.exists()) {
+            const personalCheckList = collection(userRef, "personalCheckList");
+            await setDoc(doc(personalCheckList, textInputValue), {
+                category: textInputValue,
+                color: selectedColor,
+            })
+            navigation.navigate("PersonalPage", {addedCategory: textInputValue});
+        } else {
+            console.log("사용자 문서가 존재하지 않습니다.");
+        }
+
+    } catch (e) {
+        console.error("CategoryAdd: Error adding document: ", e);
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -95,9 +126,9 @@ export default CategoryAdd = () => {
           <TouchableOpacity
             disabled={buttonDisabled}
             style={s.titleRightBtn}
-            // onPress={() => {
-            //   addTeamItem();
-            // }}
+            onPress={() => {
+              addCategoryItem();
+            }}
           >
             <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
               획인
