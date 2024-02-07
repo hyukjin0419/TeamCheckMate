@@ -165,6 +165,7 @@ export default TeamCheckPage = (props) => {
         </TouchableOpacity>
 
         <FlatList
+          keyboardShouldPersistTaps="always"
           data={memberNames}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
@@ -180,14 +181,13 @@ export default TeamCheckPage = (props) => {
               <Text style={styles.memberNameText}>{item}</Text>
             </TouchableOpacity>
           )}
-          keyboardShouldPersistTaps="always"
         />
       </View>
 
       {/* 체크리스트 구현 부분 */}
       <View style={styles.checkContainer}>
         <FlatList
-          keyboardShouldPersistTaps="always"
+          keyboardShouldPersistTaps="handled"
           data={memberInfo}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.name}
