@@ -28,7 +28,7 @@ export default function UserInfoInputPage({ route }) {
   const [phoneNumber, setphoneNumber] = useState("");
   const [logIn, setLogIn] = useState(true);
   const [disableBtn, setDisableBtn] = useState(true);
-  const [btnColor, setBtnColor] = useState("#D9D9D9");
+  const [btnColor, setBtnColor] = useState(color.deactivated);
 
   //회원가입 관련 함수
   const uploadInformation = async () => {
@@ -81,15 +81,18 @@ export default function UserInfoInputPage({ route }) {
     signOut(auth);
   };
 
+  const [maxLength, setMaxLength] = useState(15); // 영어일 때의 maxLength
   const isNameEmpty = (text) => {
     setname(text);
     if (!text.trim()) {
       setDisableBtn(true);
-      setBtnColor("#D9D9D9");
+      setBtnColor(color.deactivated);
     } else {
       setDisableBtn(false);
-      setBtnColor("#050026");
+      setBtnColor(color.activated);
     }
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 10 : 15);
   };
 
   return (
@@ -113,7 +116,6 @@ export default function UserInfoInputPage({ route }) {
         />
         {!name.trim() && (
           <Text style={{ color: "red", position: "absolute", marginTop: "8%" }}>
-
             *
           </Text>
         )}
@@ -138,10 +140,8 @@ export default function UserInfoInputPage({ route }) {
           onChangeText={(text) => setschool(text)}
           style={s.textInput}
         />
-
       </View>
       <View style={s.textInputContainer}>
-
         {/*학번 입력창*/}
         <TextInput
           placeholder="학번"

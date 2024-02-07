@@ -69,6 +69,8 @@ export default TeamAddPage_origin = () => {
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [textInputValue, setTextInputValue] = useState("");
 
+  const [maxLength, setMaxLength] = useState(40); // 기본값은 영어일 때의 maxLength
+
   //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
   const onTextInputChange = (text) => {
     setTextInputValue(text);
@@ -79,6 +81,9 @@ export default TeamAddPage_origin = () => {
       setButtonDisabled(true);
       setConfirmBtnColor(color.deactivated);
     }
+    //한국어인 경우 제목 글자제한을 20으로 변경
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 20 : 40);
   };
 
   const addTeamItem = async () => {
@@ -182,6 +187,7 @@ export default TeamAddPage_origin = () => {
             <TextInput
               placeholder="팀 이름"
               value={textInputValue}
+              maxLength={maxLength}
               returnKeyType="done"
               onChangeText={onTextInputChange}
               style={styles.colorTextInput}

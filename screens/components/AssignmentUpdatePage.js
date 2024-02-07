@@ -91,6 +91,7 @@ export default AssignmentUpdatePage = () => {
   {
     /* 과제이름, Duedate가 둘 다 valid input인 경우 확인버튼 활성화 */
   }
+  const [maxLength, setMaxLength] = useState(30); // 영어일 때의 maxLength
   //과제이름
   const AssignmentNameInputChange = (text) => {
     setAssignmentName(text);
@@ -101,6 +102,8 @@ export default AssignmentUpdatePage = () => {
       setButtonDisabled(true);
       setConfirmBtnColor(color.deactivated);
     }
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 16 : 28);
   };
 
   const handleUpdate = async () => {
@@ -176,6 +179,7 @@ export default AssignmentUpdatePage = () => {
             <TextInput
               placeholder={assignmentName}
               onChangeText={AssignmentNameInputChange}
+              maxLength={maxLength}
               value={name}
               style={styles.TextInput}
             ></TextInput>
