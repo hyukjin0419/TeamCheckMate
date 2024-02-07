@@ -89,10 +89,32 @@ export default TeamCheckPage = (props) => {
       });
       setChecklists(updatedChecklists);
 
-      // 입력이 완료되면 입력 상태 초기화
       const updatedIsWritingNewTask = { ...isWritingNewTask };
       updatedIsWritingNewTask[memberName] = false;
       setIsWritingNewTask(updatedIsWritingNewTask);
+
+      // 입력창 비우기
+      setNewTaskText("");
+    } else {
+      setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
+    }
+  };
+
+  const continueAddingNewTask = (memberName) => {
+    if (newTaskText.trim() !== "") {
+      const updatedChecklists = [...checklists];
+      updatedChecklists.push({
+        writer: memberName,
+        index: updatedChecklists.filter(
+          (checklist) => checklist.writer === memberName
+        ).length,
+        isWriting: false,
+        isChecked: false,
+        content: newTaskText,
+        regDate: new Date(),
+        modDate: new Date(),
+      });
+      setChecklists(updatedChecklists);
 
       // 입력창 비우기
       setNewTaskText("");
@@ -115,7 +137,6 @@ export default TeamCheckPage = (props) => {
       setChecklists(updatedChecklists);
     }
   };
-
   console.log(JSON.stringify(checklists, null, 2));
 
   return (
@@ -235,7 +256,7 @@ export default TeamCheckPage = (props) => {
 
               {/* 입력창 생성 */}
               {isWritingNewTask[item.name] ? (
-                <View style={styles.checkBoxContainer}>
+                <KeyboardAvoidingView style={styles.checkBoxContainer}>
                   <Checkbox style={styles.checkbox} color={fileColor} />
                   <TextInput
                     placeholder="할 일 추가..."
@@ -244,10 +265,9 @@ export default TeamCheckPage = (props) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.name)}
+                    onSubmitEditing={() => continueAddingNewTask(item.name)}
                     onBlur={() => addNewTask(item.name)}
-                    onEndEditing={() => addNewTask(item.name)}
-                    onPressOut={() => addNewTask(item.name)}
+                    blurOnSubmit={false}
                   />
                   <TouchableOpacity>
                     <Image
@@ -255,7 +275,7 @@ export default TeamCheckPage = (props) => {
                       style={styles.threeDots}
                     />
                   </TouchableOpacity>
-                </View>
+                </KeyboardAvoidingView>
               ) : null}
             </View>
           )}
