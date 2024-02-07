@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import {
@@ -45,7 +46,7 @@ export default function LogInPage({ route }) {
 
   //로그인 관련 함수
   const handleLogin = () => {
-    if(isButtonClicked) {
+    if (isButtonClicked) {
       return;
     }
     setIsButtonClicked(true);
@@ -79,13 +80,19 @@ export default function LogInPage({ route }) {
             style={s.headBtn}
             onPress={() => navigation.navigate("InitialPage")}
           >
-            <AntDesign name="left" size={20} color="black" />
+            <Image
+              style={{
+                width: 8,
+                height: 14,
+              }}
+              source={require("../images/backBtn.png")}
+            />
           </TouchableOpacity>
           <Text style={s.title}>로그인</Text>
           <View style={s.titleRightBtn}></View>
         </View>
 
-        <View style={s.inputTextContainer}>
+        <View style={s.textInputContainer}>
           <TextInput
             placeholder="이메일"
             autoCapitalize="none"
@@ -94,6 +101,8 @@ export default function LogInPage({ route }) {
             style={s.textInput}
             keyboardType="email-address"
           />
+        </View>
+        <View style={s.textInputContainer}>
           <TextInput
             placeholder="비밀번호"
             value={password}

@@ -38,11 +38,10 @@ const commonStyles = StyleSheet.create({
   //헤더에 들어가는 타이틀 -> 글꼴수에 따라 marginLeft 수정 바람.
   title: {
     flex: 3,
-    fontWeight: "bold",
     fontSize: 16,
     textAlign: "center",
     fontFamily: "SUIT-Medium",
-    // backgroundColor: "violet",
+    //backgroundColor: "violet",
   },
   //헤더 오른쪽 버튼 (안보일 수 있음, 비율 맞추기 위해 존재)
   titleRightBtn: {
@@ -50,23 +49,30 @@ const commonStyles = StyleSheet.create({
     // backgroundColor: "blue",
   },
   titleRightText: {
-    fontSize: 16,
+    fontSize: 17,
     alignSelf: "flex-end", // 오른쪽 정렬
     fontFamily: "SUIT-Medium",
   },
-  //로그인 화면에서 쓰이는 textBox
-  inputTextContainer: {
-    marginTop: "%",
+  //------------------------TextInput---------------------------
+  //입력창을 감싸는 컨테이너
+  inputContainer: {
+    flex: 1,
+    justifyContent: "flex-start",
   },
-  //로그인 화면에서 쓰이는 textInput
+  //textInput
   textInput: {
-    marginTop: "10%",
+    height: 50,
     fontSize: 16,
-    borderBottomColor: "#050026",
-    borderBottomWidth: 2,
-    paddingBottom: 10,
     fontFamily: "SUIT-Regular",
+    marginLeft: "1%",
+    marginTop: "5%",
+    paddingTop: "2%",
   },
+  //입력창 밑줄
+  textInputContainer: {
+    borderBottomWidth: 1.5,
+  },
+
   //버튼 기본 디자인
   button: {
     borderRadius: 9,
@@ -104,7 +110,7 @@ const commonStyles = StyleSheet.create({
   },
   twoBtnContainerLeft: {
     flex: 1,
-    backgroundColor: "#050026",
+    backgroundColor: color.activated,
     padding: 15,
     marginRight: 5,
     borderRadius: 7,
@@ -113,7 +119,7 @@ const commonStyles = StyleSheet.create({
     color: "white",
     fontFamily: "SUIT-Medium",
     textAlign: "center",
-    fontSize: 13,
+    fontSize: 14,
   },
   twoBtnContainerRight: {
     flex: 1,
@@ -125,19 +131,20 @@ const commonStyles = StyleSheet.create({
   twoBtnContainerRightText: {
     fontFamily: "SUIT-Medium",
     textAlign: "center",
-    fontSize: 13,
+    fontSize: 14,
   },
   // -----------------------모달창--------------------------------------
   modalTeamBtnContainer: {
     width: WINDOW_WIDHT,
-    //backgroundColor: "yellow",
+    alignSelf: "center",
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
-    height: WINDOW_HEIGHT * 0.13,
+    height: WINDOW_HEIGHT * 0.1,
+    marginBottom: 15,
   },
   teamReviseBtn: {
-    width: WINDOW_WIDHT * 0.45,
+    width: WINDOW_WIDHT * 0.41,
     height: 65,
     backgroundColor: color.activated,
     borderRadius: 10,
@@ -150,7 +157,7 @@ const commonStyles = StyleSheet.create({
     fontSize: 14,
   },
   teamDeleteBtn: {
-    width: WINDOW_WIDHT * 0.45,
+    width: WINDOW_WIDHT * 0.41,
     height: 65,
     backgroundColor: color.deletegrey,
     borderRadius: 10,
@@ -172,11 +179,11 @@ const commonStyles = StyleSheet.create({
     marginTop: 20,
     fontFamily: "SUIT-Medium",
     fontSize: 16,
+    textAlign: "center",
   },
   modalItemContainter: {
     flex: 1,
     alignItems: "center",
-    marginBottom: "5%",
   },
   modalView: {
     backgroundColor: "white",
@@ -184,8 +191,57 @@ const commonStyles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
-    minHeight: 400, // This property determines the minimum height of the modal
-    paddingBottom: 20,
+    minHeight: 350, // This property determines the minimum height of the modal
+  },
+  modalInsideView: {
+    flexDirection: "column-reverse",
+    flex: 0.9,
+  },
+  BtnContainer: {
+    position: "absolute",
+    bottom: 90,
+    right: 10,
+    paddingHorizontal: "6%",
+    alignItems: "flex-end",
+  },
+  addClassBtn: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginBottom: 12,
+    marginTop: "2%",
+  },
+  addClassBtnText: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    paddingHorizontal: 1,
+    marginRight: 3,
+  },
+  joinClassBtn: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+  },
+  addBtnContainer: {
+    position: "absolute",
+    right: "1%",
+    bottom: 10,
+    zIndex: 1,
+  },
+  closeBtnContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: "1%",
+  },
+  addOrCloseBtn: {
+    width: 80,
+    height: 80,
   },
 });
 

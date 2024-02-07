@@ -42,9 +42,7 @@ export default function TeamMemberAddPage({ route }) {
   //현재 로그인된 유저 정보
   const user = auth.currentUser;
   //보내기 버튼 활성||비활성
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
-  //확인 버튼 상태 (초기값:비활성화 상태)
-  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [confirmBtnColor, setConfirmBtnColor] = useState("#BEBEBE");
 
   //1. 파이어 베이스에서 이메일 가져오는 함수 (자신의 이메일은 가져오지 x)
   const getUsers = async () => {
@@ -193,6 +191,7 @@ export default function TeamMemberAddPage({ route }) {
             filteredResults.length > 0 && (
               <View style={styles.emailContainer}>
                 <FlatList
+                  keyboardShouldPersistTaps="always"
                   style={styles.emailTextContainer}
                   data={filteredResults}
                   keyExtractor={(item) => item.id.toString()}
@@ -235,11 +234,12 @@ export default function TeamMemberAddPage({ route }) {
               )}
               <View style={s.twoBtnContainer}>
                 <TouchableOpacity
+                  disabled={addedUserEmailArray.length > 0 ? false : true}
                   style={{
                     ...s.twoBtnContainerLeft,
                     backgroundColor:
                       addedUserEmailArray.length > 0
-                        ? "#050026"
+                        ? color.activated
                         : confirmBtnColor,
                   }}
                   onPress={() => {

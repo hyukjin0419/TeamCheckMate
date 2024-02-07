@@ -10,7 +10,6 @@ import {
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
-  Keyboard,
   ActivityIndicator,
 } from "react-native";
 import { useState, useEffect } from "react";
@@ -25,11 +24,10 @@ import {
   getDocs,
   collection,
   auth,
-  updateDoc,
-  deleteField,
 } from "../../../firebase";
 import { query, orderBy, arrayRemove } from "firebase/firestore";
 import * as React from "react";
+import { color } from "../../styles/colors";
 import { showToast, toastConfig } from "../Toast";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 
@@ -96,29 +94,44 @@ export default TeamPage = () => {
 
   //팀 나가기 코드
   const leaveTeam = async (id) => {
-    const teamRef = doc(db, "team", id);
-    const teamDoc = await getDoc(teamRef);
-    const teamData = teamDoc.data();
-    console.log("------------------>", teamData.member_id_array.length);
-    // updateDoc와 deleteDoc를 병렬로 실행
-    const updatePromise = updateDoc(teamRef, {
-      member_id_array: arrayRemove(user.email),
-    });
+    try {
+      const teamRef = doc(db, "team", id);
+      const teamDoc = await getDoc(teamRef);
 
-    const deletePromise = deleteDoc(
-      doc(doc(db, "user", user.email), "teamList", id)
-    );
-
-    if (teamData.member_id_array.length === 1) {
-      console.log("이건실행이 아예 안되는겨?");
-      try {
-        const deleteTeam = deleteDoc(doc(db, "team", id));
-      } catch (e) {
-        console.log("TeamPage: leavTeam함수 문제발생!!!");
+      if (!teamDoc.exists()) {
+        console.log("팀 문서가 존재하지 않습니다.");
+        return;
       }
-    }
 
-    getTeamList();
+      const membersRef = collection(teamRef, "members");
+      const membersSnapshot = await getDocs(membersRef);
+
+      if (!membersSnapshot.empty) {
+        // 멤버가 존재하면 삭제
+        await deleteDoc(doc(membersRef, user.email));
+        console.log("멤버 삭제 완료");
+      }
+
+      const updatedMembersSnapshot = await getDocs(membersRef);
+      const updatedMembersCount = updatedMembersSnapshot.size;
+      console.log(updatedMembersCount);
+
+      if (updatedMembersCount === 0) {
+        console.log("팀 삭제 작업 수행");
+
+        // 팀 삭제
+        await deleteDoc(teamRef);
+        console.log("팀 삭제 완료");
+      }
+
+      const deletePromise = deleteDoc(
+        doc(doc(db, "user", user.email), "teamList", id)
+      );
+      console.log("leaveTeam 함수 실행 완료");
+      getTeamList();
+    } catch (e) {
+      console.error("leaveTeam 함수에서 오류 발생: ", e);
+    }
   };
 
   //TeamPage에 들어올 시 getTeamList 함수 작동 (새로고침 함수)
@@ -150,37 +163,18 @@ export default TeamPage = () => {
     <View style={styles.container}>
       <StatusBar style={"dark"}></StatusBar>
       <View style={s.headContainer}></View>
-      {/* 팀 추가에 점근할 수 있는 버튼 */}
-      <TouchableOpacity style={styles.AddBtnContainer} onPress={handlePress}>
-        <Image
-          style={styles.addOrCloseBtn}
-          source={require("../../images/ClassAddBtn.png")}
-        ></Image>
-
-        {/* 모달 뷰 */}
-        <Modal
-          style={styles.modalView}
-          // animationType="fade"
-          transparent={true}
-          visible={showModal}
-          animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
-          animationOutTiming={20}
-        >
-          <TouchableWithoutFeedback onPress={handlePress}>
-            {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
-            <View style={styles.modalView}>
-              <View style={s.headContainer}></View>
-              {/* 엑스 버튼 */}
-              <TouchableOpacity
-                style={styles.AddBtnContainer}
-                onPress={handlePress}
-                activeOpacity={1}
-              >
-                <Image
-                  style={styles.addOrCloseBtn}
-                  source={require("../../images/CloseClassAddBtn.png")}
-                ></Image>
-              </TouchableOpacity>
+      {/* 모달 뷰 */}
+      <Modal
+        //animationType="fade"
+        transparent={true}
+        visible={showModal}
+        animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
+        animationOutTiming={20}
+      >
+        <TouchableWithoutFeedback onPress={handlePress}>
+          {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
+          <View style={styles.modalView}>
+            <View style={styles.modalInsideView}>
               {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
               <View style={styles.twoBtnContainer} onPress={handlePress}>
                 {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
@@ -209,16 +203,22 @@ export default TeamPage = () => {
                     style={{ width: 16, height: 16 }}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("TeamJoinPage"), setShowModal(false);
-                  }}
-                ></TouchableOpacity>
               </View>
+              {/* 엑스 버튼 */}
+              <TouchableOpacity
+                style={styles.closeBtnContainer}
+                onPress={handlePress}
+                activeOpacity={1}
+              >
+                <Image
+                  style={styles.addOrCloseBtn}
+                  source={require("../../images/CloseClassAddBtn.png")}
+                ></Image>
+              </TouchableOpacity>
             </View>
-          </TouchableWithoutFeedback>
-        </Modal>
-      </TouchableOpacity>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
       {/* 팀 파일 렌더링하는 코드 */}
       {/* 저장된 팀 리스트를 TeamItem페이지로 보내어서 생성하여 생성된 TeamIteam들을 TeamPage화면에 렌더링*/}
       {isLoading ? (
@@ -237,13 +237,19 @@ export default TeamPage = () => {
               title={item.title}
               id={item.id}
               fileColor={item.fileImage}
-              member_id_array={item.member_id_array}
               leaveTeam={leaveTeam}
             ></TeamItem>
           )}
           keyExtractor={(item) => item.id}
-        />
+        ></FlatList>
       )}
+      {/* 팀 추가에 점근할 수 있는 버튼 */}
+      <TouchableOpacity style={styles.addBtnContainer} onPress={handlePress}>
+        <Image
+          style={styles.addOrCloseBtn}
+          source={require("../../images/ClassAddBtn.png")}
+        ></Image>
+      </TouchableOpacity>
       <Toast
         position="bottom"
         style={styles.text}
@@ -265,24 +271,36 @@ const styles = StyleSheet.create({
     width: WINDOW_WIDHT * 0.92,
     alignSelf: "center",
   },
-  AddBtnContainer: {
-    alignItems: "flex-end",
-    paddingBottom: "2%",
-    paddingHorizontal: "5%",
+  addBtnContainer: {
+    position: "absolute",
+    right: "1%",
+    bottom: 10,
+    zIndex: 1,
+  },
+  closeBtnContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: "1%",
   },
   addOrCloseBtn: {
-    width: 40,
-    height: 40,
-    marginRight: "2%",
+    width: 80,
+    height: 80,
   },
   modalView: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flexDirection: "column",
+  },
+  modalInsideView: {
+    flexDirection: "column-reverse",
+    flex: 0.9,
   },
   twoBtnContainer: {
+    position: "absolute",
+    bottom: 90,
+    right: 10,
     paddingHorizontal: "6%",
     alignItems: "flex-end",
-    justifyContent: "center",
   },
   addClassBtn: {
     backgroundColor: "white",
@@ -313,6 +331,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     size: "large",
-    color: "#050026",
+    color: color.activated,
   },
 });

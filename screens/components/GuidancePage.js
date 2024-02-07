@@ -1,33 +1,53 @@
-import { View, Text, StyleSheet } from "react-native";
-import { showToast, toastConfig } from "../components/Toast";
-import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import React, { useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import { View, TouchableOpacity, StyleSheet, Image, Text } from "react-native";
+import s from "../styles/css";
+import { AntDesign } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/core";
 
-const GuidancePage = () => {
+const YourComponent = () => {
+  const navigation = useNavigation();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Guidance Page</Text>
-      <Toast
-        position="bottom"
-        style={styles.text}
-        visibilityTime={2000}
-        config={toastConfig}
-        keyboardOffset={null}
-      />
+    <View style={s.container}>
+      <StatusBar style={"dark"}></StatusBar>
+      {/* 뒤로가기 버튼, 팀 등록 헤더와 확인버튼 컨테이너 */}
+      <View style={s.headContainer}>
+        <View style={s.headBtn}></View>
+        <Text style={s.title}>길라잡이</Text>
+        <View style={s.titleRightBtn}></View>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: "10%",
+        }}
+      >
+        <Image
+          style={styles.noPostIcon}
+          source={require("../images/GuidancePageNoPost.png")}
+        ></Image>
+        <Text style={styles.noPostText}>등록된 내용이 없습니다.</Text>
+      </View>
     </View>
   );
 };
 
-export default GuidancePage;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
+  noPostIcon: {
+    width: 40,
+    height: 40,
     justifyContent: "center",
   },
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
+  noPostText: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+    textAlign: "center",
+    color: "#797979",
+    marginTop: "5%",
   },
 });
+
+export default YourComponent;

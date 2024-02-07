@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import {
@@ -76,7 +77,7 @@ export default function SignInPage({ route }) {
 
   //회원가입 관련 함수
   const handleSignUp = () => {
-    if(isButtonClicked) {
+    if (isButtonClicked) {
       return;
     }
     setIsButtonClicked(true);
@@ -116,27 +117,34 @@ export default function SignInPage({ route }) {
         {/*head 부분*/}
         <View style={s.headContainer}>
           <TouchableOpacity style={s.headBtn} onPress={goingBack}>
-            <AntDesign name="left" size={20} color="black" />
+            <Image
+              style={{
+                width: 8,
+                height: 14,
+              }}
+              source={require("../images/backBtn.png")}
+            />
           </TouchableOpacity>
           <Text style={s.title}>가입하기</Text>
           <View style={s.titleRightBtn}></View>
         </View>
 
         {/*입력창*/}
-        <View style={s.inputTextContainer}>
+        <View style={s.textInputContainer}>
           {/*이메일 입력창*/}
           <TextInput
-            placeholder=" 이메일"
+            placeholder="이메일"
             value={email}
             onChangeText={(text) => setEmail(text)}
             style={s.textInput}
             keyboardType="email-address"
             autoCapitalize="none"
           />
-
+        </View>
+        <View style={s.textInputContainer}>
           {/*비밀번호 입력창*/}
           <TextInput
-            placeholder=" 비밀번호"
+            placeholder="비밀번호"
             value={password}
             onChangeText={(text) => setPassword(text)}
             style={s.textInput}

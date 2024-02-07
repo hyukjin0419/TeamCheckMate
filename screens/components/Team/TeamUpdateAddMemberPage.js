@@ -43,6 +43,8 @@ export default function TeamUpdateAddMemberPage({ route }) {
   const [addedUserEmailArray, setAddedUserEmailArray] = useState([]);
   //현재 로그인된 유저 정보
   const user = auth.currentUser;
+  //보내기 버튼 활성||비활성
+  const [confirmBtnColor, setConfirmBtnColor] = useState("#BEBEBE");
 
   //1. 파이어 베이스에서 이메일 가져오는 함수 (자신의 이메일은 가져오지 x)
   const getUsers = async () => {
@@ -210,6 +212,7 @@ export default function TeamUpdateAddMemberPage({ route }) {
                 <View>
                   <Text style={styles.emailAddedTitle}>초대할 이메일</Text>
                   <FlatList
+                    keyboardShouldPersistTaps="always"
                     data={addedUserEmailArray}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
@@ -239,7 +242,7 @@ export default function TeamUpdateAddMemberPage({ route }) {
                     backgroundColor:
                       addedUserEmailArray.length > 0
                         ? color.activated
-                        : color.deactivated,
+                        : confirmBtnColor, //deactivated
                   }}
                   onPress={() => {
                     if (addedUserEmailArray.length > 0) {
@@ -350,7 +353,7 @@ const styles = StyleSheet.create({
   twoBtnContainerRightText: {
     fontFamily: "SUIT-Medium",
     textAlign: "center",
-    fontSize: 13,
+    fontSize: 14,
     color: color.redpink,
   },
 });

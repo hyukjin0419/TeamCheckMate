@@ -26,6 +26,8 @@ import UserInfoInputPage from "./screens/logins/UserInfoInputPage";
 import { getDoc } from "firebase/firestore";
 import * as Font from "expo-font";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import CategoryAdd from "./screens/components/Category/CategoryAdd";
+import TeamCheckPage from "./screens/components/TeamCheckPage";
 
 const Stack = createNativeStackNavigator();
 // - 스택 형태로 화면 전환을 관리한다
@@ -50,6 +52,7 @@ function PersonalPageTab() {
   return (
     <PersonalStack.Navigator screenOptions={{ headerShown: false }}>
       <PersonalStack.Screen name="PersonalPage" component={PersonalPage} />
+      <PersonalStack.Screen name="CategoryAdd" component={CategoryAdd} />
     </PersonalStack.Navigator>
   );
 }
@@ -77,6 +80,7 @@ function TeamPageTab() {
         name="AssignmentUpdatePage"
         component={AssignmentUpdatePage}
       />
+      <TeamStack.Screen name="TeamCheckPage" component={TeamCheckPage} />
     </TeamStack.Navigator>
   );
 }
@@ -265,8 +269,10 @@ export default function App() {
               screenOptions={({ route }) => ({
                 //탭 바에 표시될 아이콘을 설정한다.
                 //현재 선택된 탭일 때와 아닐 때 아이콘을 다르게 지정할 수 있다.
-                tabBarIcon: ({ focused, color, size }) => {
+                tabBarIcon: ({ focused }) => {
                   let iconAddress;
+                  let iconWidth = 28;
+                  let iconHeight = 28;
 
                   if (route.name === "개인") {
                     //focused는 현재 탭이 활성화 된 상태인지 여부를 나타내는 불리언 값
@@ -274,10 +280,14 @@ export default function App() {
                     iconAddress = focused
                       ? require("./screens/images/PersonalIconSelected.png")
                       : require("./screens/images/PersonalIconUnselected.png");
+                    iconWidth = 25;
+                    iconHeight = 25;
                   } else if (route.name === "팀") {
                     iconAddress = focused
                       ? require("./screens/images/TeamIconSelected.png")
                       : require("./screens/images/TeamIconUnselected.png");
+                    iconWidth = 30;
+                    iconHeight = 25;
                   } else if (route.name === "시간표") {
                     iconAddress = focused
                       ? require("./screens/images/ScheduleIconSelected.png")
@@ -286,22 +296,34 @@ export default function App() {
                     iconAddress = focused
                       ? require("./screens/images/GuidanceIconSelected.png")
                       : require("./screens/images/GuidanceIconUnselected.png");
+                    iconWidth = focused ? 36 : 30;
+                    iconHeight = 28;
                   } else if (route.name === "설정") {
                     iconAddress = focused
                       ? require("./screens/images/SettingIconSelected.png")
                       : require("./screens/images/SettingIconUnselected.png");
+                    iconWidth = 27;
+                    iconHeight = 27;
                   }
 
                   return (
                     <Image
                       source={iconAddress}
-                      style={{ width: 25, height: 25 }}
+                      style={{ width: iconWidth, height: iconHeight }}
                     />
                   );
                 },
                 headerShown: false,
-                tabBarStyle: { height: "10%", borderTopWidth: 0 }, //탭 바의 스타일을 설정한다.
-                tabBarLabelStyle: { paddingBottom: 7 }, //탭 바 라벨의 스타일을 설정한다.
+                tabBarStyle: {
+                  height: "10%",
+                  borderTopWidth: 0,
+                }, //탭 바의 스타일을 설정한다.
+                tabBarLabelStyle: {
+                  paddingBottom: "7%",
+                  marginTop: "5%",
+                  fontFamily: "SUIT-Regular",
+                  fontSize: 11,
+                }, //탭 바 라벨의 스타일을 설정한다.
                 tabBarActiveTintColor: "black", //활성화된 탭의 텍스트 색상을 설정한다.
                 tabBarInactiveTintColor: "black", //비활성화된 탭의 텍스트 색상을 설정한다.
               })}

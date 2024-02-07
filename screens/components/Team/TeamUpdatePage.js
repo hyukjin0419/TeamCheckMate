@@ -52,9 +52,10 @@ export default TeamUpdatePage = ({ route }) => {
   };
 
   const [textInputValue, setTextInputValue] = useState(title);
+  const [maxLength, setMaxLength] = useState(40); // 기본값은 영어일 때의 maxLength
 
   /* 문자 입력 시 확인 버튼 활성화  */
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const onTextInputChange = (text) => {
     setTextInputValue(text);
@@ -63,14 +64,17 @@ export default TeamUpdatePage = ({ route }) => {
       setConfirmBtnColor(color.activated);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 20 : 40);
   };
 
   /* 색상 선택 모달창 띄우기/숨기기 (초기값: 숨기기) */
   const [isModalVisible, setIsModalVisible] = useState(false);
   const handleModalPress = () => {
     setIsModalVisible(!isModalVisible);
+    setSelectedColor(colorConfirmed);
   };
 
   /* 팀이름, 색상 firebase에 업데이트 */
@@ -97,7 +101,13 @@ export default TeamUpdatePage = ({ route }) => {
                 navigation.navigate("TeamPage");
               }}
             >
-              <AntDesign name="left" size={20} color="black" />
+              <Image
+                style={{
+                  width: 8,
+                  height: 14,
+                }}
+                source={require("../../images/backBtn.png")}
+              />
             </TouchableOpacity>
           </View>
 
@@ -126,6 +136,7 @@ export default TeamUpdatePage = ({ route }) => {
             <TextInput
               placeholder={title}
               value={textInputValue}
+              maxLength={maxLength}
               returnKeyType="done"
               onChangeText={onTextInputChange}
               style={styles.colorTextInput}
@@ -333,7 +344,7 @@ const styles = StyleSheet.create({
   colorTextInputContainer: {
     flexDirection: "row",
     //backgroundColor: "blue",
-    borderBottomWidth: 2,
+    borderBottomWidth: 1.5,
     marginTop: "3%",
   },
   colorTextInput: {
@@ -376,10 +387,10 @@ const styles = StyleSheet.create({
   modalConfirmBtn: {
     borderRadius: 10,
     width: WINDOW_WIDHT * 0.9,
-    height: WINDOW_HEIGHT * 0.06,
+    height: 50,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: 10,
     backgroundColor: color.deletegrey,
   },
   modalVector: {

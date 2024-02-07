@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
@@ -35,7 +36,7 @@ export default function TeamJoinPage() {
   //가져온 정보에서 이메일 빼서 저장하기
   const email = user.email;
   //확인 버튼 색상 초기값 (회색)
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey);
   //확인 버튼 상태 초기값 (비활성화 상태)
   const [buttonDisabled, setButtonDisabled] = useState(true);
   //참여코드
@@ -51,7 +52,7 @@ export default function TeamJoinPage() {
       setConfirmBtnColor(color.activated);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
   };
 
@@ -60,42 +61,69 @@ export default function TeamJoinPage() {
     try {
       Keyboard.dismiss();
 
-      const teamDocRef = doc(db, "team", teamCode);
-      const teamDocSnapshot = await getDoc(teamDocRef);
+      const teamRef = doc(db, "team", teamCode);
+      const teamDoc = await getDoc(teamRef);
 
-      // if (!teamDocSnapshot.exists) {
-      //   console.log("[TeamJoingPage] 등록되지 않은 팀에 참여하려함.");
-      //   showToast("success", "   등록되지 않은 팀입니다");
-      // }
-      if (
-        teamDocSnapshot.data() &&
-        teamDocSnapshot.data().member_id_array &&
-        teamDocSnapshot.data().member_id_array.includes(email)
-      ) {
-        console.log("[TeamJoingPage] 이미 등록된 팀에 참여하려함.");
-        setTimeout(() => showToast("success", "  이미 참여중인 팀입니다"), 300);
+      if (teamDoc.exists()) {
+        const userRef = doc(db, "user", email);
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const membersRef = collection(teamRef, "members");
+
+          const existingMemberDoc = await getDoc(doc(membersRef, email));
+
+          console.log("IsAlready?", existingMemberDoc);
+          if (existingMemberDoc.exists()) {
+            setTimeout(
+              () => showToast("success", "  이미 참여중인 팀입니다"),
+              300
+            );
+            console.log("이미 참여 완료된 팀입니다.");
+            return;
+          } else {
+            const memberObject = {
+              name: userData.name || "undefined",
+              email: email || "undefined",
+              phoneNumber: userData.phoneNumber || "undefined",
+              school: userData.school || "undefined",
+              studentNumber: userData.studentNumber || "undefined",
+              joinedTime: new Date(),
+              updateTime: null,
+            };
+
+            const memberDocRef = doc(collection(teamRef, "members"), email);
+            await setDoc(memberDocRef, memberObject);
+
+            // 팀코드 -> 유저 페이지에 추가
+
+            const teamListCollectionRef = collection(userRef, "teamList");
+            await setDoc(doc(teamListCollectionRef, teamCode), {
+              teamID: teamCode,
+            });
+
+            console.log("Member added to the team successfully.");
+            navigation.navigate("TeamPage");
+            showToast(
+              "success",
+              " ✓  팀 참여 완료! 이번 팀플도 파이팅하세요 :)"
+            );
+          }
+        } else {
+          console.log("사용자 문서가 존재하지 않습니다.");
+          showToast(
+            "success",
+            "  그럴리는 없지만 등록되지 않은 사용자 입니다."
+          );
+        }
       } else {
-        await updateDoc(teamDocRef, {
-          member_id_array: arrayUnion(email),
-        });
-
-        // 팀코드 -> 유저 페이지에 추가
-        const userDocRef = doc(db, "user", email);
-        const teamListCollectionRef = collection(userDocRef, "teamList");
-        await setDoc(doc(teamListCollectionRef, teamCode), {
-          teamID: teamCode,
-        });
-
-        // 토스트 메시지: 팀 등록 완료
-        navigation.navigate("TeamPage");
-        showToast("success", " ✓  팀 참여 완료! 이번 팀플도 파이팅하세요 :)");
+        console.log("팀 문서가 존재하지 않습니다.");
+        setTimeout(() => showToast("success", "  등록되지 않은 팀입니다"), 300);
       }
     } catch (e) {
-      // console.error("[TeamJoinPage] 이 문제는 괜찮습니다.");
-      showToast("success", "  등록되지 않은 팀입니다");
+      console.error("[TeamJoinPage]", e);
     }
-
-    // navigation.navigate("TeamPage");
   };
 
   return (
@@ -111,7 +139,13 @@ export default function TeamJoinPage() {
             style={s.headBtn}
             onPress={() => navigation.goBack()}
           >
-            <AntDesign name="left" size={20} color="black" />
+            <Image
+              style={{
+                width: 8,
+                height: 14,
+              }}
+              source={require("../../images/backBtn.png")}
+            />
           </TouchableOpacity>
           <Text style={s.title}>팀 참여</Text>
           <TouchableOpacity
@@ -126,16 +160,18 @@ export default function TeamJoinPage() {
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={s.inputTextContainer}>
-          <TextInput
-            placeholder="참여 코드"
-            onChangeText={activatedHeadBtn}
-            style={s.textInput}
-          ></TextInput>
+        <View style={s.inputContainer}>
+          <View style={s.textInputContainer}>
+            <TextInput
+              placeholder="참여 코드"
+              onChangeText={activatedHeadBtn}
+              style={s.textInput}
+            ></TextInput>
+          </View>
         </View>
         <Toast
           position="bottom"
-          visibilityTime={2000}
+          visibilityTime={800}
           config={toastConfig}
           keyboardOffset={null}
         />
