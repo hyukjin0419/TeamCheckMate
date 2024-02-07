@@ -10,8 +10,10 @@ import {
   Dimensions,
   Keyboard,
   TouchableWithoutFeedback,
+  Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
 import { color } from "../styles/colors";
 import { db, collection, addDoc } from "../../firebase";
 import { useNavigation } from "@react-navigation/core";
@@ -21,17 +23,24 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default AssignmentAddPage = ({ route }) => {
+export default AssignmentAddPage = () => {
   const navigation = useNavigation();
 
   {
     /* AssignmentPage에서 팀 이름, 파일 아이콘 색상, 팀 id 불러오기 */
   }
-  const { title, fileColor, teamCode } = route.params;
+  const route = useRoute();
+  const {
+    teamCode: teamCode,
+    title: title,
+    fileColor: fileColor,
+    memberInfo: memberInfo,
+    memberNames: memberNames,
+  } = route.params;
   {
     /* 과제추가 확인버튼 상태 변경 코드 */
   }
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated); //확인버튼 색상 (초기값: 비활성화)
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey); //확인버튼 색상 (초기값: 비활성화)
   const [buttonDisabled, setButtonDisabled] = useState(true); //확인버튼 상태 (초기값: 비활성화)
 
   {
@@ -41,6 +50,7 @@ export default AssignmentAddPage = ({ route }) => {
 
   const [dueDateValid, setDueDateValid] = useState(false);
   const [assignmentValid, setAssignmentValid] = useState(false);
+  const [maxLength, setMaxLength] = useState(40); // 기본값은 영어일 때의 maxLength
 
   {
     /* 과제이름, 제출기한 둘 다 valid input인 경우 확인버튼 활성화 */
@@ -54,8 +64,10 @@ export default AssignmentAddPage = ({ route }) => {
       setAssignmentValid(true);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 20 : 40);
   };
   //제출기한
   const [date, setDate] = useState(new Date());
@@ -91,7 +103,7 @@ export default AssignmentAddPage = ({ route }) => {
       setAssignmentValid(true);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
       setAssignmentValid(false);
     }
   };
@@ -131,9 +143,11 @@ export default AssignmentAddPage = ({ route }) => {
       // assignmentDocRef.id 값이 정상적으로 존재할 때에만 navigation.navigate 호출
       if (assignmentDocRef.id) {
         navigation.navigate("AssignmentPage", {
+          teamCode: teamCode,
           title: title,
           fileColor: fileColor,
-          teamCode: teamCode,
+          memberInfo: memberInfo,
+          memberNames: memberNames,
         });
       } else {
         console.error("assignmentDocRef.id 값이 유효하지 않습니다.");
@@ -154,13 +168,21 @@ export default AssignmentAddPage = ({ route }) => {
             style={s.headBtn}
             onPress={() => {
               navigation.navigate("AssignmentPage", {
+                teamCode: teamCode,
                 title: title,
                 fileColor: fileColor,
-                teamCode: teamCode,
+                memberInfo: memberInfo,
+                memberNames: memberNames,
               });
             }}
           >
-            <AntDesign name="left" size={20} color="black" />
+            <Image
+              style={{
+                width: 8,
+                height: 14,
+              }}
+              source={require("../images/backBtn.png")}
+            />
           </TouchableOpacity>
 
           <Text style={s.title}>과제 추가</Text>
@@ -186,6 +208,7 @@ export default AssignmentAddPage = ({ route }) => {
             <TextInput
               placeholder="과제 이름"
               onChangeText={handleNameChange}
+              maxLength={maxLength}
               value={assignmentName}
               style={s.textInput}
             ></TextInput>

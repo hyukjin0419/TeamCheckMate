@@ -8,6 +8,9 @@ import {
   Dimensions,
   FlatList,
   Image,
+  ScrollView,
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
@@ -29,7 +32,13 @@ const AssignmentPage = () => {
 
   //TeamItem에서 정보 가져오기
   const route = useRoute();
-  const { title, fileColor, teamCode, memberInfo, memberNames } = route.params;
+  const {
+    teamCode: teamCode,
+    title: title,
+    fileColor: fileColor,
+    memberInfo: memberInfo,
+    memberNames: memberNames,
+  } = route.params;
 
   const [openedFileImage, setOpenedFileImage] = useState(
     require("../images/OpenedFileColor/9CB1BB.png")
@@ -145,10 +154,16 @@ const AssignmentPage = () => {
     }, [])
   );
 
+  //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
+  const [showModal, setShowModal] = useState(false);
+  const handlePress = () => {
+    setShowModal(!showModal);
+  };
+
   return (
     <View
       style={{
-        ...s.container,
+        ...styles.container,
         alignItems: "center",
       }}
     >
@@ -166,7 +181,13 @@ const AssignmentPage = () => {
             navigation.navigate("TeamPage");
           }}
         >
-          <AntDesign name="left" size={20} color="black"></AntDesign>
+          <Image
+            style={{
+              width: 8,
+              height: 14,
+            }}
+            source={require("../images/backBtn.png")}
+          />
         </TouchableOpacity>
         <ImageBackground source={openedFileImage} style={styles.openedFile}>
           <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>
@@ -174,64 +195,140 @@ const AssignmentPage = () => {
           </Text>
         </ImageBackground>
       </View>
-      {/* 팀메이트 보여주는 남색 칸 */}
-      <View style={styles.teamMate}>
-        <Text style={styles.teamMateText}>팀 메이트: </Text>
-        {/* 팀메이트 추가 버튼 */}
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("TeamUpdateAddMemberPage", {});
-          }}
-        >
-          <AntDesign
-            style={styles.plusBtn}
-            name="plus"
-            size={20}
-            color="white"
-          />
-        </TouchableOpacity>
-      </View>
-      {/* 과제 리스트 */}
-      <FlatList
-        data={assignmentList}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <AssignmentItem
-            teamCode={teamCode}
-            title={title}
-            fileColor={fileColor}
-            memberInfo={memberInfo}
-            memberNames={memberNames}
-            assignmentName={item.assignmentName}
-            assignmentId={item.assignmentId}
-            dueDate={item.dueDate}
-            getAssignmentList={getAssignmentList}
-          ></AssignmentItem>
-        )}
-        keyExtractor={(item) => item.id}
-        /* 과제 아이템 아래에 있는 과제추가 버튼 */
-        ListFooterComponent={() => (
-          <View style={styles.addBtnContainer}>
-            <TouchableOpacity
-              /* Top마진을 주기 위한 스타일 */
-              style={styles.addBtnMargin}
-              onPress={() => {
-                navigation.navigate("AssignmentAddPage", {
-                  title: title,
-                  fileColor: fileColor,
-                  teamCode: teamCode,
-                });
-              }}
-            >
-              {/* Add 버튼 */}
-              <Image
-                style={styles.addBtn}
-                source={require("../images/ClassAddBtn.png")}
-              ></Image>
-            </TouchableOpacity>
+      <Modal
+        //animationType="fade"
+        transparent={true}
+        visible={showModal}
+        animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
+        animationOutTiming={20}
+      >
+        <TouchableWithoutFeedback onPress={handlePress}>
+          {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
+          <View style={styles.modalView}>
+            <View style={s.modalInsideView}>
+              {/* 버튼 두개: 과제추가 버튼 & 팀원추가 버튼 */}
+              <View style={s.BtnContainer} onPress={handlePress}>
+                {/* 과제추가 버튼: 과제추가 페이지로 넘어가는 버튼 */}
+                <TouchableOpacity
+                  style={s.addClassBtn}
+                  onPress={() => {
+                    navigation.navigate("AssignmentAddPage", {
+                      teamCode: teamCode,
+                      title: title,
+                      fileColor: fileColor,
+                      memberInfo: memberInfo,
+                      memberNames: memberNames,
+                    });
+                    handlePress();
+                  }}
+                >
+                  <Text style={s.addClassBtnText}>과제 추가</Text>
+                  <Image
+                    source={require("../images/icons/AssignmentAdd.png")}
+                    style={{ width: 20, height: 20 }}
+                  />
+                </TouchableOpacity>
+                {/* 팀원추가: 팀원추가 페이지로 넘어가는 버튼 */}
+                <TouchableOpacity
+                  style={s.joinClassBtn}
+                  onPress={() => {
+                    navigation.navigate("TeamUpdateAddMemberPage", {
+                      teamId: teamCode,
+                    }),
+                      setShowModal(false);
+                  }}
+                >
+                  <Text style={s.addClassBtnText}>팀원 추가</Text>
+                  <Image
+                    source={require("../images/icons/TeamMateAdd.png")}
+                    style={{ width: 20, height: 20 }}
+                  />
+                </TouchableOpacity>
+              </View>
+              {/* 엑스 버튼 */}
+              <TouchableOpacity
+                style={styles.closeBtnContainer}
+                onPress={handlePress}
+                activeOpacity={1}
+              >
+                <Image
+                  style={styles.addOrCloseBtn}
+                  source={require("../images/CloseClassAddBtn.png")}
+                ></Image>
+              </TouchableOpacity>
+            </View>
           </View>
-        )}
-      ></FlatList>
+        </TouchableWithoutFeedback>
+      </Modal>
+      <ScrollView
+        alignSelf="center"
+        scrollEnabled={false}
+        style={{
+          marginLeft: 20,
+          marginTop: 140,
+          width: WINDOW_WIDHT,
+        }}
+      >
+        <View flexDirection="row">
+          <View
+            style={{
+              ...styles.teamMateBtn,
+              borderColor: fileColor,
+              backgroundColor: fileColor,
+              marginLeft: 10,
+            }}
+          >
+            <Text style={styles.teamMateBtnText}>팀 메이트</Text>
+          </View>
+          <FlatList
+            showsHorizontalScrollIndicator={false}
+            horizontal={true}
+            data={memberNames}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={{
+                  ...styles.teamMateBtn,
+                  borderColor: fileColor,
+                }}
+              >
+                <Text style={styles.teamMateBtnText}>{item}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </ScrollView>
+      {/* Parent View for both FlatLists */}
+      <View style={{ flex: 18 }}>
+        {/* 과제 리스트 */}
+        <FlatList
+          data={assignmentList}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View>
+              <AssignmentItem
+                teamCode={teamCode}
+                title={title}
+                fileColor={fileColor}
+                memberInfo={memberInfo}
+                memberNames={memberNames}
+                assignmentName={item.assignmentName}
+                assignmentId={item.assignmentId}
+                dueDate={item.dueDate}
+                getAssignmentList={getAssignmentList}
+              ></AssignmentItem>
+            </View>
+          )}
+          keyExtractor={(item) => item.id}
+        ></FlatList>
+      </View>
+      {/* 팀 추가에 점근할 수 있는 버튼 */}
+      <TouchableOpacity style={styles.addBtnContainer} onPress={handlePress}>
+        <Image
+          style={styles.addOrCloseBtn}
+          source={require("../images/ClassAddBtn.png")}
+        ></Image>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -239,46 +336,58 @@ const AssignmentPage = () => {
 export default AssignmentPage;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: "5%",
+    backgroundColor: "white",
+  },
+  modalView: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flexDirection: "column",
+  },
+  addBtnContainer: {
+    position: "absolute",
+    right: "1%",
+    bottom: 10,
+    zIndex: 1,
+  },
+  closeBtnContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: "1%",
+  },
+  addOrCloseBtn: {
+    width: 80,
+    height: 80,
+  },
+  teamMateBtn: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 35,
+    borderWidth: 1,
+    borderRadius: 23,
+    marginHorizontal: 4,
+    paddingHorizontal: 15,
+    marginTop: 10,
+    marginLeft: 5,
+  },
+  teamMateBtnText: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 12,
+  },
   openedFile: {
     position: "absolute",
     top: "25%",
-    left: WINDOW_WIDHT * 0.22,
-    right: WINDOW_WIDHT * 0.22,
     alignItems: "center",
     justifyContent: "center",
     width: 180,
     height: 155,
-    marginBottom: "15%",
-  },
-  teamMate: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: WINDOW_HEIGHT > 800 ? "4%" : "5%",
-    marginTop: WINDOW_HEIGHT > 800 ? "40%" : "45%",
-    backgroundColor: color.activated,
-    width: WINDOW_WIDHT,
-    justifyContent: "space-between",
-    marginBottom: "6%",
-  },
-  teamMateText: {
-    color: "white",
-    paddingLeft: "3%",
-    fontFamily: "SUIT-Regular",
-    fontSize: 12,
-  },
-  plusBtn: {
-    paddingRight: "3%",
-  },
-  addBtnContainer: {
-    alignItems: "center",
-    //marginTop: "4%",
-  },
-  addBtnMargin: {
-    marginTop: 20,
-  },
-  addBtn: {
-    width: 40,
-    height: 40,
+    left: "50%",
+    marginLeft: -90,
+    marginBottom: "10%",
   },
   title: {
     textAlign: "center",

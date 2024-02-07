@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   KeyboardAvoidingView,
+  Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Alert } from "react-native";
@@ -28,7 +29,7 @@ export default function UserInfoInputPage({ route }) {
   const [phoneNumber, setphoneNumber] = useState("");
   const [logIn, setLogIn] = useState(true);
   const [disableBtn, setDisableBtn] = useState(true);
-  const [btnColor, setBtnColor] = useState("#D9D9D9");
+  const [btnColor, setBtnColor] = useState(color.deactivated);
 
   //회원가입 관련 함수
   const uploadInformation = async () => {
@@ -81,15 +82,18 @@ export default function UserInfoInputPage({ route }) {
     signOut(auth);
   };
 
+  const [maxLength, setMaxLength] = useState(15); // 영어일 때의 maxLength
   const isNameEmpty = (text) => {
     setname(text);
     if (!text.trim()) {
       setDisableBtn(true);
-      setBtnColor("#D9D9D9");
+      setBtnColor(color.deactivated);
     } else {
       setDisableBtn(false);
-      setBtnColor("#050026");
+      setBtnColor(color.activated);
     }
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 10 : 15);
   };
 
   return (
@@ -97,7 +101,13 @@ export default function UserInfoInputPage({ route }) {
       {/*head 부분*/}
       <View style={s.headContainer}>
         <TouchableOpacity style={s.headBtn} onPress={previousPage}>
-          <AntDesign name="left" size={20} color="black" />
+          <Image
+            style={{
+              width: 8,
+              height: 14,
+            }}
+            source={require("../images/backBtn.png")}
+          />
         </TouchableOpacity>
         <Text style={s.title}>가입하기</Text>
         <View style={s.titleRightBtn}></View>
@@ -113,7 +123,6 @@ export default function UserInfoInputPage({ route }) {
         />
         {!name.trim() && (
           <Text style={{ color: "red", position: "absolute", marginTop: "8%" }}>
-
             *
           </Text>
         )}
@@ -138,10 +147,8 @@ export default function UserInfoInputPage({ route }) {
           onChangeText={(text) => setschool(text)}
           style={s.textInput}
         />
-
       </View>
       <View style={s.textInputContainer}>
-
         {/*학번 입력창*/}
         <TextInput
           placeholder="학번"

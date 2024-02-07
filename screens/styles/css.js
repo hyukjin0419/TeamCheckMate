@@ -38,11 +38,10 @@ const commonStyles = StyleSheet.create({
   //헤더에 들어가는 타이틀 -> 글꼴수에 따라 marginLeft 수정 바람.
   title: {
     flex: 3,
-    fontWeight: "bold",
     fontSize: 16,
     textAlign: "center",
     fontFamily: "SUIT-Medium",
-    // backgroundColor: "violet",
+    //backgroundColor: "violet",
   },
   //헤더 오른쪽 버튼 (안보일 수 있음, 비율 맞추기 위해 존재)
   titleRightBtn: {
@@ -50,7 +49,7 @@ const commonStyles = StyleSheet.create({
     // backgroundColor: "blue",
   },
   titleRightText: {
-    fontSize: 16,
+    fontSize: 17,
     alignSelf: "flex-end", // 오른쪽 정렬
     fontFamily: "SUIT-Medium",
   },
@@ -180,6 +179,7 @@ const commonStyles = StyleSheet.create({
     marginTop: 20,
     fontFamily: "SUIT-Medium",
     fontSize: 16,
+    textAlign: "center",
   },
   modalItemContainter: {
     flex: 1,
@@ -192,6 +192,56 @@ const commonStyles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     minHeight: 350, // This property determines the minimum height of the modal
+  },
+  modalInsideView: {
+    flexDirection: "column-reverse",
+    flex: 0.9,
+  },
+  BtnContainer: {
+    position: "absolute",
+    bottom: 90,
+    right: 10,
+    paddingHorizontal: "6%",
+    alignItems: "flex-end",
+  },
+  addClassBtn: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginBottom: 12,
+    marginTop: "2%",
+  },
+  addClassBtnText: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    paddingHorizontal: 1,
+    marginRight: 3,
+  },
+  joinClassBtn: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 15,
+  },
+  addBtnContainer: {
+    position: "absolute",
+    right: "1%",
+    bottom: 10,
+    zIndex: 1,
+  },
+  closeBtnContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: "1%",
+  },
+  addOrCloseBtn: {
+    width: 80,
+    height: 80,
   },
 });
 

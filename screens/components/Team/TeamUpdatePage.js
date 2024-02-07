@@ -52,9 +52,10 @@ export default TeamUpdatePage = ({ route }) => {
   };
 
   const [textInputValue, setTextInputValue] = useState(title);
+  const [maxLength, setMaxLength] = useState(40); // 기본값은 영어일 때의 maxLength
 
   /* 문자 입력 시 확인 버튼 활성화  */
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const onTextInputChange = (text) => {
     setTextInputValue(text);
@@ -63,8 +64,10 @@ export default TeamUpdatePage = ({ route }) => {
       setConfirmBtnColor(color.activated);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 20 : 40);
   };
 
   /* 색상 선택 모달창 띄우기/숨기기 (초기값: 숨기기) */
@@ -98,7 +101,13 @@ export default TeamUpdatePage = ({ route }) => {
                 navigation.navigate("TeamPage");
               }}
             >
-              <AntDesign name="left" size={20} color="black" />
+              <Image
+                style={{
+                  width: 8,
+                  height: 14,
+                }}
+                source={require("../../images/backBtn.png")}
+              />
             </TouchableOpacity>
           </View>
 
@@ -127,6 +136,7 @@ export default TeamUpdatePage = ({ route }) => {
             <TextInput
               placeholder={title}
               value={textInputValue}
+              maxLength={maxLength}
               returnKeyType="done"
               onChangeText={onTextInputChange}
               style={styles.colorTextInput}
