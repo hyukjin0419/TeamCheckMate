@@ -181,7 +181,13 @@ const AssignmentPage = () => {
             navigation.navigate("TeamPage");
           }}
         >
-          <AntDesign name="left" size={20} color="black"></AntDesign>
+          <Image
+            style={{
+              width: 8,
+              height: 14,
+            }}
+            source={require("../images/backBtn.png")}
+          />
         </TouchableOpacity>
         <ImageBackground source={openedFileImage} style={styles.openedFile}>
           <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>

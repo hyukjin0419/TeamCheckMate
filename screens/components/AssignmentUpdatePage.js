@@ -157,7 +157,13 @@ export default AssignmentUpdatePage = () => {
               });
             }}
           >
-            <AntDesign name="left" size={20} color="black" />
+            <Image
+              style={{
+                width: 8,
+                height: 14,
+              }}
+              source={require("../images/backBtn.png")}
+            />
           </TouchableOpacity>
 
           <Text style={s.title}>과제 수정</Text>
