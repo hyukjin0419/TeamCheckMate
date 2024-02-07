@@ -51,9 +51,7 @@ export default TeamCheckPage = (props) => {
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
 
   const pressAddBtn = (memberName) => {
-    // 다른 텍스트 입력 창이 열려있는지 확인하고 있다면 닫기
-    Keyboard.dismiss();
-
+    //isWritingNewTask를 순회하면서 현재 선택된 사람이 아니면 textinput을 닫는다.
     Object.keys(isWritingNewTask).forEach((name) => {
       if (name !== memberName && isWritingNewTask[name]) {
         closeTextInput(name);
@@ -68,6 +66,7 @@ export default TeamCheckPage = (props) => {
   };
 
   const closeTextInput = (memberName) => {
+    addNewTask(memberName);
     setIsWritingNewTask((prevIsWritingNewTask) => ({
       ...prevIsWritingNewTask,
       [memberName]: false,
@@ -247,6 +246,8 @@ export default TeamCheckPage = (props) => {
                     onChangeText={(text) => setNewTaskText(text)}
                     onSubmitEditing={() => addNewTask(item.name)}
                     onBlur={() => addNewTask(item.name)}
+                    onEndEditing={() => addNewTask(item.name)}
+                    onPressOut={() => addNewTask(item.name)}
                   />
                   <TouchableOpacity>
                     <Image
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
     marginLeft: "7%",
     justifyContent: "space-evenly",
     paddingVertical: "5%",
-    backgroundColor: "grey",
+    // backgroundColor: "grey",
   },
   dueDateText: {
     color: color.redpink,
