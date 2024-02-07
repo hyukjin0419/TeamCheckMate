@@ -65,7 +65,7 @@ export default TeamAddPage_origin = () => {
   };
 
   //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [textInputValue, setTextInputValue] = useState("");
 
@@ -79,7 +79,7 @@ export default TeamAddPage_origin = () => {
       setConfirmBtnColor(color.activated);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
     //한국어인 경우 제목 글자제한을 20으로 변경
     const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
