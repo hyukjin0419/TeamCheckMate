@@ -396,10 +396,12 @@ const TeamItem = (props) => {
             backdropTransitionOutTiming={0}
           >
             <View style={styles.teamMateModal}>
-              <Image
-                style={styles.teamModalXBtn}
-                source={require("../../images/modalXBtn.png")}
-              ></Image>
+              <TouchableOpacity onPress={handleTeamMateLabelPress}>
+                <Image
+                  style={styles.teamModalXBtn}
+                  source={require("../../images/modalXBtn.png")}
+                ></Image>
+              </TouchableOpacity>
               {/* 선택된 팀원의 이름을 표시합니다. */}
               <View
                 style={{
