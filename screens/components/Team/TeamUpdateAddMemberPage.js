@@ -212,6 +212,7 @@ export default function TeamUpdateAddMemberPage({ route }) {
                 <View>
                   <Text style={styles.emailAddedTitle}>초대할 이메일</Text>
                   <FlatList
+                    keyboardShouldPersistTaps="always"
                     data={addedUserEmailArray}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
