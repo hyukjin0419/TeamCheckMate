@@ -180,6 +180,7 @@ const commonStyles = StyleSheet.create({
     marginTop: 20,
     fontFamily: "SUIT-Medium",
     fontSize: 16,
+    textAlign: "center",
   },
   modalItemContainter: {
     flex: 1,

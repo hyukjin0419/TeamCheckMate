@@ -49,6 +49,7 @@ export default AssignmentAddPage = () => {
 
   const [dueDateValid, setDueDateValid] = useState(false);
   const [assignmentValid, setAssignmentValid] = useState(false);
+  const [maxLength, setMaxLength] = useState(40); // 기본값은 영어일 때의 maxLength
 
   {
     /* 과제이름, 제출기한 둘 다 valid input인 경우 확인버튼 활성화 */
@@ -64,6 +65,8 @@ export default AssignmentAddPage = () => {
       setButtonDisabled(true);
       setConfirmBtnColor(color.deactivated);
     }
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 20 : 40);
   };
   //제출기한
   const [date, setDate] = useState(new Date());
@@ -198,6 +201,7 @@ export default AssignmentAddPage = () => {
             <TextInput
               placeholder="과제 이름"
               onChangeText={handleNameChange}
+              maxLength={maxLength}
               value={assignmentName}
               style={s.textInput}
             ></TextInput>
