@@ -10,6 +10,7 @@ import {
   Dimensions,
   Keyboard,
   TouchableWithoutFeedback,
+  Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
@@ -175,7 +176,13 @@ export default AssignmentAddPage = () => {
               });
             }}
           >
-            <AntDesign name="left" size={20} color="black" />
+            <Image
+              style={{
+                width: 8,
+                height: 14,
+              }}
+              source={require("../images/backBtn.png")}
+            />
           </TouchableOpacity>
 
           <Text style={s.title}>과제 추가</Text>

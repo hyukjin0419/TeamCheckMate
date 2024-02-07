@@ -38,7 +38,6 @@ const commonStyles = StyleSheet.create({
   //헤더에 들어가는 타이틀 -> 글꼴수에 따라 marginLeft 수정 바람.
   title: {
     flex: 3,
-    fontWeight: "bold",
     fontSize: 16,
     textAlign: "center",
     fontFamily: "SUIT-Medium",

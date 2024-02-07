@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import {
@@ -116,7 +117,13 @@ export default function SignInPage({ route }) {
         {/*head 부분*/}
         <View style={s.headContainer}>
           <TouchableOpacity style={s.headBtn} onPress={goingBack}>
-            <AntDesign name="left" size={20} color="black" />
+            <Image
+              style={{
+                width: 8,
+                height: 14,
+              }}
+              source={require("../images/backBtn.png")}
+            />
           </TouchableOpacity>
           <Text style={s.title}>가입하기</Text>
           <View style={s.titleRightBtn}></View>
