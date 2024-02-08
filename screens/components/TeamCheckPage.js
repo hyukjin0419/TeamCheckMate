@@ -16,11 +16,9 @@ import {
   db,
   collection,
   addDoc,
-  auth,
   doc,
-  setDoc,
-  getDoc,
   getDocs,
+  updateDoc,
 } from "../../firebase.js";
 import { query, orderBy, arrayRemove } from "firebase/firestore";
 import React, { useEffect, useState, useRef } from "react";
@@ -80,6 +78,17 @@ export default TeamCheckPage = (props) => {
 
   const addNewTask = async (memberName, isSubmitedByEnter) => {
     if (newTaskText.trim() !== "") {
+      const newChecklist = {
+        writer: memberName,
+        isChecked: false,
+        content: newTaskText,
+        regDate: new Date(),
+        modDate: new Date(),
+      };
+
+      // 새로운 체크리스트를 현재의 체크리스트 목록에 추가
+      setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
+
       const checkListDoc = addDoc(
         collection(
           db,
@@ -91,39 +100,50 @@ export default TeamCheckPage = (props) => {
           memberName,
           "checkList"
         ),
-        {
-          writer: memberName,
-          isWriting: false,
-          isChecked: false,
-          content: newTaskText,
-          regDate: new Date(),
-          modDate: new Date(),
-        }
+        newChecklist
       );
       if (!isSubmitedByEnter) {
         const updatedIsWritingNewTask = { ...isWritingNewTask };
         updatedIsWritingNewTask[memberName] = false;
         setIsWritingNewTask(updatedIsWritingNewTask);
       }
-      getCheckLists();
       setNewTaskText("");
     } else {
       setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
     }
   };
 
-  const handleCheckboxChange = (writer, index, newValue) => {
+  const handleCheckboxChange = async (writer, id, newValue) => {
     // 체크박스 상태 변경
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const updatedChecklists = [...checklists];
-    const checklistToUpdate = updatedChecklists.find(
-      (checklist) => checklist.writer === writer && checklist.index === index
-    );
 
-    if (checklistToUpdate) {
-      checklistToUpdate.isChecked = newValue;
-      checklistToUpdate.modDate = new Date();
-      setChecklists(updatedChecklists);
+    const updatedChecklists = checklists.map((checklist) =>
+      checklist.writer === writer && checklist.id === id
+        ? { ...checklist, isChecked: newValue, modDate: new Date() }
+        : checklist
+    );
+    setChecklists(updatedChecklists);
+
+    // Firestore에 업데이트 반영
+    try {
+      // 각 체크리스트에 대해 업데이트 명령 추가
+      const docRef = doc(
+        db,
+        "team",
+        teamCode,
+        "과제 list",
+        assignmentId,
+        "memberName",
+        writer,
+        "checkList",
+        id // 해당 체크리스트의 ID를 사용하여 문서를 참조합니다.
+      );
+      await updateDoc(docRef, {
+        isChecked: newValue,
+        modDate: new Date(),
+      });
+    } catch (error) {
+      console.error("Error updating documents: ", error);
     }
   };
 
@@ -147,7 +167,9 @@ export default TeamCheckPage = (props) => {
             orderBy("regDate", "asc")
           )
         );
-        checkList.push(...querySnapshot.docs.map((doc) => doc.data()));
+        checkList.push(
+          ...querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
       })
     );
 
@@ -255,14 +277,18 @@ export default TeamCheckPage = (props) => {
               {/* 체크리스트 항목 추가 입력 창 */}
               {checklists
                 .filter((checklist) => checklist.writer === item.name)
-                .map((checklist, index) => (
-                  <View key={index} style={styles.checkBoxContainer}>
+                .map((checklist) => (
+                  <View key={checklist.id} style={styles.checkBoxContainer}>
                     <Checkbox
                       value={checklist.isChecked}
                       style={styles.checkbox}
                       color={fileColor}
                       onValueChange={(newValue) =>
-                        handleCheckboxChange(checklist.writer, index, newValue)
+                        handleCheckboxChange(
+                          checklist.writer,
+                          checklist.id,
+                          newValue
+                        )
                       }
                     />
                     <Text style={styles.checkBoxContent}>
