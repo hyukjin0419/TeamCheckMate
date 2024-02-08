@@ -9,7 +9,6 @@ import {
   FlatList,
   Image,
   ScrollView,
-  Modal,
   TouchableWithoutFeedback,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -17,8 +16,9 @@ import { useNavigation } from "@react-navigation/core";
 import React, { useState, useEffect } from "react";
 import { color } from "../styles/colors";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
-import { db, doc, getDocs, collection, auth } from "../../firebase";
+import { db, doc, getDocs, collection, auth, getDoc } from "../../firebase";
 import AssignmentItem from "./AssignmentItem";
+import Modal from "react-native-modal";
 import s from "../styles/css";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 구하는 코드
@@ -33,12 +33,21 @@ const AssignmentPage = () => {
   //TeamItem에서 정보 가져오기
   const route = useRoute();
   const {
-    teamCode: teamCode,
     title: title,
     fileColor: fileColor,
-    memberInfo: memberInfo,
-    memberNames: memberNames,
+    teamCode: teamCode,
   } = route.params;
+
+  const [memberNames, setMemberNames] = useState([]);
+  const [memberInfo, setMemberInfo] = useState([]);
+  //멤버 전화번호 문자 배열
+  const [memberPhoneNumbers, setMemberPhoneNumbers] = useState([]);
+  //멤버 학교 문자 배열
+  const [memberSchools, setMemberSchools] = useState([]);
+  //멤버 학번 문자 배열
+  const [memberStudentNumbers, setMemberStudentNumbers] = useState([]);
+  //멤버 학번 문자 배열
+  const [memberEmails, setMemberEmails] = useState([]);
 
   const [openedFileImage, setOpenedFileImage] = useState(
     require("../images/OpenedFileColor/9CB1BB.png")
@@ -122,6 +131,25 @@ const AssignmentPage = () => {
 
   const [assignmentList, setAssignmentList] = useState([]);
 
+  //팀메이트 정보 모달창
+  const [teamMateModalVisible, setTeamMateModalVisible] = useState(false);
+  const [selectedTeamMateName, setSelectedTeamMateName] = useState("");
+  const [selectedTeamMatePhoneNumber, setSelectedTeamMatePhoneNumber] =
+    useState("");
+  const [selectedTeamMateSchool, setSelectedTeamMateSchool] = useState("");
+  const [selectedTeamMateStudentNumber, setSelectedTeamMateStudentNumber] =
+    useState("");
+  const [selectedTeamMateEmail, setSelectedTeamMateEmail] = useState("");
+
+  const handleTeamMateLabelPress = (index) => {
+    setSelectedTeamMateName(memberNames[index]);
+    setSelectedTeamMatePhoneNumber(memberPhoneNumbers[index]);
+    setSelectedTeamMateSchool(memberSchools[index]);
+    setSelectedTeamMateStudentNumber(memberStudentNumbers[index]);
+    setSelectedTeamMateEmail(memberEmails[index]);
+    setTeamMateModalVisible(!teamMateModalVisible);
+  };
+
   const getAssignmentList = async () => {
     try {
       // "team" collection에 접근
@@ -159,6 +187,80 @@ const AssignmentPage = () => {
   const handlePress = () => {
     setShowModal(!showModal);
   };
+
+  //팀원 정보 불러오기
+  const getMembers = async () => {
+    try {
+      const teamRef = doc(db, "team", teamCode);
+      const teamDoc = await getDoc(teamRef);
+
+      if (teamDoc.exists()) {
+        const memberRef = collection(teamRef, "members");
+        const memberSnapshot = await getDocs(memberRef);
+
+        const memberList = memberSnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const name = data.name;
+          const email = data.email;
+          const phoneNumber = data.phoneNumber || null;
+          const school = data.school || null;
+          const studentNumber = data.studentNumber || null;
+          console.log(memberList);
+
+          return {
+            id: doc.id,
+            name,
+            phoneNumber,
+            school,
+            studentNumber,
+            email,
+          };
+        });
+
+        // 상태 업데이트
+        setMemberInfo(memberList);
+        //멤버 이름
+        const memberNameList = memberList.map((member) => member.name || null);
+        setMemberNames(memberNameList);
+        //멤버 전화번호
+        const memberPhoneNumberList = memberList.map(
+          (member) => member.phoneNumber || null
+        );
+        setMemberPhoneNumbers(memberPhoneNumberList);
+        //멤버 학교
+        const memberSchoolList = memberList.map(
+          (member) => member.school || null
+        );
+        setMemberSchools(memberSchoolList);
+        //멤버 학번
+        const memberStudentNumberList = memberList.map(
+          (member) => member.studentNumber || null
+        );
+        setMemberStudentNumbers(memberStudentNumberList);
+        //멤버 이메일
+        const memberEmailList = memberList.map(
+          (member) => member.email || null
+        );
+        setMemberEmails(memberEmailList);
+
+        // 이제 memberInfo에는 members 컬렉션에 있는 문서들이 객체 배열로 저장되어 있습니다.
+        // console.log(memberInfo);
+        // console.log(memberNames);
+      } else {
+        console.log("팀 문서가 존재하지 않습니다.");
+        throw new Error("팀 문서가 존재하지 않습니다."); // 또는 다른 적절한 처리
+      }
+    } catch (error) {
+      console.error("데이터를 불러오는 중 오류가 발생했습니다.", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    getMembers();
+    console.log(memberInfo);
+    console.log(memberNames);
+  }, []);
 
   return (
     <View
@@ -213,11 +315,15 @@ const AssignmentPage = () => {
                   style={s.addClassBtn}
                   onPress={() => {
                     navigation.navigate("AssignmentAddPage", {
-                      teamCode: teamCode,
                       title: title,
                       fileColor: fileColor,
+                      teamCode: teamCode,
                       memberInfo: memberInfo,
                       memberNames: memberNames,
+                      memberPhoneNumbers: memberPhoneNumbers,
+                      memberEmails: memberEmails,
+                      memberSchools: memberSchools,
+                      memberStudentNumbers: memberStudentNumbers,
                     });
                     handlePress();
                   }}
@@ -285,12 +391,13 @@ const AssignmentPage = () => {
             horizontal={true}
             data={memberNames}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
+            renderItem={({ item, index }) => (
               <TouchableOpacity
                 style={{
                   ...styles.teamMateBtn,
                   borderColor: fileColor,
                 }}
+                onPress={() => handleTeamMateLabelPress(index)}
               >
                 <Text style={styles.teamMateBtnText}>{item}</Text>
               </TouchableOpacity>
@@ -298,6 +405,51 @@ const AssignmentPage = () => {
           />
         </View>
       </ScrollView>
+      <Modal
+        onBackdropPress={handleTeamMateLabelPress}
+        isVisible={teamMateModalVisible}
+        animationIn="zoomIn"
+        animationOut="zoomOut"
+        animationInTiming={300}
+        animationOutTiming={200}
+        backdropTransitionInTiming={0}
+        backdropTransitionOutTiming={0}
+      >
+        <View style={styles.teamMateModal}>
+          <TouchableOpacity onPress={handleTeamMateLabelPress}>
+            <Image
+              style={styles.teamModalXBtn}
+              source={require("../images/modalXBtn.png")}
+            ></Image>
+          </TouchableOpacity>
+          {/* 선택된 팀원의 이름을 표시합니다. */}
+          <View
+            style={{
+              ...styles.teamMateBtn,
+              borderColor: fileColor,
+              alignSelf: "center",
+              marginTop: 15,
+            }}
+            onPress={() => handleTeamMateLabelPress(index)}
+          >
+            <Text style={styles.teamMateBtnText}>{selectedTeamMateName}</Text>
+          </View>
+          <View marginTop="5%">
+            <Text style={styles.teamMateDataText}>
+              이메일: {selectedTeamMateEmail}
+            </Text>
+            <Text style={styles.teamMateDataText}>
+              학교: {selectedTeamMateSchool}
+            </Text>
+            <Text style={styles.teamMateDataText}>
+              학번: {selectedTeamMateStudentNumber}
+            </Text>
+            <Text style={styles.teamMateDataText}>
+              전화번호: {selectedTeamMatePhoneNumber}
+            </Text>
+          </View>
+        </View>
+      </Modal>
       {/* Parent View for both FlatLists */}
       <View style={{ flex: 18 }}>
         {/* 과제 리스트 */}
@@ -396,5 +548,24 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: "30%",
     marginTop: WINDOW_HEIGHT > 700 ? "10%" : "10.5%",
+  },
+  teamMateModal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    minHeight: "25%",
+    marginBottom: "10%",
+  },
+  teamModalXBtn: {
+    position: "absolute",
+    right: 12,
+    top: 12,
+    width: 30,
+    height: 30,
+  },
+  teamMateDataText: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginHorizontal: "10%",
+    marginBottom: "3%",
   },
 });
