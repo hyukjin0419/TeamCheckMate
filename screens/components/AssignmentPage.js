@@ -298,73 +298,75 @@ const AssignmentPage = () => {
         </ImageBackground>
       </View>
       <Modal
-        //animationType="fade"
-        transparent={true}
-        visible={showModal}
-        animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
-        animationOutTiming={20}
+        isVisible={showModal}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        animationInTiming={100}
+        animationOutTiming={100}
+        backdropTransitionInTiming={0}
+        backdropTransitionOutTiming={0}
+        onBackdropPress={handlePress}
+        backdropOpacity={0.7}
       >
-        <TouchableWithoutFeedback onPress={handlePress}>
-          {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
-          <View style={styles.modalView}>
-            <View style={s.modalInsideView}>
-              {/* 버튼 두개: 과제추가 버튼 & 팀원추가 버튼 */}
-              <View style={s.BtnContainer} onPress={handlePress}>
-                {/* 과제추가 버튼: 과제추가 페이지로 넘어가는 버튼 */}
-                <TouchableOpacity
-                  style={s.addClassBtn}
-                  onPress={() => {
-                    navigation.navigate("AssignmentAddPage", {
-                      title: title,
-                      fileColor: fileColor,
-                      teamCode: teamCode,
-                      memberInfo: memberInfo,
-                      memberNames: memberNames,
-                      memberPhoneNumbers: memberPhoneNumbers,
-                      memberEmails: memberEmails,
-                      memberSchools: memberSchools,
-                      memberStudentNumbers: memberStudentNumbers,
-                    });
-                    handlePress();
-                  }}
-                >
-                  <Text style={s.addClassBtnText}>과제 추가</Text>
-                  <Image
-                    source={require("../images/icons/AssignmentAdd.png")}
-                    style={{ width: 20, height: 20 }}
-                  />
-                </TouchableOpacity>
-                {/* 팀원추가: 팀원추가 페이지로 넘어가는 버튼 */}
-                <TouchableOpacity
-                  style={s.joinClassBtn}
-                  onPress={() => {
-                    navigation.navigate("TeamUpdateAddMemberPage", {
-                      teamId: teamCode,
-                    }),
-                      setShowModal(false);
-                  }}
-                >
-                  <Text style={s.addClassBtnText}>팀원 추가</Text>
-                  <Image
-                    source={require("../images/icons/TeamMateAdd.png")}
-                    style={{ width: 20, height: 20 }}
-                  />
-                </TouchableOpacity>
-              </View>
-              {/* 엑스 버튼 */}
+        {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
+        <View style={styles.modalView}>
+          <View style={s.modalInsideView}>
+            {/* 버튼 두개: 과제추가 버튼 & 팀원추가 버튼 */}
+            <View style={s.BtnContainer} onPress={handlePress}>
+              {/* 과제추가 버튼: 과제추가 페이지로 넘어가는 버튼 */}
               <TouchableOpacity
-                style={styles.closeBtnContainer}
-                onPress={handlePress}
-                activeOpacity={1}
+                style={s.addClassBtn}
+                onPress={() => {
+                  navigation.navigate("AssignmentAddPage", {
+                    title: title,
+                    fileColor: fileColor,
+                    teamCode: teamCode,
+                    memberInfo: memberInfo,
+                    memberNames: memberNames,
+                    memberPhoneNumbers: memberPhoneNumbers,
+                    memberEmails: memberEmails,
+                    memberSchools: memberSchools,
+                    memberStudentNumbers: memberStudentNumbers,
+                  });
+                  handlePress();
+                }}
               >
+                <Text style={s.addClassBtnText}>과제 추가</Text>
                 <Image
-                  style={styles.addOrCloseBtn}
-                  source={require("../images/CloseClassAddBtn.png")}
-                ></Image>
+                  source={require("../images/icons/AssignmentAdd.png")}
+                  style={{ width: 20, height: 20 }}
+                />
+              </TouchableOpacity>
+              {/* 팀원추가: 팀원추가 페이지로 넘어가는 버튼 */}
+              <TouchableOpacity
+                style={s.joinClassBtn}
+                onPress={() => {
+                  navigation.navigate("TeamUpdateAddMemberPage", {
+                    teamId: teamCode,
+                  }),
+                    setShowModal(false);
+                }}
+              >
+                <Text style={s.addClassBtnText}>팀원 추가</Text>
+                <Image
+                  source={require("../images/icons/TeamMateAdd.png")}
+                  style={{ width: 20, height: 20 }}
+                />
               </TouchableOpacity>
             </View>
+            {/* 엑스 버튼 */}
+            <TouchableOpacity
+              style={styles.closeBtnContainer}
+              onPress={handlePress}
+              activeOpacity={1}
+            >
+              <Image
+                style={styles.addOrCloseBtn}
+                source={require("../images/CloseClassAddBtn.png")}
+              ></Image>
+            </TouchableOpacity>
           </View>
-        </TouchableWithoutFeedback>
+        </View>
       </Modal>
       <ScrollView
         alignSelf="center"
@@ -496,9 +498,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   modalView: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     flexDirection: "column",
+    width: WINDOW_WIDHT,
+    height: WINDOW_HEIGHT,
+    alignSelf: "center",
   },
   addBtnContainer: {
     position: "absolute",
