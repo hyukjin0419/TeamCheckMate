@@ -12,6 +12,15 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
+import {
+  db,
+  collection,
+  addDoc,
+  doc,
+  getDocs,
+  updateDoc,
+} from "../../firebase.js";
+import { query, orderBy, arrayRemove } from "firebase/firestore";
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
@@ -38,14 +47,8 @@ export default TeamCheckPage = (props) => {
     dueDate,
   } = route.params;
 
-  /*
-필요한 함수가 뭘까..
-1. 플러스 버튼 눌렀을 때 입력창이 열려야함 -> 입력창 state
-2. 입력창이 입력이 끝났을 때 checklists에 체크박스컨테이너 하나가 추가 되어야함 (addTask)
-3. 만약 체크박스 눌렀을 때 상태가 바뀌어야 함
-4. update 및 delete도 구현해야 함
-*/
-
+  //체크리스트를 전부 가지고 있는 객체 배열. 하나의 객체는 하나의 체크를 뜻한다
+  //key값은 writer.
   const [checklists, setChecklists] = useState([]);
   const [newTaskText, setNewTaskText] = useState("");
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
@@ -73,72 +76,115 @@ export default TeamCheckPage = (props) => {
     }));
   };
 
-  const addNewTask = (memberName) => {
+  const addNewTask = async (memberName, isSubmitedByEnter) => {
     if (newTaskText.trim() !== "") {
-      const updatedChecklists = [...checklists];
-      updatedChecklists.push({
+      const newChecklist = {
         writer: memberName,
-        index: updatedChecklists.filter(
-          (checklist) => checklist.writer === memberName
-        ).length,
-        isWriting: false,
         isChecked: false,
         content: newTaskText,
         regDate: new Date(),
         modDate: new Date(),
-      });
-      setChecklists(updatedChecklists);
+      };
 
-      const updatedIsWritingNewTask = { ...isWritingNewTask };
-      updatedIsWritingNewTask[memberName] = false;
-      setIsWritingNewTask(updatedIsWritingNewTask);
+      // 새로운 체크리스트를 현재의 체크리스트 목록에 추가
+      setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
 
-      // 입력창 비우기
+      const checkListDoc = addDoc(
+        collection(
+          db,
+          "team",
+          teamCode,
+          "과제 list",
+          assignmentId,
+          "memberName",
+          memberName,
+          "checkList"
+        ),
+        newChecklist
+      );
+      if (!isSubmitedByEnter) {
+        const updatedIsWritingNewTask = { ...isWritingNewTask };
+        updatedIsWritingNewTask[memberName] = false;
+        setIsWritingNewTask(updatedIsWritingNewTask);
+      }
       setNewTaskText("");
     } else {
       setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
     }
   };
 
-  const continueAddingNewTask = (memberName) => {
-    if (newTaskText.trim() !== "") {
-      const updatedChecklists = [...checklists];
-      updatedChecklists.push({
-        writer: memberName,
-        index: updatedChecklists.filter(
-          (checklist) => checklist.writer === memberName
-        ).length,
-        isWriting: false,
-        isChecked: false,
-        content: newTaskText,
-        regDate: new Date(),
-        modDate: new Date(),
-      });
-      setChecklists(updatedChecklists);
 
-      // 입력창 비우기
-      setNewTaskText("");
-    } else {
-      setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
-    }
-  };
-
-  const handleCheckboxChange = (writer, index, newValue) => {
+  const handleCheckboxChange = async (writer, id, newValue) => {
     // 체크박스 상태 변경
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const updatedChecklists = [...checklists];
-    const checklistToUpdate = updatedChecklists.find(
-      (checklist) => checklist.writer === writer && checklist.index === index
-    );
 
-    if (checklistToUpdate) {
-      checklistToUpdate.isChecked = newValue;
-      checklistToUpdate.modDate = new Date();
-      setChecklists(updatedChecklists);
+    const updatedChecklists = checklists.map((checklist) =>
+      checklist.writer === writer && checklist.id === id
+        ? { ...checklist, isChecked: newValue, modDate: new Date() }
+        : checklist
+    );
+    setChecklists(updatedChecklists);
+
+    // Firestore에 업데이트 반영
+    try {
+      // 각 체크리스트에 대해 업데이트 명령 추가
+      const docRef = doc(
+        db,
+        "team",
+        teamCode,
+        "과제 list",
+        assignmentId,
+        "memberName",
+        writer,
+        "checkList",
+        id // 해당 체크리스트의 ID를 사용하여 문서를 참조합니다.
+      );
+      await updateDoc(docRef, {
+        isChecked: newValue,
+        modDate: new Date(),
+      });
+    } catch (error) {
+      console.error("Error updating documents: ", error);
     }
   };
-  console.log(JSON.stringify(checklists, null, 2));
 
+  const getCheckLists = async () => {
+    const checkList = [];
+
+    await Promise.all(
+      memberNames.map(async (memberName) => {
+        const querySnapshot = await getDocs(
+          query(
+            collection(
+              db,
+              "team",
+              teamCode,
+              "과제 list",
+              assignmentId,
+              "memberName",
+              memberName,
+              "checkList"
+            ),
+            orderBy("regDate", "asc")
+          )
+        );
+        checkList.push(
+          ...querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
+      })
+    );
+
+    // console.log("[TeamCheckPage]:asdf ", checkList);
+    setChecklists(checkList);
+  };
+
+
+  useEffect(() => {
+    getCheckLists();
+    console.log("[TeamCheckPage]: ", checklists);
+  }, []);
+
+  console.log(JSON.stringify(checklists, null, 2));
   return (
     //헤더 부분
     <KeyboardAvoidingView
@@ -231,14 +277,18 @@ export default TeamCheckPage = (props) => {
               {/* 체크리스트 항목 추가 입력 창 */}
               {checklists
                 .filter((checklist) => checklist.writer === item.name)
-                .map((checklist, index) => (
-                  <View key={index} style={styles.checkBoxContainer}>
+                .map((checklist) => (
+                  <View key={checklist.id} style={styles.checkBoxContainer}>
                     <Checkbox
                       value={checklist.isChecked}
                       style={styles.checkbox}
                       color={fileColor}
                       onValueChange={(newValue) =>
-                        handleCheckboxChange(checklist.writer, index, newValue)
+                        handleCheckboxChange(
+                          checklist.writer,
+                          checklist.id,
+                          newValue
+                        )
                       }
                     />
                     <Text style={styles.checkBoxContent}>
@@ -264,8 +314,8 @@ export default TeamCheckPage = (props) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => continueAddingNewTask(item.name)}
-                    onBlur={() => addNewTask(item.name)}
+                    onSubmitEditing={() => addNewTask(item.name, true)}
+                    onBlur={() => addNewTask(item.name, false)}
                     blurOnSubmit={false}
                   />
                   <TouchableOpacity>
