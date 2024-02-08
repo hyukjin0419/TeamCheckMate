@@ -36,42 +36,24 @@ export default PersonalPageBtn = () => {
       <StatusBar style={"dark"}></StatusBar>
       <View style={s.headContainer}></View>
       {/* 팀 추가에 점근할 수 있는 버튼 */}
-      <TouchableOpacity style={styles.AddBtnContainer} onPress={handlePress}>
-        <Image
-          style={styles.addOrCloseBtn}
-          source={require("../../images/categoryAddBtn.png")}
-        ></Image>
-
-        {/* 모달 뷰 */}
-        <Modal
-          style={styles.modalView}
-          // animationType="fade"
-          transparent={true}
-          visible={showModal}
-          animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
-          animationOutTiming={20}
-        >
-          <TouchableWithoutFeedback onPress={handlePress}>
-            {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
-            <View style={styles.modalView}>
-              <View style={s.headContainer}></View>
-              {/* 엑스 버튼 */}
-              <TouchableOpacity
-                style={styles.AddBtnContainer}
-                onPress={handlePress}
-              >
-                <Image
-                  style={{...styles.addOrCloseBtn}}
-                  source={require("../../images/categoryCloseBtn.png")}
-                ></Image>
-              </TouchableOpacity>
+      <Modal
+        //animationType="fade"
+        transparent={true}
+        visible={showModal}
+        animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
+        animationOutTiming={20}
+      >
+        <TouchableWithoutFeedback onPress={handlePress}>
+          {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
+          <View style={styles.modalView}>
+            <View style={styles.modalInsideView}>
               {/* 버튼 두개: 팀 등록 버튼 & 팀 참여하기 버튼 */}
               <View style={styles.twoBtnContainer} onPress={handlePress}>
                 {/* 팀 등록 버튼: 팀등록 페이지로 넘어가는 버튼 */}
                 <TouchableOpacity
                   style={styles.addCategoryBtn}
                   onPress={() => {
-                    navigation.navigate(), setShowModal(false);
+                    navigation.navigate("CategoryAdd"), setShowModal(false);
                   }}
                 >
                   <Text style={styles.categoryManageText}>카테고리 등록</Text>
@@ -93,15 +75,27 @@ export default PersonalPageBtn = () => {
                     style={{ width: 16, height: 16 }}
                   />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("TeamJoinPage"), setShowModal(false);
-                  }}
-                ></TouchableOpacity>
               </View>
+              {/* 엑스 버튼 */}
+              <TouchableOpacity
+                style={styles.closeBtnContainer}
+                onPress={handlePress}
+                activeOpacity={1}
+              >
+                <Image
+                  style={styles.addOrCloseBtn}
+                  source={require("../../images/CloseClassAddBtn.png")}
+                ></Image>
+              </TouchableOpacity>
             </View>
-          </TouchableWithoutFeedback>
-        </Modal>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+      <TouchableOpacity style={styles.addBtnContainer} onPress={handlePress}>
+        <Image
+          style={styles.addOrCloseBtn}
+          source={require("../../images/ClassAddBtn.png")}
+        ></Image>
       </TouchableOpacity>
     </View>
   );
@@ -112,34 +106,36 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
-  AddBtnContainer: {
-    alignItems: "flex-end",
-    paddingBottom: "2%",
-    paddingHorizontal: "5%",
+  addBtnContainer: {
     position: "absolute",
-    bottom: 22,
-    marginLeft: "70%",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.45,
-    shadowRadius: 4,
+    right: "1%",
+    bottom: 10,
+    zIndex: 1,
+  },
+  closeBtnContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: "1%",
   },
   addOrCloseBtn: {
-    width: 50,
-    height: 50,
-    marginRight: "2%",
+    width: 80,
+    height: 80,
   },
   modalView: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flexDirection: "column",
+  },
+  modalInsideView: {
+    flexDirection: "column-reverse",
+    flex: 0.9,
   },
   twoBtnContainer: {
+    position: "absolute",
+    bottom: 90,
+    right: 10,
     paddingHorizontal: "6%",
     alignItems: "flex-end",
-    justifyContent: "center",
   },
   addCategoryBtn: {
     backgroundColor: "white",
