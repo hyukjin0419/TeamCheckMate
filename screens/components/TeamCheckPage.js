@@ -113,6 +113,7 @@ export default TeamCheckPage = (props) => {
     }
   };
 
+
   const handleCheckboxChange = async (writer, id, newValue) => {
     // 체크박스 상태 변경
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -177,13 +178,13 @@ export default TeamCheckPage = (props) => {
     setChecklists(checkList);
   };
 
+
   useEffect(() => {
     getCheckLists();
     console.log("[TeamCheckPage]: ", checklists);
   }, []);
 
   console.log(JSON.stringify(checklists, null, 2));
-
   return (
     //헤더 부분
     <KeyboardAvoidingView
@@ -217,7 +218,6 @@ export default TeamCheckPage = (props) => {
 
       <View style={styles.teamMembersNamesArrayContainer}>
         {/* Display the 팀메이트 */}
-
         <TouchableOpacity
           style={{
             ...styles.teamMateContainer,
@@ -442,7 +442,6 @@ const styles = StyleSheet.create({
     width: "90%",
     display: "flex",
     flexDirection: "row",
-
     // backgroundColor: "violet",
     marginBottom: "7%",
     alignSelf: "center",

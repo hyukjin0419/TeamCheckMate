@@ -7,27 +7,30 @@ import {
   Image,
   TouchableWithoutFeedback,
   TextInput,
+  FlatList,
  } from "react-native";
+import * as React from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import Checkbox from "expo-checkbox"
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { EvilIcons } from "@expo/vector-icons";
 import { showToast, toastConfig } from "../components/Toast";
-import Modal from "react-native-modal"
+import Modal from "react-native-modal";
 import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import s from "../styles/css.js"
 import PersonalPageBtn from "./PersonalPageFolder/PersonalPageBtn";
 import WeeklyCalendar from "./PersonalPageFolder/WeeklyCalendar";
+import CategoryItem from "./CategoryItem";
 
 
 const PersonalPage = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [isSelected, setSelection] = useState(false);
-  const [isSelected1, setSelection1] = useState(false);
+  const [categoryList, setCategoryList] = useState([]);
+  const email = auth.currentUser.email;
 
     // Visibility of modal
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -36,10 +39,35 @@ const PersonalPage = () => {
     setIsModalVisible(!isModalVisible);
   };
 
-  const handlePress = () => {
-    setShowModal(!showModal);
-  };
+  const getCategoryList = async() => {
+    try {
+      const userDocRef = doc(db, "user", email);
+      const userCategoryRef = collection(userDocRef, "personalCheckList");
+      const querySnapshot1 = await getDocs(query(userCategoryRef));
+      if(!querySnapshot1.empty) {
+        const list = [];
+        querySnapshot1.forEach((doc) => {
+          list.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+        setCategoryList(list);
+        console.log(categoryList);
+      } else {
+        return;
+      }
+    } catch (error) {
+      console.error("Error getting category: ", error);
+    }
+  }
+  
 
+  useFocusEffect( 
+    React.useCallback(() => {
+      getCategoryList();
+    }, [])
+  );
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -65,8 +93,8 @@ const PersonalPage = () => {
       }
     }
     fetchUserData();
+    getCategoryList();
   }, [userEmail]);
-
 
   return(
     <View style={styles.container}>
@@ -75,45 +103,14 @@ const PersonalPage = () => {
         <PersonalPageBtn />
       </View> */}
       <Text style={styles.titleHeader}>{userName} 님 환영합니다</Text>
-      <WeeklyCalendar style={{marginBottom: "10%"}}/>
-      <TouchableOpacity
-        style={styles.categoryClassBtn}
-      >
-        <Text style={styles.addClassBtnText}>팀 등록</Text>
-        <Image
-          source={require("../images/ClassAddBtn.png")}
-          style={{ width: 20, height: 20 }}
-        />
-      </TouchableOpacity>
-      <View style={{flexDirection: "row", marginTop: "2%"}}>
-        <Checkbox
-          value={isSelected}
-          onValueChange={setSelection}
-          style={styles.checkbox}
-          color="#D7D2FF"
-        />
-          <Text style={styles.checkText}>LMS 파일 제출하기</Text>
-        <Text style={{...styles.optionSelect, fontWeight: "bold"}}>. . .</Text>
-      </View>
-      <View style={{flexDirection: "row", marginTop: "5%"}}>
-        <Checkbox
-          value={isSelected1}
-          onValueChange={setSelection1}
-          style={styles.checkbox}
-          color="#D7D2FF"
-        />
-          <Text style={styles.checkText}>그래프 1 완성</Text>
-          <TouchableOpacity onPress={toggleModal} style={styles.optionSelect}>
-            <Text style={{fontWeight: "bold", fontSize: 18}}>. . .</Text>
-          </TouchableOpacity>
-      </View>
+      <WeeklyCalendar style={{marginBottom: "5%"}}/>
+
+      {/* Go to CategoryItem.js and pass the categoryList value to it */}
+      <CategoryItem
+        categoryList={categoryList}
+      />
+
       <PersonalPageBtn />
-      {/* <View>
-        <TextInput 
-          onChangeText={(text) => setEmail(text)}
-          style={s.textInput}
-        />
-      </View> */}
 
       {/* modal code */}
       <Modal
@@ -196,12 +193,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginTop: "2%",
   },
-  addClassBtnText: {
-    fontFamily: "SUIT-Regular",
-    fontSize: 14,
-    paddingHorizontal: 1,
-    marginRight: 3,
-  },
   joinClassBtn: {
     backgroundColor: "white",
     padding: 10,
@@ -209,19 +200,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 15,
-  },
-  categoryClassBtn: {
-    backgroundColor: "#D7D2FF",
-    width: "50%",
-    padding: 10,
-    borderRadius: 24,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    marginBottom: 12,
-    marginTop: "2%",
-    marginLeft: "3%",
-    justifyContent: "space-between"
   },
     modalContent: {
     backgroundColor: "white",
@@ -274,20 +252,5 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: 400,
     color: "white",
-  },
-  checkbox: {
-    marginLeft: "8%",
-    borderRadius: 6,
-  },
-  checkText: {
-    marginLeft: "3%",
-    fontFamily: "SUIT-Regular"
-  },
-  optionSelect: {
-    marginRight: "6%",
-    fontSize: 18,
-    position: "absolute",
-    right: 0,
-    top: -7
   },
 });
