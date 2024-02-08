@@ -38,14 +38,8 @@ export default TeamCheckPage = (props) => {
     dueDate,
   } = route.params;
 
-  /*
-필요한 함수가 뭘까..
-1. 플러스 버튼 눌렀을 때 입력창이 열려야함 -> 입력창 state
-2. 입력창이 입력이 끝났을 때 checklists에 체크박스컨테이너 하나가 추가 되어야함 (addTask)
-3. 만약 체크박스 눌렀을 때 상태가 바뀌어야 함
-4. update 및 delete도 구현해야 함
-*/
-
+  //체크리스트를 전부 가지고 있는 객체 배열. 하나의 객체는 하나의 체크를 뜻한다
+  //key값은 writer.
   const [checklists, setChecklists] = useState([]);
   const [newTaskText, setNewTaskText] = useState("");
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
@@ -73,11 +67,12 @@ export default TeamCheckPage = (props) => {
     }));
   };
 
-  const addNewTask = (memberName) => {
+  const addNewTask = (memberName, isSubmitedByEnter) => {
     if (newTaskText.trim() !== "") {
       const updatedChecklists = [...checklists];
       updatedChecklists.push({
         writer: memberName,
+        //이 구문을 통해 사용자마다
         index: updatedChecklists.filter(
           (checklist) => checklist.writer === memberName
         ).length,
@@ -89,34 +84,11 @@ export default TeamCheckPage = (props) => {
       });
       setChecklists(updatedChecklists);
 
-      const updatedIsWritingNewTask = { ...isWritingNewTask };
-      updatedIsWritingNewTask[memberName] = false;
-      setIsWritingNewTask(updatedIsWritingNewTask);
-
-      // 입력창 비우기
-      setNewTaskText("");
-    } else {
-      setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
-    }
-  };
-
-
-  const continueAddingNewTask = (memberName) => {
-    if (newTaskText.trim() !== "") {
-      const updatedChecklists = [...checklists];
-      updatedChecklists.push({
-        writer: memberName,
-        index: updatedChecklists.filter(
-          (checklist) => checklist.writer === memberName
-        ).length,
-        isWriting: false,
-        isChecked: false,
-        content: newTaskText,
-        regDate: new Date(),
-        modDate: new Date(),
-      });
-      setChecklists(updatedChecklists);
-
+      if (!isSubmitedByEnter) {
+        const updatedIsWritingNewTask = { ...isWritingNewTask };
+        updatedIsWritingNewTask[memberName] = false;
+        setIsWritingNewTask(updatedIsWritingNewTask);
+      }
       // 입력창 비우기
       setNewTaskText("");
     } else {
@@ -138,8 +110,8 @@ export default TeamCheckPage = (props) => {
       setChecklists(updatedChecklists);
     }
   };
-  console.log(JSON.stringify(checklists, null, 2));
 
+  console.log(JSON.stringify(checklists, null, 2));
 
   return (
     //헤더 부분
@@ -267,8 +239,8 @@ export default TeamCheckPage = (props) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => continueAddingNewTask(item.name)}
-                    onBlur={() => addNewTask(item.name)}
+                    onSubmitEditing={() => addNewTask(item.name, true)}
+                    onBlur={() => addNewTask(item.name, false)}
                     blurOnSubmit={false}
                   />
                   <TouchableOpacity>
