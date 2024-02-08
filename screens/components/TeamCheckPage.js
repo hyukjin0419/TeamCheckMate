@@ -12,6 +12,15 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
+import {
+  db,
+  collection,
+  addDoc,
+  auth,
+  doc,
+  setDoc,
+  getDoc,
+} from "../../firebase.js";
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
@@ -67,29 +76,33 @@ export default TeamCheckPage = (props) => {
     }));
   };
 
-  const addNewTask = (memberName, isSubmitedByEnter) => {
+  const addNewTask = async (memberName, isSubmitedByEnter) => {
     if (newTaskText.trim() !== "") {
-      const updatedChecklists = [...checklists];
-      updatedChecklists.push({
-        writer: memberName,
-        //이 구문을 통해 사용자마다
-        index: updatedChecklists.filter(
-          (checklist) => checklist.writer === memberName
-        ).length,
-        isWriting: false,
-        isChecked: false,
-        content: newTaskText,
-        regDate: new Date(),
-        modDate: new Date(),
-      });
-      setChecklists(updatedChecklists);
-
+      const checkListDoc = addDoc(
+        collection(
+          db,
+          "team",
+          teamCode,
+          "과제 list",
+          assignmentId,
+          "memberName",
+          memberName,
+          "checkList"
+        ),
+        {
+          writer: memberName,
+          isWriting: false,
+          isChecked: false,
+          content: newTaskText,
+          regDate: new Date(),
+          modDate: new Date(),
+        }
+      );
       if (!isSubmitedByEnter) {
         const updatedIsWritingNewTask = { ...isWritingNewTask };
         updatedIsWritingNewTask[memberName] = false;
         setIsWritingNewTask(updatedIsWritingNewTask);
       }
-      // 입력창 비우기
       setNewTaskText("");
     } else {
       setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
