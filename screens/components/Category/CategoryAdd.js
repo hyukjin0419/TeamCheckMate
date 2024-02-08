@@ -91,11 +91,11 @@ export default CategoryAdd = () => {
 
         if(userDoc.exists()) {
             const personalCheckList = collection(userRef, "personalCheckList");
-            await setDoc(doc(personalCheckList, textInputValue), {
+            await setDoc(doc(personalCheckList), {
                 category: textInputValue,
                 color: selectedColor,
             })
-            navigation.navigate("PersonalPage", {addedCategory: textInputValue});
+            navigation.navigate("PersonalPage");
         } else {
             console.log("사용자 문서가 존재하지 않습니다.");
         }
