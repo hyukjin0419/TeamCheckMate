@@ -32,7 +32,13 @@ const AssignmentPage = () => {
 
   //TeamItem에서 정보 가져오기
   const route = useRoute();
-  const { title, fileColor, teamCode, memberInfo, memberNames } = route.params;
+  const {
+    teamCode: teamCode,
+    title: title,
+    fileColor: fileColor,
+    memberInfo: memberInfo,
+    memberNames: memberNames,
+  } = route.params;
 
   const [openedFileImage, setOpenedFileImage] = useState(
     require("../images/OpenedFileColor/9CB1BB.png")
@@ -175,7 +181,13 @@ const AssignmentPage = () => {
             navigation.navigate("TeamPage");
           }}
         >
-          <AntDesign name="left" size={20} color="black"></AntDesign>
+          <Image
+            style={{
+              width: 8,
+              height: 14,
+            }}
+            source={require("../images/backBtn.png")}
+          />
         </TouchableOpacity>
         <ImageBackground source={openedFileImage} style={styles.openedFile}>
           <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>
@@ -201,9 +213,11 @@ const AssignmentPage = () => {
                   style={s.addClassBtn}
                   onPress={() => {
                     navigation.navigate("AssignmentAddPage", {
+                      teamCode: teamCode,
                       title: title,
                       fileColor: fileColor,
-                      teamCode: teamCode,
+                      memberInfo: memberInfo,
+                      memberNames: memberNames,
                     });
                     handlePress();
                   }}
@@ -251,7 +265,7 @@ const AssignmentPage = () => {
         scrollEnabled={false}
         style={{
           marginLeft: 20,
-          marginTop: 135,
+          marginTop: 140,
           width: WINDOW_WIDHT,
         }}
       >
@@ -261,6 +275,7 @@ const AssignmentPage = () => {
               ...styles.teamMateBtn,
               borderColor: fileColor,
               backgroundColor: fileColor,
+              marginLeft: 10,
             }}
           >
             <Text style={styles.teamMateBtnText}>팀 메이트</Text>
@@ -284,7 +299,7 @@ const AssignmentPage = () => {
         </View>
       </ScrollView>
       {/* Parent View for both FlatLists */}
-      <View style={{ flex: 20 }}>
+      <View style={{ flex: 18 }}>
         {/* 과제 리스트 */}
         <FlatList
           data={assignmentList}
@@ -351,12 +366,13 @@ const styles = StyleSheet.create({
   teamMateBtn: {
     alignItems: "center",
     justifyContent: "center",
-    width: 80,
-    height: 45,
+    height: 35,
     borderWidth: 1,
     borderRadius: 23,
     marginHorizontal: 4,
+    paddingHorizontal: 15,
     marginTop: 10,
+    marginLeft: 5,
   },
   teamMateBtnText: {
     fontFamily: "SUIT-Regular",

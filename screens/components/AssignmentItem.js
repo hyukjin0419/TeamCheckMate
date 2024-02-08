@@ -58,7 +58,7 @@ const AssignmentItem = (props) => {
   const handleDelete = async () => {
     try {
       //team collection에 접근
-      const teamDocumentRef = doc(collection(db, "team"), props.teamid);
+      const teamDocumentRef = doc(collection(db, "team"), teamCode);
       const assignmentListCollectionRef = collection(
         teamDocumentRef,
         "과제 list"
@@ -130,7 +130,7 @@ const AssignmentItem = (props) => {
               {/* 모달창 상단 회색 막대 */}
               <View style={s.modalVector}></View>
               {/* 모달창 상단 과제 이름 표시 */}
-              <Text style={styles.assignmentNameText}>{assignmentName}</Text>
+              <Text style={s.modalTitle}>{assignmentName}</Text>
               <Text style={styles.modalDueDateText}>제출기한: {dueDate}</Text>
               <View flex={1}></View>
               {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
@@ -143,12 +143,14 @@ const AssignmentItem = (props) => {
                       /* 터치 시 과제 수정 화면으로 이동 */
                     }
                     navigation.navigate("AssignmentUpdatePage", {
-                      title: props.title,
-                      fileColor: props.fileColor,
-                      teamid: props.teamid,
-                      assignmentName: props.assignmentName,
-                      dueDate: props.dueDate,
-                      assignmentId: props.assignmentId,
+                      teamCode: teamCode,
+                      title: title,
+                      fileColor: fileColor,
+                      memberInfo: memberInfo,
+                      memberNames: memberNames,
+                      assignmentName: assignmentName,
+                      assignmentId: assignmentId,
+                      dueDate: dueDate,
                     });
                     {
                       /* 모달 숨기기 */

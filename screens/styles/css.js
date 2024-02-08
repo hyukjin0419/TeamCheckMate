@@ -38,11 +38,10 @@ const commonStyles = StyleSheet.create({
   //헤더에 들어가는 타이틀 -> 글꼴수에 따라 marginLeft 수정 바람.
   title: {
     flex: 3,
-    fontWeight: "bold",
     fontSize: 16,
     textAlign: "center",
     fontFamily: "SUIT-Medium",
-    // backgroundColor: "violet",
+    //backgroundColor: "violet",
   },
   //헤더 오른쪽 버튼 (안보일 수 있음, 비율 맞추기 위해 존재)
   titleRightBtn: {
@@ -50,7 +49,7 @@ const commonStyles = StyleSheet.create({
     // backgroundColor: "blue",
   },
   titleRightText: {
-    fontSize: 16,
+    fontSize: 17,
     alignSelf: "flex-end", // 오른쪽 정렬
     fontFamily: "SUIT-Medium",
   },
@@ -180,6 +179,7 @@ const commonStyles = StyleSheet.create({
     marginTop: 20,
     fontFamily: "SUIT-Medium",
     fontSize: 16,
+    textAlign: "center",
   },
   modalItemContainter: {
     flex: 1,

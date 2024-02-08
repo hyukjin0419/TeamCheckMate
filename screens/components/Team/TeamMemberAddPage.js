@@ -191,6 +191,7 @@ export default function TeamMemberAddPage({ route }) {
             filteredResults.length > 0 && (
               <View style={styles.emailContainer}>
                 <FlatList
+                  keyboardShouldPersistTaps="always"
                   style={styles.emailTextContainer}
                   data={filteredResults}
                   keyExtractor={(item) => item.id.toString()}

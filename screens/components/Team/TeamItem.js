@@ -34,6 +34,14 @@ const TeamItem = (props) => {
   const [memberInfo, setMemberInfo] = useState([]);
   //멤버 이름 문자 배열
   const [memberNames, setMemberNames] = useState([]);
+  //멤버 전화번호 문자 배열
+  const [memberPhoneNumbers, setMemberPhoneNumbers] = useState([]);
+  //멤버 학교 문자 배열
+  const [memberSchools, setMemberSchools] = useState([]);
+  //멤버 학번 문자 배열
+  const [memberStudentNumbers, setMemberStudentNumbers] = useState([]);
+  //멤버 학번 문자 배열
+  const [memberEmails, setMemberEmails] = useState([]);
   //터치시 팀 나가는 함수
   const leavingtheTeam = () => {
     props.leaveTeam(props.id);
@@ -128,10 +136,36 @@ const TeamItem = (props) => {
     }
   }, [fileColor]);
 
+  const [teamOptionModalOpacity, setTeamOptionModalOpacity] = useState(0.7);
+
   //팀 파일 아이콘 옵션 버튼 터치시 팀 설정 모달창 띄우기
-  const [TeamOptionModalVisible, SetTeamOptionModalVisible] = useState(false);
+  const [teamOptionModalVisible, setTeamOptionModalVisible] = useState(false);
   handleTeamOptionPress = () => {
-    SetTeamOptionModalVisible(!TeamOptionModalVisible);
+    setTeamOptionModalVisible(!teamOptionModalVisible);
+  };
+
+  //팀메이트 정보 모달창
+  const [teamMateModalVisible, setTeamMateModalVisible] = useState(false);
+  const [selectedTeamMateName, setSelectedTeamMateName] = useState("");
+  const [selectedTeamMatePhoneNumber, setSelectedTeamMatePhoneNumber] =
+    useState("");
+  const [selectedTeamMateSchool, setSelectedTeamMateSchool] = useState("");
+  const [selectedTeamMateStudentNumber, setSelectedTeamMateStudentNumber] =
+    useState("");
+  const [selectedTeamMateEmail, setSelectedTeamMateEmail] = useState("");
+
+  const handleTeamMateLabelPress = (index) => {
+    setSelectedTeamMateName(memberNames[index]);
+    setSelectedTeamMatePhoneNumber(memberPhoneNumbers[index]);
+    setSelectedTeamMateSchool(memberSchools[index]);
+    setSelectedTeamMateStudentNumber(memberStudentNumbers[index]);
+    setSelectedTeamMateEmail(memberEmails[index]);
+    setTeamMateModalVisible(!teamMateModalVisible);
+    if (teamMateModalVisible == true) {
+      setTeamOptionModalOpacity(0.7);
+    } else {
+      setTeamOptionModalOpacity(0);
+    }
   };
 
   const copyToClipboard = async (teamCode) => {
@@ -155,18 +189,46 @@ const TeamItem = (props) => {
         const memberList = memberSnapshot.docs.map((doc) => {
           const data = doc.data();
           const name = data.name;
+          const email = data.email;
           const phoneNumber = data.phoneNumber || null;
           const school = data.school || null;
           const studentNumber = data.studentNumber || null;
 
-          return { id: doc.id, name, phoneNumber, school, studentNumber };
+          return {
+            id: doc.id,
+            name,
+            phoneNumber,
+            school,
+            studentNumber,
+            email,
+          };
         });
 
         // 상태 업데이트
         setMemberInfo(memberList);
-
+        //멤버 이름
         const memberNameList = memberList.map((member) => member.name || null);
         setMemberNames(memberNameList);
+        //멤버 전화번호
+        const memberPhoneNumberList = memberList.map(
+          (member) => member.phoneNumber || null
+        );
+        setMemberPhoneNumbers(memberPhoneNumberList);
+        //멤버 학교
+        const memberSchoolList = memberList.map(
+          (member) => member.school || null
+        );
+        setMemberSchools(memberSchoolList);
+        //멤버 학번
+        const memberStudentNumberList = memberList.map(
+          (member) => member.studentNumber || null
+        );
+        setMemberStudentNumbers(memberStudentNumberList);
+        //멤버 이메일
+        const memberEmailList = memberList.map(
+          (member) => member.email || null
+        );
+        setMemberEmails(memberEmailList);
 
         // 이제 memberInfo에는 members 컬렉션에 있는 문서들이 객체 배열로 저장되어 있습니다.
         // console.log(memberInfo);
@@ -200,7 +262,7 @@ const TeamItem = (props) => {
       }}
     >
       <ImageBackground style={styles.file} source={imageSource}>
-        <Text numberOfLines={2} ellipsizeMode="tail" style={styles.title}>
+        <Text numberOfLines={2} style={styles.title}>
           {title}
         </Text>
         {/* 팀 파일 아이콘 옵션 버튼 */}
@@ -215,16 +277,18 @@ const TeamItem = (props) => {
         <Modal
           onBackButtonPress={handleTeamOptionPress}
           onBackdropPress={handleTeamOptionPress}
-          isVisible={TeamOptionModalVisible}
+          isVisible={teamOptionModalVisible}
           swipeDirection="down"
           onSwipeComplete={handleTeamOptionPress}
           animationIn="slideInUp"
           animationOut="slideOutDown"
           animationInTiming={200}
           animationOutTiming={200}
-          backdropTransitionInTiming={200}
+          backdropTransitionInTiming={0}
           backdropTransitionOutTiming={0}
-          propagateSwipe={true}
+          propagateSwipe={true} //모달 내에서 수행한 스와이프 동작이 모달 외부의 스와이프 동작에 영향을 주지 않도록 함
+          backdropColor="black"
+          backdropOpacity={teamOptionModalOpacity}
           style={{ justifyContent: "flex-end", margin: 0 }}
         >
           {/* 팀 설정 모달창 */}
@@ -260,8 +324,11 @@ const TeamItem = (props) => {
               </TouchableOpacity>
             </View>
             <ScrollView
-              width={WINDOW_WIDHT * 0.9}
-              alignSelf="center"
+              style={{
+                width: WINDOW_WIDHT,
+                alignSelf: "center",
+                marginLeft: "10%",
+              }}
               scrollEnabled={false}
             >
               <FlatList
@@ -269,12 +336,13 @@ const TeamItem = (props) => {
                 horizontal={true}
                 data={memberNames}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
                   <TouchableOpacity
                     style={{
                       ...styles.teamMateBtn,
                       borderColor: props.fileColor,
                     }}
+                    onPress={() => handleTeamMateLabelPress(index)}
                   >
                     <Text style={styles.teamMateBtnText}>{item}</Text>
                   </TouchableOpacity>
@@ -313,6 +381,53 @@ const TeamItem = (props) => {
               </TouchableOpacity>
             </View>
           </View>
+          <Modal
+            onBackdropPress={handleTeamMateLabelPress}
+            isVisible={teamMateModalVisible}
+            animationIn="zoomIn"
+            animationOut="zoomOut"
+            animationInTiming={300}
+            animationOutTiming={200}
+            backdropTransitionInTiming={0}
+            backdropTransitionOutTiming={0}
+          >
+            <View style={styles.teamMateModal}>
+              <TouchableOpacity onPress={handleTeamMateLabelPress}>
+                <Image
+                  style={styles.teamModalXBtn}
+                  source={require("../../images/modalXBtn.png")}
+                ></Image>
+              </TouchableOpacity>
+              {/* 선택된 팀원의 이름을 표시합니다. */}
+              <View
+                style={{
+                  ...styles.teamMateBtn,
+                  borderColor: props.fileColor,
+                  alignSelf: "center",
+                  marginTop: 15,
+                }}
+                onPress={() => handleTeamMateLabelPress(index)}
+              >
+                <Text style={styles.teamMateBtnText}>
+                  {selectedTeamMateName}
+                </Text>
+              </View>
+              <View marginTop="5%">
+                <Text style={styles.teamMateDataText}>
+                  이메일: {selectedTeamMateEmail}
+                </Text>
+                <Text style={styles.teamMateDataText}>
+                  학교: {selectedTeamMateSchool}
+                </Text>
+                <Text style={styles.teamMateDataText}>
+                  학번: {selectedTeamMateStudentNumber}
+                </Text>
+                <Text style={styles.teamMateDataText}>
+                  전화번호: {selectedTeamMatePhoneNumber}
+                </Text>
+              </View>
+            </View>
+          </Modal>
         </Modal>
       </ImageBackground>
     </TouchableOpacity>
@@ -322,14 +437,33 @@ const TeamItem = (props) => {
 export default TeamItem;
 
 const styles = StyleSheet.create({
+  teamMateModal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    minHeight: "25%",
+    marginBottom: "10%",
+  },
+  teamModalXBtn: {
+    position: "absolute",
+    right: 12,
+    top: 12,
+    width: 30,
+    height: 30,
+  },
+  teamMateDataText: {
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginHorizontal: "10%",
+    marginBottom: "3%",
+  },
   teamMateBtn: {
     alignItems: "center",
     justifyContent: "center",
-    width: 80,
-    height: 45,
+    height: 35,
     borderWidth: 1,
     borderRadius: 23,
     marginHorizontal: 4,
+    paddingHorizontal: 15,
     marginTop: 10,
   },
   teamMateBtnText: {
@@ -341,7 +475,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     marginBottom: 5,
-    paddingHorizontal: 15,
+    marginHorizontal: 20,
   },
   teamMateAddText: {
     fontFamily: "SUIT-Medium",

@@ -12,6 +12,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
+import { useRoute } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../styles/colors";
 import { db, collection, doc, updateDoc } from "../../firebase";
@@ -22,18 +23,27 @@ import s from "../styles/css";
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default AssignmentUpdatePage = ({ route }) => {
+export default AssignmentUpdatePage = () => {
   const navigation = useNavigation();
 
   {
     /* 팀 이름, 파일 아이콘 색상, 팀 id 불러오기 */
   }
-  const { title, fileColor, teamid, assignmentName, dueDate, assignmentId } =
-    route.params;
+  const route = useRoute();
+  const {
+    teamCode,
+    title,
+    fileColor,
+    memberInfo,
+    memberNames,
+    assignmentName,
+    assignmentId,
+    dueDate,
+  } = route.params;
   {
     /* 과제 추가 확인 버튼 상태 변경 코드 */
   }
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated); //확인 버튼 색상 (초기값: 비활성화)
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey); //확인 버튼 색상 (초기값: 비활성화)
   const [buttonDisabled, setButtonDisabled] = useState(true); //확인 버튼 상태 (초기값:비활성화 상태)
 
   {
@@ -73,7 +83,7 @@ export default AssignmentUpdatePage = ({ route }) => {
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
       setButtonDisabled(true);
     }
   };
@@ -81,6 +91,7 @@ export default AssignmentUpdatePage = ({ route }) => {
   {
     /* 과제이름, Duedate가 둘 다 valid input인 경우 확인버튼 활성화 */
   }
+  const [maxLength, setMaxLength] = useState(30); // 영어일 때의 maxLength
   //과제이름
   const AssignmentNameInputChange = (text) => {
     setAssignmentName(text);
@@ -89,14 +100,16 @@ export default AssignmentUpdatePage = ({ route }) => {
       setConfirmBtnColor(color.activated);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 16 : 28);
   };
 
   const handleUpdate = async () => {
     try {
       // Reference to the "team" collection and the specific assignment document
-      const teamDocumentRef = doc(collection(db, "team"), teamid);
+      const teamDocumentRef = doc(collection(db, "team"), teamCode);
       const assignmentListCollectionRef = collection(
         teamDocumentRef,
         "과제 list"
@@ -136,13 +149,21 @@ export default AssignmentUpdatePage = ({ route }) => {
             style={s.headBtn}
             onPress={() => {
               navigation.navigate("AssignmentPage", {
+                teamCode: teamCode,
                 title: title,
                 fileColor: fileColor,
-                teamid: teamid,
+                memberInfo: memberInfo,
+                memberNames: memberNames,
               });
             }}
           >
-            <AntDesign name="left" size={20} color="black" />
+            <Image
+              style={{
+                width: 8,
+                height: 14,
+              }}
+              source={require("../images/backBtn.png")}
+            />
           </TouchableOpacity>
 
           <Text style={s.title}>과제 수정</Text>
@@ -166,6 +187,7 @@ export default AssignmentUpdatePage = ({ route }) => {
             <TextInput
               placeholder={assignmentName}
               onChangeText={AssignmentNameInputChange}
+              maxLength={maxLength}
               value={name}
               style={styles.TextInput}
             ></TextInput>
