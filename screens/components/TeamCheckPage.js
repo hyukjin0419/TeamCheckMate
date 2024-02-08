@@ -20,7 +20,9 @@ import {
   doc,
   setDoc,
   getDoc,
+  getDocs,
 } from "../../firebase.js";
+import { query, orderBy, arrayRemove } from "firebase/firestore";
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
@@ -103,6 +105,7 @@ export default TeamCheckPage = (props) => {
         updatedIsWritingNewTask[memberName] = false;
         setIsWritingNewTask(updatedIsWritingNewTask);
       }
+      getCheckLists();
       setNewTaskText("");
     } else {
       setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
@@ -123,6 +126,39 @@ export default TeamCheckPage = (props) => {
       setChecklists(updatedChecklists);
     }
   };
+
+  const getCheckLists = async () => {
+    const checkList = [];
+
+    await Promise.all(
+      memberNames.map(async (memberName) => {
+        const querySnapshot = await getDocs(
+          query(
+            collection(
+              db,
+              "team",
+              teamCode,
+              "과제 list",
+              assignmentId,
+              "memberName",
+              memberName,
+              "checkList"
+            ),
+            orderBy("regDate", "asc")
+          )
+        );
+        checkList.push(...querySnapshot.docs.map((doc) => doc.data()));
+      })
+    );
+
+    // console.log("[TeamCheckPage]:asdf ", checkList);
+    setChecklists(checkList);
+  };
+
+  useEffect(() => {
+    getCheckLists();
+    console.log("[TeamCheckPage]: ", checklists);
+  }, []);
 
   console.log(JSON.stringify(checklists, null, 2));
 
