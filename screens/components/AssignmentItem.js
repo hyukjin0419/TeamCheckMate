@@ -29,7 +29,7 @@ const AssignmentItem = (props) => {
   const [assignmentName, setAssignmentName] = useState(props.assignmentName);
   const [assignmentId, setAssignmentId] = useState(props.assignmentId);
   const [dueDate, setDueDate] = useState(props.dueDate);
-  console.log("[AssignmentItem] teamCode", teamCode, "여기까지는 로드 됨");
+  //console.log("[AssignmentItem] teamCode", teamCode, "여기까지는 로드 됨");
   const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
     useState(false);
 

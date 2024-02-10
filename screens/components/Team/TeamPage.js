@@ -6,7 +6,6 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Modal,
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
@@ -16,6 +15,7 @@ import { useState, useEffect } from "react";
 import s from "../../styles/css";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
+import Modal from "react-native-modal";
 import {
   db,
   doc,
@@ -165,11 +165,14 @@ export default TeamPage = () => {
       <View style={s.headContainer}></View>
       {/* 모달 뷰 */}
       <Modal
-        //animationType="fade"
-        transparent={true}
-        visible={showModal}
-        animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
-        animationOutTiming={20}
+        isVisible={showModal}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        animationInTiming={100}
+        animationOutTiming={100}
+        backdropTransitionInTiming={0}
+        backdropTransitionOutTiming={0}
+        backdropOpacity={0.6}
       >
         <TouchableWithoutFeedback onPress={handlePress}>
           {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
@@ -287,9 +290,10 @@ const styles = StyleSheet.create({
     height: 80,
   },
   modalView: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     flexDirection: "column",
+    width: WINDOW_WIDHT,
+    height: WINDOW_HEIGHT,
+    alignSelf: "center",
   },
   modalInsideView: {
     flexDirection: "column-reverse",
