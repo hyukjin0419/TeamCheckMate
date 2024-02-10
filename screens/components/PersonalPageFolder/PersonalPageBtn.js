@@ -6,16 +6,18 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Modal,
   TouchableWithoutFeedback,
+  Dimensions,
 } from "react-native";
 import { useState, useEffect } from "react";
 import * as Font from "expo-font";
 import s from "../../styles/css";
-import {
-  auth,
-} from "../../../firebase";
+import { auth } from "../../../firebase";
 import * as React from "react";
+import Modal from "react-native-modal";
+
+const WINDOW_WIDHT = Dimensions.get("window").width;
+const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default PersonalPageBtn = () => {
   const navigation = useNavigation();
@@ -29,19 +31,20 @@ export default PersonalPageBtn = () => {
     setShowModal(!showModal);
   };
 
-
-
   return (
     <View style={styles.container}>
       <StatusBar style={"dark"}></StatusBar>
       <View style={s.headContainer}></View>
       {/* 팀 추가에 점근할 수 있는 버튼 */}
       <Modal
-        //animationType="fade"
-        transparent={true}
-        visible={showModal}
-        animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
-        animationOutTiming={20}
+        isVisible={showModal}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        animationInTiming={100}
+        animationOutTiming={100}
+        backdropTransitionInTiming={0}
+        backdropTransitionOutTiming={0}
+        backdropOpacity={0.6}
       >
         <TouchableWithoutFeedback onPress={handlePress}>
           {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
@@ -122,9 +125,10 @@ const styles = StyleSheet.create({
     height: 80,
   },
   modalView: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     flexDirection: "column",
+    width: WINDOW_WIDHT,
+    height: WINDOW_HEIGHT,
+    alignSelf: "center",
   },
   modalInsideView: {
     flexDirection: "column-reverse",
