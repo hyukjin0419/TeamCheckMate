@@ -47,13 +47,23 @@ export default TeamCheckPage = (props) => {
     assignmentId,
     dueDate,
   } = route.params;
+  console.log(route.params);
 
   //체크리스트를 전부 가지고 있는 객체 배열. 하나의 객체는 하나의 체크를 뜻한다
   //key값은 writer.
   const [checklists, setChecklists] = useState([]);
   const [newTaskText, setNewTaskText] = useState("");
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
-
+  console.log(
+    teamCode,
+    title,
+    fileColor,
+    memberInfo,
+    memberNames,
+    assignmentName,
+    assignmentId,
+    dueDate
+  );
   const pressAddBtn = (memberName) => {
     //isWritingNewTask를 순회하면서 현재 선택된 사람이 아니면 textinput을 닫는다.
     Object.keys(isWritingNewTask).forEach((name) => {
@@ -182,6 +192,7 @@ export default TeamCheckPage = (props) => {
               memberName,
               "checkList"
             ),
+            console.log("??:", memberNames, memberName),
             orderBy("regDate", "asc")
           )
         );
@@ -206,6 +217,7 @@ export default TeamCheckPage = (props) => {
   useEffect(() => {
     getCheckLists();
     console.log("[TeamCheckPage]: ", checklists);
+    console.log("[TeamCheckPage]: memberNames", memberNames);
   }, []);
 
   return (
@@ -260,14 +272,13 @@ export default TeamCheckPage = (props) => {
           data={memberNames}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.name}
-          renderItem={({ item }) => (
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => (
             <TouchableOpacity
               style={{
                 ...styles.memberNameContainer,
                 borderColor: fileColor,
               }}
-              // onPress={() => createChecklist(item.name)}
             >
               <Text style={styles.memberNameText}>{item}</Text>
             </TouchableOpacity>
