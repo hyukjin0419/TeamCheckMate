@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
+  ImageBackground,
 } from "react-native";
 import {
   db,
@@ -94,7 +95,7 @@ export default TeamCheckPage = (props) => {
           db,
           "team",
           teamCode,
-          "과제 list",
+          "assignmentList",
           assignmentId,
           "memberName",
           memberName,
@@ -102,6 +103,7 @@ export default TeamCheckPage = (props) => {
         ),
         newChecklist
       );
+
       if (!isSubmitedByEnter) {
         const updatedIsWritingNewTask = { ...isWritingNewTask };
         updatedIsWritingNewTask[memberName] = false;
@@ -111,6 +113,7 @@ export default TeamCheckPage = (props) => {
     } else {
       setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
     }
+    await getCheckLists();
   };
 
   const handleCheckboxChange = async (writer, id, newValue) => {
@@ -122,6 +125,20 @@ export default TeamCheckPage = (props) => {
         ? { ...checklist, isChecked: newValue, modDate: new Date() }
         : checklist
     );
+
+    updatedChecklists.sort((a, b) => {
+      if (a.isChecked === b.isChecked) {
+        // 체크 여부가 동일하다면 타임스탬프로 정렬
+        return a.regDate - b.regDate;
+      } else if (a.isChecked && !b.isChecked) {
+        // 체크된 항목이 뒤로 가도록 설정
+        return 1;
+      } else {
+        // 체크되지 않은 항목이 앞으로 가도록 설정
+        return -1;
+      }
+    });
+
     setChecklists(updatedChecklists);
 
     // Firestore에 업데이트 반영
@@ -131,7 +148,7 @@ export default TeamCheckPage = (props) => {
         db,
         "team",
         teamCode,
-        "과제 list",
+        "assignmentList",
         assignmentId,
         "memberName",
         writer,
@@ -148,7 +165,8 @@ export default TeamCheckPage = (props) => {
   };
 
   const getCheckLists = async () => {
-    const checkList = [];
+    const uncheckedChecklists = [];
+    const checkedChecklists = [];
 
     await Promise.all(
       memberNames.map(async (memberName) => {
@@ -158,7 +176,7 @@ export default TeamCheckPage = (props) => {
               db,
               "team",
               teamCode,
-              "과제 list",
+              "assignmentList",
               assignmentId,
               "memberName",
               memberName,
@@ -167,22 +185,28 @@ export default TeamCheckPage = (props) => {
             orderBy("regDate", "asc")
           )
         );
-        checkList.push(
-          ...querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        );
+        querySnapshot.forEach((doc) => {
+          const data = { id: doc.id, ...doc.data(), memberName };
+          if (data.isChecked) {
+            checkedChecklists.push(data);
+          } else {
+            uncheckedChecklists.push(data);
+          }
+        });
       })
     );
 
-    // console.log("[TeamCheckPage]:asdf ", checkList);
-    setChecklists(checkList);
+    // 체크된 항목과 체크되지 않은 항목을 합쳐서 최종적인 배열을 생성
+    const combinedChecklists = [...uncheckedChecklists, ...checkedChecklists];
+
+    setChecklists(combinedChecklists);
+    // getCheckLists();
   };
 
   useEffect(() => {
     getCheckLists();
     console.log("[TeamCheckPage]: ", checklists);
   }, []);
-
-  console.log(JSON.stringify(checklists, null, 2));
 
   return (
     //헤더 부분
@@ -207,17 +231,19 @@ export default TeamCheckPage = (props) => {
         <View style={s.titleRightBtn}></View>
       </View>
       {/* 과제 제목 부분 */}
-      <View style={styles.assignmentTitleContainer}>
+      <ImageBackground
+        style={styles.assignmentTitleContainer}
+        source={require("../images/AssignmentContainer.png")}
+      >
         <TouchableOpacity style={styles.assignmentTitleInfoContainer}>
           <Text style={styles.dueDateText}>{dueDate}</Text>
           <Text style={styles.assignmentTitleText}>{assignmentName}</Text>
         </TouchableOpacity>
-      </View>
+      </ImageBackground>
       {/* 팀원 목록 부분 */}
 
       <View style={styles.teamMembersNamesArrayContainer}>
         {/* Display the 팀메이트 */}
-
         <TouchableOpacity
           style={{
             ...styles.teamMateContainer,
@@ -234,7 +260,7 @@ export default TeamCheckPage = (props) => {
           data={memberNames}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.toString()}
+          keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={{
@@ -257,7 +283,7 @@ export default TeamCheckPage = (props) => {
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
-            <View style={styles.contentContainer}>
+            <View style={styles.contentContainer} key={item.name}>
               <TouchableOpacity
                 style={{
                   ...styles.memberNameContainerTwo,
@@ -340,8 +366,6 @@ const styles = StyleSheet.create({
     width: WINDOW_WIDHT * 0.9,
     height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
     //backgroundColor: "red",
-    borderWidth: 1,
-    borderRadius: 9,
     marginTop: "5%",
     marginBottom: "5%",
     flexDirection: "row",
@@ -442,7 +466,6 @@ const styles = StyleSheet.create({
     width: "90%",
     display: "flex",
     flexDirection: "row",
-
     // backgroundColor: "violet",
     marginBottom: "7%",
     alignSelf: "center",

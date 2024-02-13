@@ -29,7 +29,7 @@ const AssignmentItem = (props) => {
   const [assignmentName, setAssignmentName] = useState(props.assignmentName);
   const [assignmentId, setAssignmentId] = useState(props.assignmentId);
   const [dueDate, setDueDate] = useState(props.dueDate);
-  console.log("[AssignmentItem] teamCode", teamCode, "여기까지는 로드 됨");
+  //console.log("[AssignmentItem] teamCode", teamCode, "여기까지는 로드 됨");
   const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
     useState(false);
 
@@ -61,7 +61,7 @@ const AssignmentItem = (props) => {
       const teamDocumentRef = doc(collection(db, "team"), teamCode);
       const assignmentListCollectionRef = collection(
         teamDocumentRef,
-        "과제 list"
+        "assignmentList"
       );
       //과제 list colloection에 접근
       const assignmentDocRef = doc(

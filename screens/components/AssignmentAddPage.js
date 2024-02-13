@@ -125,7 +125,12 @@ export default AssignmentAddPage = () => {
   }
   const addAssignment = async () => {
     try {
-      const teamCollectionRef = collection(db, "team", teamCode, "과제 list");
+      const teamCollectionRef = collection(
+        db,
+        "team",
+        teamCode,
+        "assignmentList"
+      );
       const assignmentDocRef = await addDoc(teamCollectionRef, {
         assignmentName: assignmentName,
         dueDate: dueDate,

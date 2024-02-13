@@ -258,6 +258,10 @@ const TeamItem = (props) => {
           teamCode: teamCode,
           memberInfo: memberInfo,
           memberNames: memberNames,
+          memberPhoneNumbers: memberPhoneNumbers,
+          memberEmails: memberEmails,
+          memberSchools: memberSchools,
+          memberStudentNumbers: memberStudentNumbers,
         });
       }}
     >
