@@ -125,6 +125,20 @@ export default TeamCheckPage = (props) => {
         ? { ...checklist, isChecked: newValue, modDate: new Date() }
         : checklist
     );
+
+    updatedChecklists.sort((a, b) => {
+      if (a.isChecked === b.isChecked) {
+        // 체크 여부가 동일하다면 타임스탬프로 정렬
+        return a.regDate - b.regDate;
+      } else if (a.isChecked && !b.isChecked) {
+        // 체크된 항목이 뒤로 가도록 설정
+        return 1;
+      } else {
+        // 체크되지 않은 항목이 앞으로 가도록 설정
+        return -1;
+      }
+    });
+
     setChecklists(updatedChecklists);
 
     // Firestore에 업데이트 반영
@@ -186,7 +200,7 @@ export default TeamCheckPage = (props) => {
     const combinedChecklists = [...uncheckedChecklists, ...checkedChecklists];
 
     setChecklists(combinedChecklists);
-    getCheckLists();
+    // getCheckLists();
   };
 
   useEffect(() => {
@@ -246,7 +260,7 @@ export default TeamCheckPage = (props) => {
           data={memberNames}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.toString()}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={{
@@ -269,7 +283,7 @@ export default TeamCheckPage = (props) => {
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
-            <View style={styles.contentContainer}>
+            <View style={styles.contentContainer} key={item.name}>
               <TouchableOpacity
                 style={{
                   ...styles.memberNameContainerTwo,
