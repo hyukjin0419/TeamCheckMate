@@ -155,17 +155,23 @@ const AssignmentPage = () => {
     const assignmentData = [];
 
     try {
+      // "team" collection에 접근
+      const teamCollectionRef = collection(db, "team");
+      // "team" collection에 있는 document에 접근
+      const teamDocumentRef = doc(teamCollectionRef, teamCode);
+      // "과제List" collection에 접근하여 모든 문서 가져오기
       const querySnapshot = await getDocs(
-        query(
-          collection(db, "team", teamCode, "assignmentList"),
-          orderBy("regDate", "desc")
-        )
+        collection(teamDocumentRef, "assignmentList")
       );
-
-      querySnapshot.forEach((doc) =>
-        assignmentData.push({ id: doc.id, assignmentId: doc.id, ...doc.data() })
-      );
-
+      // 가져온 문서를 배열로 변환하여 state 업데이트
+      const assignmentData = [];
+      querySnapshot.forEach((doc) => {
+        assignmentData.push({
+          id: doc.id,
+          assignmentId: doc.id,
+          ...doc.data(),
+        });
+      });
       setAssignmentList(assignmentData);
       // console.log(
       //   "[AssignmentPage] : ",

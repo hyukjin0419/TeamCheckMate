@@ -205,7 +205,7 @@ export default TeamCheckPage = (props) => {
 
   useEffect(() => {
     getCheckLists();
-    // console.log("[TeamCheckPage]: ", checklists);
+    console.log("[TeamCheckPage]: ", checklists);
   }, []);
 
   return (
@@ -260,7 +260,7 @@ export default TeamCheckPage = (props) => {
           data={memberNames}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={{
