@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
+  ImageBackground,
 } from "react-native";
 import {
   db,
@@ -113,7 +114,6 @@ export default TeamCheckPage = (props) => {
     }
   };
 
-
   const handleCheckboxChange = async (writer, id, newValue) => {
     // 체크박스 상태 변경
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -178,7 +178,6 @@ export default TeamCheckPage = (props) => {
     setChecklists(checkList);
   };
 
-
   useEffect(() => {
     getCheckLists();
     console.log("[TeamCheckPage]: ", checklists);
@@ -208,12 +207,15 @@ export default TeamCheckPage = (props) => {
         <View style={s.titleRightBtn}></View>
       </View>
       {/* 과제 제목 부분 */}
-      <View style={styles.assignmentTitleContainer}>
+      <ImageBackground
+        style={styles.assignmentTitleContainer}
+        source={require("../images/AssignmentContainer.png")}
+      >
         <TouchableOpacity style={styles.assignmentTitleInfoContainer}>
           <Text style={styles.dueDateText}>{dueDate}</Text>
           <Text style={styles.assignmentTitleText}>{assignmentName}</Text>
         </TouchableOpacity>
-      </View>
+      </ImageBackground>
       {/* 팀원 목록 부분 */}
 
       <View style={styles.teamMembersNamesArrayContainer}>
@@ -340,8 +342,6 @@ const styles = StyleSheet.create({
     width: WINDOW_WIDHT * 0.9,
     height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
     //backgroundColor: "red",
-    borderWidth: 1,
-    borderRadius: 9,
     marginTop: "5%",
     marginBottom: "5%",
     flexDirection: "row",
