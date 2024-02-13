@@ -106,7 +106,7 @@ const AssignmentItem = (props) => {
         <Pressable
           style={styles.optionBtn}
           onPress={() => {
-            handleAssignmentOptionPress(props);
+            handleAssignmentOptionPress();
           }}
         ></Pressable>
         {/* 과제 설정 모달창 */}
