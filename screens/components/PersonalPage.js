@@ -18,7 +18,7 @@ import { EvilIcons } from "@expo/vector-icons";
 import { showToast, toastConfig } from "../components/Toast";
 import Modal from "react-native-modal";
 import { useEffect, useState } from "react";
-import { collection, doc, getDoc, getDocs, query } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import s from "../styles/css.js"
 import PersonalPageBtn from "./PersonalPageFolder/PersonalPageBtn";
@@ -45,7 +45,7 @@ const PersonalPage = () => {
     try {
       const userDocRef = doc(db, "user", email);
       const userCategoryRef = collection(userDocRef, "personalCheckList");
-      const querySnapshot1 = await getDocs(query(userCategoryRef));
+      const querySnapshot1 = await getDocs(query(userCategoryRef, orderBy("regDate", "asc")));
       if(!querySnapshot1.empty) {
         const list = [];
         querySnapshot1.forEach((doc) => {

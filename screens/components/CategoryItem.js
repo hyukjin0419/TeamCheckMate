@@ -5,7 +5,7 @@ import Checkbox from 'expo-checkbox';
 import * as Haptics from "expo-haptics";
 import s from "../styles/css.js"
 import moment from 'moment';
-import { getDoc, getDocs, onSnapshot, query } from 'firebase/firestore';
+import { getDoc, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 
 const CategoryItem = (props) => {
@@ -69,6 +69,7 @@ const CategoryItem = (props) => {
             isChecked: false,
             task: newTaskText,
             regDate: new Date(),
+            modDate: new Date(),
           });
         } catch (e) {
           console.log(e.message);
@@ -109,13 +110,12 @@ const CategoryItem = (props) => {
           if(newValue) {
             await updateDoc(userInputTaskRef, {
               isChecked: newValue,
-              regDate: new Date(),
+              modDate: new Date(),
             });
           }
           else {
             await updateDoc(userInputTaskRef, {
               isChecked: newValue,
-              regDate: "",
             });
           }
           showCheck(updatedChecklists, writer, index);
@@ -179,7 +179,6 @@ const CategoryItem = (props) => {
               setCheckColor(updatedCheckColorList);
             }
           } 
-          console.log(checklistToUpdate)
           let dateMap = new Map()
           // add all the dates of tasks being checked into new map
           for (let i = 0; i < checkColor.length; i++) {
@@ -211,7 +210,7 @@ const CategoryItem = (props) => {
         await Promise.all(querySnapshot1.docs.map(async (child1) => {
           const userCategoryRef = doc(userCheckListRef, child1.id);
           const userTaskRef = collection(userCategoryRef, "tasks");
-          const querySnapshot2 = await getDocs(userTaskRef);
+          const querySnapshot2 = await getDocs(query(userTaskRef, orderBy("regDate", "asc")));
   
           // if tasks is not empty
           if(!querySnapshot2.empty) {

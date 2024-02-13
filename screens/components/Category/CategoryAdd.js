@@ -94,6 +94,7 @@ export default CategoryAdd = () => {
             await setDoc(doc(personalCheckList), {
                 category: textInputValue,
                 color: selectedColor,
+                regDate: new Date(),
             })
             navigation.navigate("PersonalPage");
         } else {
