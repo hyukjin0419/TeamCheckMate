@@ -167,10 +167,10 @@ const AssignmentPage = () => {
       );
 
       setAssignmentList(assignmentData);
-      console.log(
-        "[AssignmentPage] : ",
-        JSON.stringify(assignmentData, null, 2)
-      );
+      // console.log(
+      //   "[AssignmentPage] : ",
+      //   JSON.stringify(assignmentData, null, 2)
+      // );
     } catch (error) {
       console.error("데이터 불러오기 중 오류 발생:", error);
     }
