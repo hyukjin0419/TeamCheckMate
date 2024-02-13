@@ -95,7 +95,7 @@ export default TeamCheckPage = (props) => {
           db,
           "team",
           teamCode,
-          "과제 list",
+          "assignmentList",
           assignmentId,
           "memberName",
           memberName,
@@ -134,7 +134,7 @@ export default TeamCheckPage = (props) => {
         db,
         "team",
         teamCode,
-        "과제 list",
+        "assignmentList",
         assignmentId,
         "memberName",
         writer,
@@ -161,7 +161,7 @@ export default TeamCheckPage = (props) => {
               db,
               "team",
               teamCode,
-              "과제 list",
+              "assignmentList",
               assignmentId,
               "memberName",
               memberName,
@@ -177,11 +177,12 @@ export default TeamCheckPage = (props) => {
     );
 
     setChecklists(checkList);
+    // console.log("[TeamCheckPage]: : ", JSON.stringify(checkList, null, 2));
   };
 
   useEffect(() => {
     getCheckLists();
-    console.log("[TeamCheckPage]: ", checklists);
+    // console.log("[TeamCheckPage]: ", checklists);
   }, []);
 
   console.log(JSON.stringify(checklists, null, 2));

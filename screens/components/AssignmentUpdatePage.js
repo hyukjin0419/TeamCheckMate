@@ -112,7 +112,7 @@ export default AssignmentUpdatePage = () => {
       const teamDocumentRef = doc(collection(db, "team"), teamCode);
       const assignmentListCollectionRef = collection(
         teamDocumentRef,
-        "과제 list"
+        "assignmentList"
       );
       const assignmentDocRef = doc(assignmentListCollectionRef, assignmentId);
 
