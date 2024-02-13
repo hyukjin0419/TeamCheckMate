@@ -103,6 +103,7 @@ export default TeamCheckPage = (props) => {
         ),
         newChecklist
       );
+
       if (!isSubmitedByEnter) {
         const updatedIsWritingNewTask = { ...isWritingNewTask };
         updatedIsWritingNewTask[memberName] = false;
@@ -112,6 +113,7 @@ export default TeamCheckPage = (props) => {
     } else {
       setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
     }
+    await getCheckLists();
   };
 
   const handleCheckboxChange = async (writer, id, newValue) => {
@@ -174,7 +176,6 @@ export default TeamCheckPage = (props) => {
       })
     );
 
-    // console.log("[TeamCheckPage]:asdf ", checkList);
     setChecklists(checkList);
   };
 
