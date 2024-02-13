@@ -131,7 +131,7 @@ export default CategoryAdd = () => {
             }}
           >
             <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
-              획인
+              확인
             </Text>
           </TouchableOpacity>
         </View>

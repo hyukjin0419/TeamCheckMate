@@ -9,7 +9,7 @@ import Modal from "react-native-modal"
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Entypo } from '@expo/vector-icons';
 
-const WeeklyCalendar = (props) => {
+const WeeklyCalendar = ({ checkColor, checkEvent, ...props }) => {
     const [currDate, setCurrDate] = useState(moment(props.selected).locale(props.locale))
     const [weekdays, setWeekdays] = useState([])
     const [weekdayLabels, setWeekdayLabels] = useState([])
@@ -95,7 +95,7 @@ const WeeklyCalendar = (props) => {
         console.log(currDate);
         toggleModal();
     }
-
+    
     return (
         <View style={{marginTop: "15%", justifyContent: "center", alignItems: "center"}}>
             <View style={[styles.component, props.style]}>
@@ -189,14 +189,16 @@ const WeeklyCalendar = (props) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[0]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
-                            {/* Visuals for adding checks in weekly schedule */}
-                            <View style={{position: "absolute"}}>
-                                <View style={{flexDirection: "row", top: "70%"}}>
-                                    <Entypo name="check" size={13} color="#D7D2FF" />
-                                    <Entypo name="check" size={13} color="#F7FF99" />
-                                    <Entypo name="check" size={13} color="#A8EC9A" />
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[0].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
+                                    {checkColor.map(item => (
+                                        <View key={item.id}>
+                                            <Entypo name="check" size={13} color={item.checkColor} />
+                                        </View>
+                                    ))}
                                 </View>
-                            </View>
+                            )}
+                            {/* Visuals for adding checks in weekly schedule */}
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[1], 1)} >
                             <View style={isCalendarReady && isSelectedDate(weekdays[1]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
@@ -207,16 +209,34 @@ const WeeklyCalendar = (props) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[1]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[1].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
+                                    {checkColor.map(item => (
+                                        <View key={item.id}>
+                                            <Entypo name="check" size={13} color={item.checkColor} />
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.weekDayNumber}onPress={onDayPress.bind(this, weekdays[2], 2)}>
                             <View style={isCalendarReady && isSelectedDate(weekdays[2]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
-                                <Text style={isCalendarReady && isSelectedDate(weekdays[2]) ? styles.weekDayNumberTextToday : { color: props.themeColo, fontSize: 17, fontFamily: "SUIT-Medium" }}>
+                                <Text style={isCalendarReady && isSelectedDate(weekdays[2]) ? styles.weekDayNumberTextToday : { color: props.themeColor, fontSize: 17, fontFamily: "SUIT-Medium" }}>
                                     {isCalendarReady ? weekdays[2].date() : ''}
                                 </Text>
                             </View>
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[2]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[2].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
+                                    {checkColor.map(item => (
+                                        <View key={item.id}>
+                                            <Entypo name="check" size={13} color={item.checkColor} />
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[3], 3)}>
                             <View style={isCalendarReady && isSelectedDate(weekdays[3]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
@@ -227,6 +247,15 @@ const WeeklyCalendar = (props) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[3]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[3].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
+                                    {checkColor.map(item => (
+                                        <View key={item.id}>
+                                            <Entypo name="check" size={13} color={item.checkColor} />
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[4], 4)}>
                             <View style={isCalendarReady && isSelectedDate(weekdays[4]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
@@ -234,9 +263,16 @@ const WeeklyCalendar = (props) => {
                                     {isCalendarReady ? weekdays[4].date() : ''}
                                 </Text>
                             </View>
-                            {/* {isCalendarReady && 
-                                <View style={isSelectedDate(weekdays[4]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
-                            } */}
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[4].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
+                                    {checkColor.map(item => (
+                                        <View key={item.id}>
+                                            <Entypo name="check" size={13} color={item.checkColor} />
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
+                                                        
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[5], 5)}>
                             <View style={isCalendarReady && isSelectedDate(weekdays[5]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
@@ -247,6 +283,15 @@ const WeeklyCalendar = (props) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[5]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[5].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
+                                    {checkColor.map(item => (
+                                        <View key={item.id}>
+                                            <Entypo name="check" size={13} color={item.checkColor} />
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[6], 6)}>
                             <View style={isCalendarReady && isSelectedDate(weekdays[6]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
@@ -257,6 +302,15 @@ const WeeklyCalendar = (props) => {
                             {/* {isCalendarReady && eventMap.get(weekdays[6].format('YYYY-MM-DD').toString()) !== undefined && 
                                 <View style={isSelectedDate(weekdays[6]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[6].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
+                                    {checkColor.map(item => (
+                                        <View key={item.id}>
+                                            <Entypo name="check" size={13} color={item.checkColor} />
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
                         </TouchableOpacity>
                     </View>
                 </View>
