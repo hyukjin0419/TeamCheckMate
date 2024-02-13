@@ -20,6 +20,7 @@ import { db, doc, getDocs, collection, auth, getDoc } from "../../firebase";
 import AssignmentItem from "./AssignmentItem";
 import Modal from "react-native-modal";
 import s from "../styles/css";
+import { orderBy, query } from "firebase/firestore";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 구하는 코드
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -151,25 +152,25 @@ const AssignmentPage = () => {
   };
 
   const getAssignmentList = async () => {
+    const assignmentData = [];
+
     try {
-      // "team" collection에 접근
-      const teamCollectionRef = collection(db, "team");
-      // "team" collection에 있는 document에 접근
-      const teamDocumentRef = doc(teamCollectionRef, teamCode);
-      // "과제List" collection에 접근하여 모든 문서 가져오기
       const querySnapshot = await getDocs(
-        collection(teamDocumentRef, "과제 list")
+        query(
+          collection(db, "team", teamCode, "assignmentList"),
+          orderBy("regDate", "desc")
+        )
       );
-      // 가져온 문서를 배열로 변환하여 state 업데이트
-      const assignmentData = [];
-      querySnapshot.forEach((doc) => {
-        assignmentData.push({
-          id: doc.id,
-          assignmentId: doc.id,
-          ...doc.data(),
-        });
-      });
+
+      querySnapshot.forEach((doc) =>
+        assignmentData.push({ id: doc.id, assignmentId: doc.id, ...doc.data() })
+      );
+
       setAssignmentList(assignmentData);
+      console.log(
+        "[AssignmentPage] : ",
+        JSON.stringify(assignmentData, null, 2)
+      );
     } catch (error) {
       console.error("데이터 불러오기 중 오류 발생:", error);
     }

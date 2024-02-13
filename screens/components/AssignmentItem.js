@@ -61,7 +61,7 @@ const AssignmentItem = (props) => {
       const teamDocumentRef = doc(collection(db, "team"), teamCode);
       const assignmentListCollectionRef = collection(
         teamDocumentRef,
-        "과제 list"
+        "assignmentList"
       );
       //과제 list colloection에 접근
       const assignmentDocRef = doc(
