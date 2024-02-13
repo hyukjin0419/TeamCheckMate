@@ -271,8 +271,8 @@ export default function App() {
                 //현재 선택된 탭일 때와 아닐 때 아이콘을 다르게 지정할 수 있다.
                 tabBarIcon: ({ focused }) => {
                   let iconAddress;
-                  let iconWidth = 28;
-                  let iconHeight = 28;
+                  let iconWidth = 25;
+                  let iconHeight = 25;
 
                   if (route.name === "개인") {
                     //focused는 현재 탭이 활성화 된 상태인지 여부를 나타내는 불리언 값
@@ -280,14 +280,14 @@ export default function App() {
                     iconAddress = focused
                       ? require("./screens/images/PersonalIconSelected.png")
                       : require("./screens/images/PersonalIconUnselected.png");
-                    iconWidth = 25;
-                    iconHeight = 25;
+                    iconWidth = 22;
+                    iconHeight = 22;
                   } else if (route.name === "팀") {
                     iconAddress = focused
                       ? require("./screens/images/TeamIconSelected.png")
                       : require("./screens/images/TeamIconUnselected.png");
-                    iconWidth = 30;
-                    iconHeight = 25;
+                    iconWidth = 27;
+                    iconHeight = 22;
                   } else if (route.name === "시간표") {
                     iconAddress = focused
                       ? require("./screens/images/ScheduleIconSelected.png")
@@ -296,14 +296,14 @@ export default function App() {
                     iconAddress = focused
                       ? require("./screens/images/GuidanceIconSelected.png")
                       : require("./screens/images/GuidanceIconUnselected.png");
-                    iconWidth = focused ? 36 : 30;
-                    iconHeight = 28;
+                    iconWidth = focused ? 33 : 27;
+                    iconHeight = 26;
                   } else if (route.name === "설정") {
                     iconAddress = focused
                       ? require("./screens/images/SettingIconSelected.png")
                       : require("./screens/images/SettingIconUnselected.png");
-                    iconWidth = 27;
-                    iconHeight = 27;
+                    iconWidth = 24;
+                    iconHeight = 24;
                   }
 
                   return (
@@ -319,7 +319,7 @@ export default function App() {
                   borderTopWidth: 0,
                 }, //탭 바의 스타일을 설정한다.
                 tabBarLabelStyle: {
-                  paddingBottom: "7%",
+                  paddingBottom: "5%",
                   marginTop: "5%",
                   fontFamily: "SUIT-Regular",
                   fontSize: 11,
