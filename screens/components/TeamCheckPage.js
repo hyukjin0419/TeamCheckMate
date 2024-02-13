@@ -151,7 +151,8 @@ export default TeamCheckPage = (props) => {
   };
 
   const getCheckLists = async () => {
-    const checkList = [];
+    const uncheckedChecklists = [];
+    const checkedChecklists = [];
 
     await Promise.all(
       memberNames.map(async (memberName) => {
@@ -170,14 +171,22 @@ export default TeamCheckPage = (props) => {
             orderBy("regDate", "asc")
           )
         );
-        checkList.push(
-          ...querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        );
+        querySnapshot.forEach((doc) => {
+          const data = { id: doc.id, ...doc.data(), memberName };
+          if (data.isChecked) {
+            checkedChecklists.push(data);
+          } else {
+            uncheckedChecklists.push(data);
+          }
+        });
       })
     );
 
-    setChecklists(checkList);
-    // console.log("[TeamCheckPage]: : ", JSON.stringify(checkList, null, 2));
+    // 체크된 항목과 체크되지 않은 항목을 합쳐서 최종적인 배열을 생성
+    const combinedChecklists = [...uncheckedChecklists, ...checkedChecklists];
+
+    setChecklists(combinedChecklists);
+    getCheckLists();
   };
 
   useEffect(() => {
@@ -185,7 +194,6 @@ export default TeamCheckPage = (props) => {
     // console.log("[TeamCheckPage]: ", checklists);
   }, []);
 
-  console.log(JSON.stringify(checklists, null, 2));
   return (
     //헤더 부분
     <KeyboardAvoidingView
