@@ -9,8 +9,6 @@ import {
   ScrollView,
   FlatList,
   KeyboardAvoidingView,
-  Keyboard,
-  TouchableWithoutFeedback,
   ImageBackground,
 } from "react-native";
 import {
@@ -22,8 +20,8 @@ import {
   updateDoc,
 } from "../../firebase.js";
 import Modal from "react-native-modal";
-import { query, orderBy, arrayRemove } from "firebase/firestore";
-import React, { useEffect, useState, useRef } from "react";
+import { query, orderBy, deleteDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
 import { color } from "../styles/colors";
@@ -48,31 +46,16 @@ export default TeamCheckPage = (props) => {
     assignmentId,
     dueDate,
   } = route.params;
-  //console.log(route.params);
 
   //체크리스트를 전부 가지고 있는 객체 배열. 하나의 객체는 하나의 체크를 뜻한다
   //key값은 writer.
   const [checklists, setChecklists] = useState([]);
   const [newTaskText, setNewTaskText] = useState("");
+  const [editTaskText, setEditTaskText] = useState("");
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
-  /*console.log(
-    teamCode,
-    title,
-    fileColor,
-    memberInfo,
-    memberNames,
-    assignmentName,
-    assignmentId,
-    dueDate
-  );*/
-  const pressAddBtn = (memberName) => {
-    //isWritingNewTask를 순회하면서 현재 선택된 사람이 아니면 textinput을 닫는다.
-    Object.keys(isWritingNewTask).forEach((name) => {
-      if (name !== memberName && isWritingNewTask[name]) {
-        closeTextInput(name);
-      }
-    });
 
+  //체크리스트 생성을 위한 입력창을 열어주는 함수
+  const pressAddBtn = (memberName) => {
     // 플러스 버튼을 누를 때 해당 팀 멤버에 대한 입력 창을 열도록 설정
     setIsWritingNewTask((prevIsWritingNewTask) => ({
       ...prevIsWritingNewTask,
@@ -80,14 +63,7 @@ export default TeamCheckPage = (props) => {
     }));
   };
 
-  const closeTextInput = (memberName) => {
-    addNewTask(memberName);
-    setIsWritingNewTask((prevIsWritingNewTask) => ({
-      ...prevIsWritingNewTask,
-      [memberName]: false,
-    }));
-  };
-
+  //Create a new checklist
   const addNewTask = async (memberName, isSubmitedByEnter) => {
     if (newTaskText.trim() !== "") {
       const newChecklist = {
@@ -98,7 +74,6 @@ export default TeamCheckPage = (props) => {
         modDate: new Date(),
       };
 
-      // 새로운 체크리스트를 현재의 체크리스트 목록에 추가
       setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
 
       const checkListDoc = addDoc(
@@ -119,6 +94,7 @@ export default TeamCheckPage = (props) => {
         const updatedIsWritingNewTask = { ...isWritingNewTask };
         updatedIsWritingNewTask[memberName] = false;
         setIsWritingNewTask(updatedIsWritingNewTask);
+        console.log(updatedIsWritingNewTask);
       }
       setNewTaskText("");
     } else {
@@ -127,9 +103,12 @@ export default TeamCheckPage = (props) => {
     await getCheckLists();
   };
 
+  //CheckBox Update
   const handleCheckboxChange = async (writer, id, newValue) => {
+
     // 체크박스 상태 변경
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
 
     const updatedChecklists = checklists.map((checklist) =>
       checklist.writer === writer && checklist.id === id
@@ -152,9 +131,7 @@ export default TeamCheckPage = (props) => {
 
     setChecklists(updatedChecklists);
 
-    // Firestore에 업데이트 반영
     try {
-      // 각 체크리스트에 대해 업데이트 명령 추가
       const docRef = doc(
         db,
         "team",
@@ -164,7 +141,7 @@ export default TeamCheckPage = (props) => {
         "memberName",
         writer,
         "checkList",
-        id // 해당 체크리스트의 ID를 사용하여 문서를 참조합니다.
+        id
       );
       await updateDoc(docRef, {
         isChecked: newValue,
@@ -175,6 +152,7 @@ export default TeamCheckPage = (props) => {
     }
   };
 
+  //Read from Firebase and store in an object array
   const getCheckLists = async () => {
     const uncheckedChecklists = [];
     const checkedChecklists = [];
@@ -193,12 +171,11 @@ export default TeamCheckPage = (props) => {
               memberName,
               "checkList"
             ),
-            console.log("??:", memberNames, memberName),
             orderBy("regDate", "asc")
           )
         );
         querySnapshot.forEach((doc) => {
-          const data = { id: doc.id, ...doc.data(), memberName };
+          const data = { id: doc.id, ...doc.data() };
           if (data.isChecked) {
             checkedChecklists.push(data);
           } else {
@@ -212,29 +189,112 @@ export default TeamCheckPage = (props) => {
     const combinedChecklists = [...uncheckedChecklists, ...checkedChecklists];
 
     setChecklists(combinedChecklists);
-    // getCheckLists();
   };
 
   useEffect(() => {
     getCheckLists();
-    console.log("[TeamCheckPage]: ", checklists);
-    console.log("[TeamCheckPage]: memberNames", memberNames);
   }, []);
 
+  //Update
+  const readyToUpdateTask = () => {
+    setAssignmentOptionModalVisible(false);
+    // 체크리스트를 찾습니다.
+    const foundChecklist = checklists.find(
+      (checklist) => checklist.id === selectedChecklist.id
+    );
+
+    // 찾은 체크리스트가 있고, isadditing 속성을 true로 설정합니다.
+    if (foundChecklist) {
+      foundChecklist.isadditing = true;
+      setEditTaskText(foundChecklist.content);
+      // 새로운 배열을 생성하여 업데이트합니다.
+      const updatedChecklists = checklists.map((checklist) =>
+        checklist.id === foundChecklist.id ? foundChecklist : checklist
+      );
+      setChecklists(updatedChecklists);
+    }
+    console.log(JSON.stringify(checklists, null, 2));
+  };
+
+  const editTask = async (memberName) => {
+    const foundChecklist = checklists.find(
+      (checklist) => checklist.id === selectedChecklist.id
+    );
+    if (foundChecklist) {
+      foundChecklist.content = editTaskText;
+      foundChecklist.isadditing = false;
+      const updatedChecklists = checklists.map((checklist) =>
+        checklist.id === foundChecklist.id ? foundChecklist : checklist
+      );
+      setChecklists(updatedChecklists);
+    }
+    try {
+      const docRef = doc(
+        db,
+        "team",
+        teamCode,
+        "assignmentList",
+        assignmentId,
+        "memberName",
+        memberName,
+        "checkList",
+        selectedChecklist.id
+      );
+      await updateDoc(docRef, {
+        content: editTaskText,
+        modDate: new Date(),
+      });
+    } catch (error) {
+      console.error("Error updating documents: ", error);
+    }
+  };
+
+  const deleteTask = async (memberName) => {
+    try {
+      // 클라이언트 상태에서 선택된 체크리스트를 찾습니다.
+      const updatedChecklists = checklists.filter(
+        (checklist) => checklist.id !== selectedChecklist.id
+      );
+      setChecklists(updatedChecklists);
+      console.log(
+        teamCode,
+        assignmentId,
+        selectedChecklist.writer,
+        selectedChecklist.id
+      );
+      // 데이터베이스에서 해당 체크리스트를 삭제합니다.
+      await deleteDoc(
+        doc(
+          db,
+          "team",
+          teamCode,
+          "assignmentList",
+          assignmentId,
+          "memberName",
+          selectedChecklist.writer,
+          "checkList",
+          selectedChecklist.id
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  };
+
+  //모달
   const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
     useState(false);
-  {
-    /* 과제 옵션 모달창 띄우고/숨기는 함수 */
-  }
-  const [selectedChecklist, setSelectedChecklist] = useState(null);
+
+  const [selectedChecklist, setselectedChecklist] = useState({});
 
   const handleAssignmentOptionPress = (checklist) => {
     setAssignmentOptionModalVisible(!assignmentOptionModalVisible);
-    setSelectedChecklist(checklist.content);
+    setselectedChecklist(checklist);
   };
-
+  // console.log(JSON.stringify(checklists, null, 2));
   return (
     //헤더 부분
+
     <KeyboardAvoidingView
       style={s.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -321,39 +381,62 @@ export default TeamCheckPage = (props) => {
                   style={styles.taskAddBtn}
                 />
               </TouchableOpacity>
-
               {/* 생성된 체크리스트 렌더링 */}
-
               {/* 체크리스트 항목 추가 입력 창 */}
               {checklists
                 .filter((checklist) => checklist.writer === item.name)
-                .map((checklist) => (
-                  <View key={checklist.id} style={styles.checkBoxContainer}>
-                    <Checkbox
-                      value={checklist.isChecked}
-                      style={styles.checkbox}
-                      color={fileColor}
-                      onValueChange={(newValue) =>
-                        handleCheckboxChange(
-                          checklist.writer,
-                          checklist.id,
-                          newValue
-                        )
-                      }
-                    />
-                    <Text style={styles.checkBoxContent}>
-                      {checklist.content}
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => handleAssignmentOptionPress(checklist)}
-                    >
-                      <Image
-                        source={require("../images/icons/three_dots.png")}
-                        style={styles.threeDots}
+                .map((checklist) =>
+                  checklist.isadditing ? (
+                    <View key={checklist.id} style={styles.checkBoxContainer}>
+                      <Checkbox style={styles.checkbox} color={fileColor} />
+                      <TextInput
+                        style={{
+                          ...styles.checkBoxContentTextInput,
+                          borderBottomColor: fileColor,
+                        }}
+                        value={editTaskText}
+                        autoFocus={true}
+                        returnKeyType="done"
+                        onChangeText={(text) => setEditTaskText(text)}
+                        onSubmitEditing={() => editTask(item.name)}
+                        // onBlur={() => addNewTask(item.name, false)}
+                        blurOnSubmit={false}
                       />
-                    </TouchableOpacity>
-                  </View>
-                ))}
+                      <TouchableOpacity>
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View key={checklist.id} style={styles.checkBoxContainer}>
+                      <Checkbox
+                        value={checklist.isChecked}
+                        style={styles.checkbox}
+                        color={fileColor}
+                        onValueChange={(newValue) =>
+                          handleCheckboxChange(
+                            checklist.writer,
+                            checklist.id,
+                            newValue
+                          )
+                        }
+                      />
+                      <Text style={styles.checkBoxContent}>
+                        {checklist.content}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => handleAssignmentOptionPress(checklist)}
+                      >
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )
+                )}
 
               {/* 입력창 생성 */}
               {isWritingNewTask[item.name] ? (
@@ -361,7 +444,10 @@ export default TeamCheckPage = (props) => {
                   <Checkbox style={styles.checkbox} color={fileColor} />
                   <TextInput
                     placeholder="할 일 추가..."
-                    style={styles.checkBoxContent}
+                    style={{
+                      ...styles.checkBoxContentTextInput,
+                      borderBottomColor: fileColor,
+                    }}
                     value={newTaskText}
                     autoFocus={true}
                     returnKeyType="done"
@@ -406,24 +492,22 @@ export default TeamCheckPage = (props) => {
             {/* 모달창 상단 회색 막대 */}
             <View style={s.modalVector}></View>
             {/* 모달창 상단 과제 이름 표시 */}
-            <Text style={s.modalTitle}>{selectedChecklist}</Text>
+            <Text style={s.modalTitle}>{selectedChecklist.content}</Text>
             <View flex={1}></View>
             {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
             <View style={s.modalTeamBtnContainer}>
               {/* 수정 버튼 */}
               <TouchableOpacity
                 style={s.teamReviseBtn}
-                onPress={() => console.log("체크리스트 수정")}
+                onPress={() => readyToUpdateTask()}
               >
                 <Text style={s.teamReviseText}>수정</Text>
               </TouchableOpacity>
               {/* 삭제 버튼 */}
               <TouchableOpacity
                 style={s.teamDeleteBtn}
-                onPress={() => {
-                  console.log("체크리스트 삭제");
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                }}
+
+                onPress={() => deleteTask()}
               >
                 {/* 터치 시 과제 삭제 */}
                 <Text style={s.teamDeleteText}>삭제</Text>
@@ -441,7 +525,6 @@ const styles = StyleSheet.create({
   assignmentTitleContainer: {
     height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.096 : WINDOW_HEIGHT * 0.117,
     width: WINDOW_WIDHT * 0.9,
-    //backgroundColor: "red",
     marginTop: "5%",
     marginBottom: "5%",
     flexDirection: "row",
@@ -556,7 +639,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 14,
     // backgroundColor: "green",
+    borderBottomColor: "green",
   },
+  checkBoxContentTextInput: {
+    flex: 1,
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginLeft: 14,
+    marginRight: 14,
+    borderBottomWidth: 1, // 테두리 두께
+  },
+
   checklistTextInput: {
     fontFamily: "SUIT-Regular",
     fontSize: 14,

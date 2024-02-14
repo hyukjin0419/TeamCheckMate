@@ -194,6 +194,7 @@ const AssignmentPage = () => {
     }
   };
 
+  //memberInfo객체에서 정보 배열로 할당
   const extractInfo = (memberInfo) => {
     if (memberInfo && Array.isArray(memberInfo)) {
       const extractedInfo = memberInfo.map((member) => ({
