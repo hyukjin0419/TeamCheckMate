@@ -46,40 +46,23 @@ export default TeamCheckPage = (props) => {
     assignmentId,
     dueDate,
   } = route.params;
-  //console.log(route.params);
 
   //체크리스트를 전부 가지고 있는 객체 배열. 하나의 객체는 하나의 체크를 뜻한다
   //key값은 writer.
   const [checklists, setChecklists] = useState([]);
   const [newTaskText, setNewTaskText] = useState("");
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
-  const [isWritingUpdateTask, setisWritingUpdateTask] = useState(false);
-  /*console.log(
-    teamCode,
-    title,
-    fileColor,
-    memberInfo,
-    memberNames,
-    assignmentName,
-    assignmentId,
-    dueDate
-  );*/
 
   //체크리스트 생성을 위한 입력창을 열어주는 함수
   const pressAddBtn = (memberName) => {
-    setAssignmentOptionModalVisible(false);
-    console.log(selectedMember);
-    // console.log(selectedChecklist);
-
     // 플러스 버튼을 누를 때 해당 팀 멤버에 대한 입력 창을 열도록 설정
     setIsWritingNewTask((prevIsWritingNewTask) => ({
       ...prevIsWritingNewTask,
       [memberName]: true,
     }));
-    console.log(isWritingNewTask);
   };
 
-  //C
+  //Create a new checklist
   const addNewTask = async (memberName, isSubmitedByEnter) => {
     if (newTaskText.trim() !== "") {
       const newChecklist = {
@@ -90,7 +73,6 @@ export default TeamCheckPage = (props) => {
         modDate: new Date(),
       };
 
-      // 새로운 체크리스트를 현재의 체크리스트 목록에 추가
       setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
 
       const checkListDoc = addDoc(
@@ -111,6 +93,7 @@ export default TeamCheckPage = (props) => {
         const updatedIsWritingNewTask = { ...isWritingNewTask };
         updatedIsWritingNewTask[memberName] = false;
         setIsWritingNewTask(updatedIsWritingNewTask);
+        console.log(updatedIsWritingNewTask);
       }
       setNewTaskText("");
     } else {
@@ -144,9 +127,7 @@ export default TeamCheckPage = (props) => {
 
     setChecklists(updatedChecklists);
 
-    // Firestore에 업데이트 반영
     try {
-      // 각 체크리스트에 대해 업데이트 명령 추가
       const docRef = doc(
         db,
         "team",
@@ -156,7 +137,7 @@ export default TeamCheckPage = (props) => {
         "memberName",
         writer,
         "checkList",
-        id // 해당 체크리스트의 ID를 사용하여 문서를 참조합니다.
+        id
       );
       await updateDoc(docRef, {
         isChecked: newValue,
@@ -167,7 +148,7 @@ export default TeamCheckPage = (props) => {
     }
   };
 
-  //R
+  //Read from Firebase and store in an object array
   const getCheckLists = async () => {
     const uncheckedChecklists = [];
     const checkedChecklists = [];
@@ -204,35 +185,47 @@ export default TeamCheckPage = (props) => {
     const combinedChecklists = [...uncheckedChecklists, ...checkedChecklists];
 
     setChecklists(combinedChecklists);
-    // getCheckLists();
-    console.log(JSON.stringify(checklists, null, 2));
   };
 
   useEffect(() => {
     getCheckLists();
-    // console.log("[TeamCheckPage]: ", checklists);
-    // console.log("[TeamCheckPage]: memberNames", memberNames);
   }, []);
 
-  //U
-  const updateTask = (writer, id) => {};
+  //Update
+  const updateTask = () => {
+    setAssignmentOptionModalVisible(false);
+    // 체크리스트를 찾습니다.
+    const foundChecklist = checklists.find(
+      (checklist) => checklist.id === selectedChecklist.id
+    );
+
+    // 찾은 체크리스트가 있고, isadditing 속성을 true로 설정합니다.
+    if (foundChecklist) {
+      foundChecklist.isadditing = true;
+
+      // 새로운 배열을 생성하여 업데이트합니다.
+      const updatedChecklists = checklists.map((checklist) =>
+        checklist.id === foundChecklist.id ? foundChecklist : checklist
+      );
+      setChecklists(updatedChecklists);
+    }
+    console.log(JSON.stringify(checklists, null, 2));
+  };
+
   //모달
   const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
     useState(false);
-  {
-    /* 과제 옵션 모달창 띄우고/숨기는 함수 */
-  }
-  const [selectedChecklist, setSelectedChecklist] = useState();
-  const [selectedMember, setselectedMember] = useState();
+
+  const [selectedChecklist, setselectedChecklist] = useState({});
 
   const handleAssignmentOptionPress = (checklist) => {
     setAssignmentOptionModalVisible(!assignmentOptionModalVisible);
-    setSelectedChecklist(checklist.content);
-    setselectedMember(checklist.writer);
+    setselectedChecklist(checklist);
   };
-
+  console.log(JSON.stringify(checklists, null, 2));
   return (
     //헤더 부분
+
     <KeyboardAvoidingView
       style={s.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -324,7 +317,7 @@ export default TeamCheckPage = (props) => {
               {checklists
                 .filter((checklist) => checklist.writer === item.name)
                 .map((checklist) =>
-                  isWritingUpdateTask ? (
+                  checklist.isadditing ? (
                     <KeyboardAvoidingView
                       key={checklist.id}
                       style={styles.checkBoxContainer}
@@ -338,8 +331,8 @@ export default TeamCheckPage = (props) => {
                         returnKeyType="done"
                         onChangeText={(text) => setNewTaskText(text)}
                         onSubmitEditing={() => addNewTask(item.name, true)}
-                        onBlur={() => addNewTask(item.name, false)}
-                        blurOnSubmit={false}
+                        // onBlur={() => addNewTask(item.name, false)}
+                        // blurOnSubmit={false}
                       />
                       <TouchableOpacity>
                         <Image
@@ -425,14 +418,14 @@ export default TeamCheckPage = (props) => {
             {/* 모달창 상단 회색 막대 */}
             <View style={s.modalVector}></View>
             {/* 모달창 상단 과제 이름 표시 */}
-            <Text style={s.modalTitle}>{selectedChecklist}</Text>
+            <Text style={s.modalTitle}>{selectedChecklist.content}</Text>
             <View flex={1}></View>
             {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
             <View style={s.modalTeamBtnContainer}>
               {/* 수정 버튼 */}
               <TouchableOpacity
                 style={s.teamReviseBtn}
-                onPress={() => updateTask(selectedMember)}
+                onPress={() => updateTask()}
               >
                 <Text style={s.teamReviseText}>수정</Text>
               </TouchableOpacity>
@@ -471,7 +464,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "grey",
   },
   dueDateText: {
-    // color: color.redpink,
+    color: color.redpink,
     fontSize: 12,
     fontFamily: "SUIT-Regular",
   },
