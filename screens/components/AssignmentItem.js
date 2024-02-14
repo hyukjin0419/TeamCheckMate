@@ -80,8 +80,25 @@ const AssignmentItem = (props) => {
     props.getAssignmentList();
   };
 
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handlePressIn = () => {
+    setIsPressed(true);
+  };
+
+  const handlePressOut = () => {
+    setIsPressed(false);
+  };
+
   return (
-    <TouchableOpacity
+    <Pressable
+      onLongPress={handleAssignmentOptionPress}
+      delayLongPress={800}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.2 : 1,
+      })}
       onPress={() => {
         navigation.navigate("TeamCheckPage", {
           teamCode: teamCode,
@@ -178,7 +195,7 @@ const AssignmentItem = (props) => {
           </View>
         </Modal>
       </ImageBackground>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
