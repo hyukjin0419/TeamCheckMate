@@ -51,6 +51,7 @@ export default TeamCheckPage = (props) => {
   //key값은 writer.
   const [checklists, setChecklists] = useState([]);
   const [newTaskText, setNewTaskText] = useState("");
+  const [editTaskText, setEditTaskText] = useState("");
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
 
   //체크리스트 생성을 위한 입력창을 열어주는 함수
@@ -192,7 +193,7 @@ export default TeamCheckPage = (props) => {
   }, []);
 
   //Update
-  const updateTask = () => {
+  const readyToUpdateTask = () => {
     setAssignmentOptionModalVisible(false);
     // 체크리스트를 찾습니다.
     const foundChecklist = checklists.find(
@@ -202,7 +203,7 @@ export default TeamCheckPage = (props) => {
     // 찾은 체크리스트가 있고, isadditing 속성을 true로 설정합니다.
     if (foundChecklist) {
       foundChecklist.isadditing = true;
-
+      setEditTaskText(foundChecklist.content);
       // 새로운 배열을 생성하여 업데이트합니다.
       const updatedChecklists = checklists.map((checklist) =>
         checklist.id === foundChecklist.id ? foundChecklist : checklist
@@ -210,6 +211,39 @@ export default TeamCheckPage = (props) => {
       setChecklists(updatedChecklists);
     }
     console.log(JSON.stringify(checklists, null, 2));
+  };
+
+  const editTask = async (memberName) => {
+    const foundChecklist = checklists.find(
+      (checklist) => checklist.id === selectedChecklist.id
+    );
+    if (foundChecklist) {
+      foundChecklist.content = editTaskText;
+      foundChecklist.isadditing = false;
+      const updatedChecklists = checklists.map((checklist) =>
+        checklist.id === foundChecklist.id ? foundChecklist : checklist
+      );
+      setChecklists(updatedChecklists);
+    }
+    try {
+      const docRef = doc(
+        db,
+        "team",
+        teamCode,
+        "assignmentList",
+        assignmentId,
+        "memberName",
+        memberName,
+        "checkList",
+        selectedChecklist.id
+      );
+      await updateDoc(docRef, {
+        content: editTaskText,
+        modDate: new Date(),
+      });
+    } catch (error) {
+      console.error("Error updating documents: ", error);
+    }
   };
 
   //모달
@@ -318,21 +352,20 @@ export default TeamCheckPage = (props) => {
                 .filter((checklist) => checklist.writer === item.name)
                 .map((checklist) =>
                   checklist.isadditing ? (
-                    <KeyboardAvoidingView
-                      key={checklist.id}
-                      style={styles.checkBoxContainer}
-                    >
+                    <View key={checklist.id} style={styles.checkBoxContainer}>
                       <Checkbox style={styles.checkbox} color={fileColor} />
                       <TextInput
-                        placeholder="할 일 추가..."
-                        style={styles.checkBoxContent}
-                        value={newTaskText}
+                        style={{
+                          ...styles.checkBoxContentTextInput,
+                          borderBottomColor: fileColor,
+                        }}
+                        value={editTaskText}
                         autoFocus={true}
                         returnKeyType="done"
-                        onChangeText={(text) => setNewTaskText(text)}
-                        onSubmitEditing={() => addNewTask(item.name, true)}
+                        onChangeText={(text) => setEditTaskText(text)}
+                        onSubmitEditing={() => editTask(item.name)}
                         // onBlur={() => addNewTask(item.name, false)}
-                        // blurOnSubmit={false}
+                        blurOnSubmit={false}
                       />
                       <TouchableOpacity>
                         <Image
@@ -340,7 +373,7 @@ export default TeamCheckPage = (props) => {
                           style={styles.threeDots}
                         />
                       </TouchableOpacity>
-                    </KeyboardAvoidingView>
+                    </View>
                   ) : (
                     <View key={checklist.id} style={styles.checkBoxContainer}>
                       <Checkbox
@@ -376,7 +409,10 @@ export default TeamCheckPage = (props) => {
                   <Checkbox style={styles.checkbox} color={fileColor} />
                   <TextInput
                     placeholder="할 일 추가..."
-                    style={styles.checkBoxContent}
+                    style={{
+                      ...styles.checkBoxContentTextInput,
+                      borderBottomColor: fileColor,
+                    }}
                     value={newTaskText}
                     autoFocus={true}
                     returnKeyType="done"
@@ -425,7 +461,7 @@ export default TeamCheckPage = (props) => {
               {/* 수정 버튼 */}
               <TouchableOpacity
                 style={s.teamReviseBtn}
-                onPress={() => updateTask()}
+                onPress={() => readyToUpdateTask()}
               >
                 <Text style={s.teamReviseText}>수정</Text>
               </TouchableOpacity>
@@ -566,7 +602,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 14,
     // backgroundColor: "green",
+    borderBottomColor: "green",
   },
+  checkBoxContentTextInput: {
+    flex: 1,
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginLeft: 14,
+    marginRight: 14,
+    borderBottomWidth: 1, // 테두리 두께
+  },
+
   checklistTextInput: {
     fontFamily: "SUIT-Regular",
     fontSize: 14,
