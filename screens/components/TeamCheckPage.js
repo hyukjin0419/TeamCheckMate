@@ -20,7 +20,7 @@ import {
   updateDoc,
 } from "../../firebase.js";
 import Modal from "react-native-modal";
-import { query, orderBy } from "firebase/firestore";
+import { query, orderBy, deleteDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
@@ -246,6 +246,38 @@ export default TeamCheckPage = (props) => {
     }
   };
 
+  const deleteTask = async (memberName) => {
+    try {
+      // 클라이언트 상태에서 선택된 체크리스트를 찾습니다.
+      const updatedChecklists = checklists.filter(
+        (checklist) => checklist.id !== selectedChecklist.id
+      );
+      setChecklists(updatedChecklists);
+      console.log(
+        teamCode,
+        assignmentId,
+        selectedChecklist.writer,
+        selectedChecklist.id
+      );
+      // 데이터베이스에서 해당 체크리스트를 삭제합니다.
+      await deleteDoc(
+        doc(
+          db,
+          "team",
+          teamCode,
+          "assignmentList",
+          assignmentId,
+          "memberName",
+          selectedChecklist.writer,
+          "checkList",
+          selectedChecklist.id
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  };
+
   //모달
   const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
     useState(false);
@@ -256,7 +288,7 @@ export default TeamCheckPage = (props) => {
     setAssignmentOptionModalVisible(!assignmentOptionModalVisible);
     setselectedChecklist(checklist);
   };
-  console.log(JSON.stringify(checklists, null, 2));
+  // console.log(JSON.stringify(checklists, null, 2));
   return (
     //헤더 부분
 
@@ -468,7 +500,7 @@ export default TeamCheckPage = (props) => {
               {/* 삭제 버튼 */}
               <TouchableOpacity
                 style={s.teamDeleteBtn}
-                onPress={() => console.log("체크리스트 삭제")}
+                onPress={() => deleteTask()}
               >
                 {/* 터치 시 과제 삭제 */}
                 <Text style={s.teamDeleteText}>삭제</Text>
