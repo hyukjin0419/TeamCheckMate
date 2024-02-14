@@ -79,7 +79,6 @@ const WeeklyCalendar = ( props ) => {
         // When this is set to true, display calendar
         setCalendarReady(true)
         // Create Weekdays
-        const test = new Date();
         createWeekdays(currDate);
         getCategoryList(selectedDate);
     }, [selectedDate])
