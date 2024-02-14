@@ -129,7 +129,7 @@ export default TeamCheckPage = (props) => {
 
   const handleCheckboxChange = async (writer, id, newValue) => {
     // 체크박스 상태 변경
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Haptics.impactAsync(Haptics.impactAsync.Medium);
 
     const updatedChecklists = checklists.map((checklist) =>
       checklist.writer === writer && checklist.id === id
