@@ -55,7 +55,6 @@ const PersonalPage = () => {
           });
         });
         setCategoryList(list);
-        console.log(categoryList);
       } else {
         return;
       }

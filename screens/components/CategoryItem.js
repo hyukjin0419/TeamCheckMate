@@ -165,8 +165,19 @@ const CategoryItem = (props) => {
                 regDate: checklistToUpdate.regDate,
               };
           
-              // Check if id is not already in the array
-              if (!checkColorList.some(item => item.id === colorAdd.id)) {
+               // Check if id is already in the array
+              const index = checkColorList.findIndex(item => item.id === colorAdd.id);
+
+              if (index !== -1) {
+                // Update existing entry
+                if (checkColorList[index].checkColor !== colorAdd.checkColor) {
+                  // Update existing entry with the new color
+                  const updatedCheckColorList = [...checkColorList];
+                  updatedCheckColorList[index] = colorAdd;
+                  setCheckColor(updatedCheckColorList);
+                }
+              } else {
+                // Add a new entry
                 const updatedCheckColorList = [...checkColorList, colorAdd];
                 setCheckColor(updatedCheckColorList);
               }
@@ -179,6 +190,7 @@ const CategoryItem = (props) => {
               setCheckColor(updatedCheckColorList);
             }
           } 
+
           let dateMap = new Map()
           // add all the dates of tasks being checked into new map
           for (let i = 0; i < checkColor.length; i++) {
