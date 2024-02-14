@@ -41,25 +41,26 @@ const AssignmentPage = () => {
     memberInfo: memberInfo,
   } = route.params;
 
-  console.log(
-    "[AssignmentPage]: ",
-    memberNames,
-    memberInfo,
-    teamCode,
-    title,
-    fileColor,
-    memberInfo,
-    memberNames
-  );
+  // console.log(
+  //   "[AssignmentPage]: ",
+  //   memberNames,
+  //   memberInfo,
+  //   teamCode,
+  //   title,
+  //   fileColor,
+  //   memberInfo,
+  //   memberNames
+  // );
 
-  //멤버 전화번호 문자 배열
-  const [memberPhoneNumbers, setMemberPhoneNumbers] = useState([]);
+  const [extractedInfoArray, setExtractedInfoArray] = useState([]);
+  //멤버 이메일 문자 배열
+  const [memberEmails, setMemberEmails] = useState([]);
   //멤버 학교 문자 배열
   const [memberSchools, setMemberSchools] = useState([]);
   //멤버 학번 문자 배열
   const [memberStudentNumbers, setMemberStudentNumbers] = useState([]);
-  //멤버 학번 문자 배열
-  const [memberEmails, setMemberEmails] = useState([]);
+  //멤버 전화번호 문자 배열
+  const [memberPhoneNumbers, setMemberPhoneNumbers] = useState([]);
 
   const [openedFileImage, setOpenedFileImage] = useState(
     require("../images/OpenedFileColor/9CB1BB.png")
@@ -193,12 +194,32 @@ const AssignmentPage = () => {
     }
   };
 
+  const extractInfo = (memberInfo) => {
+    if (memberInfo && Array.isArray(memberInfo)) {
+      const extractedInfo = memberInfo.map((member) => ({
+        email: member.email,
+        school: member.school,
+        studentId: member.studentNumber,
+        phoneNumber: member.phoneNumber,
+      }));
+      setExtractedInfoArray(extractedInfo);
+      setMemberEmails(extractedInfo.map((info) => info.email));
+      setMemberSchools(extractedInfo.map((info) => info.school));
+      setMemberStudentNumbers(extractedInfo.map((info) => info.studentId));
+      setMemberPhoneNumbers(extractedInfo.map((info) => info.phoneNumber));
+    }
+  };
+
   //AssigmentPage에 들어올 시 getAssignmentList 함수 작동 (새로고침 함수)
   useFocusEffect(
     React.useCallback(() => {
       getAssignmentList();
     }, [])
   );
+
+  useEffect(() => {
+    extractInfo(memberInfo);
+  }, []);
 
   //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
   const [showModal, setShowModal] = useState(false);
@@ -214,7 +235,7 @@ const AssignmentPage = () => {
       }}
     >
       <StatusBar style={"dark"}></StatusBar>
-      {/* 헤더 */}
+
       <View
         style={{
           ...s.headContainer,
