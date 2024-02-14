@@ -18,6 +18,7 @@ import { db, doc, updateDoc } from "../../../firebase";
 import Modal from "react-native-modal";
 import s from "../../styles/css";
 import { useNavigation } from "@react-navigation/core";
+import * as Haptics from "expo-haptics";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 구하는 코드
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -119,6 +120,7 @@ export default TeamUpdatePage = ({ route }) => {
             onPress={() => {
               updateTeam();
               navigation.navigate("TeamPage");
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
             <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>

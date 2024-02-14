@@ -129,7 +129,7 @@ export default TeamCheckPage = (props) => {
 
   const handleCheckboxChange = async (writer, id, newValue) => {
     // 체크박스 상태 변경
-    Haptics.impactAsync(Haptics.impactAsync.Medium);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     const updatedChecklists = checklists.map((checklist) =>
       checklist.writer === writer && checklist.id === id
@@ -366,7 +366,10 @@ export default TeamCheckPage = (props) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.name, true)}
+                    onSubmitEditing={() => {
+                      addNewTask(item.name, true),
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
                     onBlur={() => addNewTask(item.name, false)}
                     blurOnSubmit={false}
                   />
@@ -417,7 +420,10 @@ export default TeamCheckPage = (props) => {
               {/* 삭제 버튼 */}
               <TouchableOpacity
                 style={s.teamDeleteBtn}
-                onPress={() => console.log("체크리스트 삭제")}
+                onPress={() => {
+                  console.log("체크리스트 삭제");
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
               >
                 {/* 터치 시 과제 삭제 */}
                 <Text style={s.teamDeleteText}>삭제</Text>
