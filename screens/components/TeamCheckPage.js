@@ -105,10 +105,8 @@ export default TeamCheckPage = (props) => {
 
   //CheckBox Update
   const handleCheckboxChange = async (writer, id, newValue) => {
-
     // 체크박스 상태 변경
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
 
     const updatedChecklists = checklists.map((checklist) =>
       checklist.writer === writer && checklist.id === id
@@ -249,7 +247,8 @@ export default TeamCheckPage = (props) => {
     }
   };
 
-  const deleteTask = async (memberName) => {
+  const deleteTask = async () => {
+    setAssignmentOptionModalVisible(false);
     try {
       // 클라이언트 상태에서 선택된 체크리스트를 찾습니다.
       const updatedChecklists = checklists.filter(
@@ -506,7 +505,6 @@ export default TeamCheckPage = (props) => {
               {/* 삭제 버튼 */}
               <TouchableOpacity
                 style={s.teamDeleteBtn}
-
                 onPress={() => deleteTask()}
               >
                 {/* 터치 시 과제 삭제 */}
