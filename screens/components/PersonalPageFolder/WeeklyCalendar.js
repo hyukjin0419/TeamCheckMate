@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, ScrollView, TouchableOpacity, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import { Text, View, ScrollView, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import moment from 'moment/min/moment-with-locales';
 import { displayTitleByLocale } from './src/Locale';
@@ -8,22 +8,81 @@ import { AntDesign } from "@expo/vector-icons";
 import Modal from "react-native-modal"
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Entypo } from '@expo/vector-icons';
+import { useFocusEffect } from "@react-navigation/native";
+import CategoryItem from '../CategoryItem';
+import { collection, doc, getDocs, orderBy, query } from 'firebase/firestore';
+import { auth, db } from '../../../firebase';
 
-const WeeklyCalendar = ({ checkColor, checkEvent, ...props }) => {
+const WeeklyCalendar = ( props ) => {
     const [currDate, setCurrDate] = useState(moment(props.selected).locale(props.locale))
     const [weekdays, setWeekdays] = useState([])
     const [weekdayLabels, setWeekdayLabels] = useState([])
     const [selectedDate, setSelectedDate] = useState(currDate.clone())
     const [isCalendarReady, setCalendarReady] = useState(false)
     const [date, setDate] = useState(new Date());
+    const [categoryList, setCategoryList] = useState([]);
+    const [checkColor, setCheckColor] = useState("");
+    const [checkEvent, setCheckEvent] = useState(undefined);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const email = auth.currentUser.email;
+
+    const handleCheckColorChange = (color) => {
+        setCheckColor(color);
+      };
+      
+      const handleCheckEvent = (event) => {
+        setCheckEvent(event);
+      }
+
+    const getCategoryList = async(selectedDate) => {
+        try {
+          const userDocRef = doc(db, "user", email);
+          const userCategoryRef = collection(userDocRef, "personalCheckList");
+          const querySnapshot1 = await getDocs(query(userCategoryRef, orderBy("regDate", "asc")));
+          if(!querySnapshot1.empty) {
+            const list = [];
+            let allCheckedDate = null;
+            let checkedDateCompare = null;
+            let temp = new Date(selectedDate).toLocaleDateString();
+            querySnapshot1.forEach((doc) => {
+                if(doc.data().allCheckedDate !== null) {
+                    allCheckedDate = doc.data().allCheckedDate.toDate();
+                    checkedDateCompare = allCheckedDate.toLocaleDateString();
+                }
+                else {
+                    allCheckedDate = null;
+                    checkedDateCompare = null;
+                }
+                if(checkedDateCompare === null || checkedDateCompare >= temp) {
+                    list.push({
+                        id: doc.id,
+                        ...doc.data(),
+                        });
+                }
+            });
+            setCategoryList(list);
+          } else {
+            return;
+          }
+        } catch (error) {
+          console.error("Error getting category: ", error);
+        }
+      }
+
+      useFocusEffect( 
+        React.useCallback(() => {
+          getCategoryList(selectedDate);
+        }, [])
+      );  
     
     useEffect(() => { // only first mount
         // When this is set to true, display calendar
         setCalendarReady(true)
         // Create Weekdays
-        createWeekdays(currDate)
-    }, [])
+        const test = new Date();
+        createWeekdays(currDate);
+        getCategoryList(selectedDate);
+    }, [selectedDate])
 
     const toggleModal = () => {
         // toggle the visibility of modal
@@ -41,6 +100,7 @@ const WeeklyCalendar = ({ checkColor, checkEvent, ...props }) => {
             setWeekdays(weekdays => [...weekdays, weekdayToAdd])
             // Label the days (Sun, Mon, Tue, ...)
             setWeekdayLabels(weekdayLabels => [...weekdayLabels, weekdayToAdd.format(props.weekdayFormat)])
+
         }
     }
 
@@ -77,7 +137,8 @@ const WeeklyCalendar = ({ checkColor, checkEvent, ...props }) => {
 
     // if user presses on a day
     const onDayPress = (weekday, i) => {
-        setSelectedDate(weekday.clone())
+        setSelectedDate(weekday.clone());
+        console.log(selectedDate);
         if (props.onDayPress !== undefined) props.onDayPress(weekday.clone(), i)
     }
 
@@ -97,7 +158,7 @@ const WeeklyCalendar = ({ checkColor, checkEvent, ...props }) => {
     }
     
     return (
-        <View style={{marginTop: "15%", justifyContent: "center", alignItems: "center"}}>
+        <View style={{marginTop: "15%"}}>
             <View style={[styles.component, props.style]}>
                 <View style={styles.header}>
                     {/* Display title and allow user to press it to change date */}
@@ -314,7 +375,13 @@ const WeeklyCalendar = ({ checkColor, checkEvent, ...props }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
+                {/* Go to CategoryItem.js and pass the categoryList value to it */}
             </View>
+            <CategoryItem
+                                categoryList={categoryList}
+                                onCheckColorChange={handleCheckColorChange}
+                                checkEvent={handleCheckEvent}
+                            />
         </View>
     )
 

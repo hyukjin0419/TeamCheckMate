@@ -29,9 +29,6 @@ import CategoryItem from "./CategoryItem";
 const PersonalPage = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
-  const [categoryList, setCategoryList] = useState([]);
-  const [checkColor, setCheckColor] = useState("");
-  const [eventCheck, setEventCheck] = useState(undefined);
   const email = auth.currentUser.email;
 
     // Visibility of modal
@@ -41,41 +38,6 @@ const PersonalPage = () => {
     setIsModalVisible(!isModalVisible);
   };
 
-  const getCategoryList = async() => {
-    try {
-      const userDocRef = doc(db, "user", email);
-      const userCategoryRef = collection(userDocRef, "personalCheckList");
-      const querySnapshot1 = await getDocs(query(userCategoryRef, orderBy("regDate", "asc")));
-      if(!querySnapshot1.empty) {
-        const list = [];
-        querySnapshot1.forEach((doc) => {
-          list.push({
-            id: doc.id,
-            ...doc.data(),
-          });
-        });
-        setCategoryList(list);
-      } else {
-        return;
-      }
-    } catch (error) {
-      console.error("Error getting category: ", error);
-    }
-  }
-
-  const handleCheckColorChange = (color) => {
-    setCheckColor(color);
-  };
-  
-  const handleCheckEvent = (event) => {
-    setEventCheck(event);
-  }
-
-  useFocusEffect( 
-    React.useCallback(() => {
-      getCategoryList();
-    }, [])
-  );
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -101,7 +63,6 @@ const PersonalPage = () => {
       }
     }
     fetchUserData();
-    getCategoryList();
   }, [userEmail]);
 
   return(
@@ -111,14 +72,8 @@ const PersonalPage = () => {
         <PersonalPageBtn />
       </View> */}
       <Text style={styles.titleHeader}>{userName} 님 환영합니다</Text>
-      <WeeklyCalendar checkColor={checkColor} checkEvent={eventCheck} style={{marginBottom: "5%"}}/>
+      <WeeklyCalendar style={{marginBottom: "5%"}}/>
 
-      {/* Go to CategoryItem.js and pass the categoryList value to it */}
-      <CategoryItem
-        categoryList={categoryList}
-        onCheckColorChange={handleCheckColorChange}
-        checkEvent={handleCheckEvent}
-      />
 
       <PersonalPageBtn />
 

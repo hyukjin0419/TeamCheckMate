@@ -141,15 +141,25 @@ const CategoryItem = (props) => {
         const checkColorList = [...checkColor];
         const querySnapshot = await getDocs(userTaskRef);
         let allChecked = true;
+        let compareDate = null;
           if(!querySnapshot.empty) {
             for (const child of querySnapshot.docs) {
+              const childModDate = child.data().modDate.toDate();
+
+              if (!compareDate || childModDate > compareDate) {
+                compareDate = childModDate;
+              }
               if (child.data().isChecked === false) {
-                
                 allChecked = false;
+                await updateDoc(userCategoryRef, {
+                  allCheckedDate: null,
+                });
                 break; // Skip to the next iteration if isChecked is false
               } else {
-                
                 allChecked = true;
+                await updateDoc(userCategoryRef, {
+                  allCheckedDate: new Date(),
+                });
               }
             }
           }
@@ -162,7 +172,7 @@ const CategoryItem = (props) => {
               const colorAdd = {
                 id: checklistToUpdate.writer,
                 checkColor: colorData.data().color,
-                regDate: checklistToUpdate.regDate,
+                regDate: compareDate,
               };
           
                // Check if id is already in the array
