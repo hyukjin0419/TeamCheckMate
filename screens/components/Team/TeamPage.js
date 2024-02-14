@@ -228,6 +228,21 @@ export default TeamPage = () => {
       {/* 저장된 팀 리스트를 TeamItem페이지로 보내어서 생성하여 생성된 TeamIteam들을 TeamPage화면에 렌더링*/}
       {isLoading ? (
         <ActivityIndicator style={styles.loadingIndicator} />
+      ) : teamList.length === 0 ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: "5%",
+          }}
+        >
+          <Image
+            style={styles.noPostIcon}
+            source={require("../../images/GuidancePageNoPost.png")}
+          ></Image>
+          <Text style={styles.noPostText}>등록된 팀이 없어요.</Text>
+        </View>
       ) : (
         <FlatList
           numColumns={2}
@@ -248,6 +263,7 @@ export default TeamPage = () => {
           keyExtractor={(item) => item.id}
         ></FlatList>
       )}
+
       {/* 팀 추가에 점근할 수 있는 버튼 */}
       <TouchableOpacity style={styles.addBtnContainer} onPress={handlePress}>
         <Image
@@ -338,5 +354,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     size: "large",
     color: color.activated,
+  },
+  noPostText: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+    textAlign: "center",
+    color: "#797979",
+    marginTop: "3%",
+  },
+  noPostIcon: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
   },
 });
