@@ -21,6 +21,7 @@ import {
   getDocs,
   updateDoc,
 } from "../../firebase.js";
+import Modal from "react-native-modal";
 import { query, orderBy, arrayRemove } from "firebase/firestore";
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigation } from "@react-navigation/core";
@@ -47,13 +48,23 @@ export default TeamCheckPage = (props) => {
     assignmentId,
     dueDate,
   } = route.params;
+  //console.log(route.params);
 
   //체크리스트를 전부 가지고 있는 객체 배열. 하나의 객체는 하나의 체크를 뜻한다
   //key값은 writer.
   const [checklists, setChecklists] = useState([]);
   const [newTaskText, setNewTaskText] = useState("");
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
-
+  /*console.log(
+    teamCode,
+    title,
+    fileColor,
+    memberInfo,
+    memberNames,
+    assignmentName,
+    assignmentId,
+    dueDate
+  );*/
   const pressAddBtn = (memberName) => {
     //isWritingNewTask를 순회하면서 현재 선택된 사람이 아니면 textinput을 닫는다.
     Object.keys(isWritingNewTask).forEach((name) => {
@@ -182,6 +193,7 @@ export default TeamCheckPage = (props) => {
               memberName,
               "checkList"
             ),
+            console.log("??:", memberNames, memberName),
             orderBy("regDate", "asc")
           )
         );
@@ -206,7 +218,20 @@ export default TeamCheckPage = (props) => {
   useEffect(() => {
     getCheckLists();
     console.log("[TeamCheckPage]: ", checklists);
+    console.log("[TeamCheckPage]: memberNames", memberNames);
   }, []);
+
+  const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
+    useState(false);
+  {
+    /* 과제 옵션 모달창 띄우고/숨기는 함수 */
+  }
+  const [selectedChecklist, setSelectedChecklist] = useState(null);
+
+  const handleAssignmentOptionPress = (checklist) => {
+    setAssignmentOptionModalVisible(!assignmentOptionModalVisible);
+    setSelectedChecklist(checklist.content);
+  };
 
   return (
     //헤더 부분
@@ -260,14 +285,13 @@ export default TeamCheckPage = (props) => {
           data={memberNames}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.name}
-          renderItem={({ item }) => (
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => (
             <TouchableOpacity
               style={{
                 ...styles.memberNameContainer,
                 borderColor: fileColor,
               }}
-              // onPress={() => createChecklist(item.name)}
             >
               <Text style={styles.memberNameText}>{item}</Text>
             </TouchableOpacity>
@@ -320,7 +344,9 @@ export default TeamCheckPage = (props) => {
                     <Text style={styles.checkBoxContent}>
                       {checklist.content}
                     </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleAssignmentOptionPress(checklist)}
+                    >
                       <Image
                         source={require("../images/icons/three_dots.png")}
                         style={styles.threeDots}
@@ -356,6 +382,50 @@ export default TeamCheckPage = (props) => {
           )}
         />
       </View>
+      <Modal
+        onBackButtonPress={handleAssignmentOptionPress}
+        onBackdropPress={handleAssignmentOptionPress}
+        isVisible={assignmentOptionModalVisible}
+        swipeDirection="down"
+        onSwipeComplete={handleAssignmentOptionPress}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        animationInTiming={200}
+        animationOutTiming={200}
+        backdropTransitionInTiming={200}
+        backdropTransitionOutTiming={0}
+        style={{ justifyContent: "flex-end", margin: 0 }}
+      >
+        {/* 과제 설정 모달창 */}
+        <View style={styles.modalView}>
+          {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
+          <View style={s.modalItemContainter}>
+            {/* 모달창 상단 회색 막대 */}
+            <View style={s.modalVector}></View>
+            {/* 모달창 상단 과제 이름 표시 */}
+            <Text style={s.modalTitle}>{selectedChecklist}</Text>
+            <View flex={1}></View>
+            {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
+            <View style={s.modalTeamBtnContainer}>
+              {/* 수정 버튼 */}
+              <TouchableOpacity
+                style={s.teamReviseBtn}
+                onPress={() => console.log("체크리스트 수정")}
+              >
+                <Text style={s.teamReviseText}>수정</Text>
+              </TouchableOpacity>
+              {/* 삭제 버튼 */}
+              <TouchableOpacity
+                style={s.teamDeleteBtn}
+                onPress={() => console.log("체크리스트 삭제")}
+              >
+                {/* 터치 시 과제 삭제 */}
+                <Text style={s.teamDeleteText}>삭제</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };
@@ -490,5 +560,13 @@ const styles = StyleSheet.create({
   threeDots: {
     width: 17.5,
     height: 4,
+  },
+  modalView: {
+    backgroundColor: "white",
+    paddingTop: 12,
+    paddingHorizontal: 12,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    minHeight: 200, // This property determines the minimum height of the modal
   },
 });

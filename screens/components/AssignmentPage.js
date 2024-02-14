@@ -37,18 +37,30 @@ const AssignmentPage = () => {
     title: title,
     fileColor: fileColor,
     teamCode: teamCode,
+    memberNames: memberNames,
+    memberInfo: memberInfo,
   } = route.params;
 
-  const [memberNames, setMemberNames] = useState([]);
-  const [memberInfo, setMemberInfo] = useState([]);
-  //멤버 전화번호 문자 배열
-  const [memberPhoneNumbers, setMemberPhoneNumbers] = useState([]);
+  // console.log(
+  //   "[AssignmentPage]: ",
+  //   memberNames,
+  //   memberInfo,
+  //   teamCode,
+  //   title,
+  //   fileColor,
+  //   memberInfo,
+  //   memberNames
+  // );
+
+  const [extractedInfoArray, setExtractedInfoArray] = useState([]);
+  //멤버 이메일 문자 배열
+  const [memberEmails, setMemberEmails] = useState([]);
   //멤버 학교 문자 배열
   const [memberSchools, setMemberSchools] = useState([]);
   //멤버 학번 문자 배열
   const [memberStudentNumbers, setMemberStudentNumbers] = useState([]);
-  //멤버 학번 문자 배열
-  const [memberEmails, setMemberEmails] = useState([]);
+  //멤버 전화번호 문자 배열
+  const [memberPhoneNumbers, setMemberPhoneNumbers] = useState([]);
 
   const [openedFileImage, setOpenedFileImage] = useState(
     require("../images/OpenedFileColor/9CB1BB.png")
@@ -164,7 +176,7 @@ const AssignmentPage = () => {
         collection(teamDocumentRef, "assignmentList")
       );
       // 가져온 문서를 배열로 변환하여 state 업데이트
-      const assignmentData = [];
+
       querySnapshot.forEach((doc) => {
         assignmentData.push({
           id: doc.id,
@@ -182,6 +194,22 @@ const AssignmentPage = () => {
     }
   };
 
+  const extractInfo = (memberInfo) => {
+    if (memberInfo && Array.isArray(memberInfo)) {
+      const extractedInfo = memberInfo.map((member) => ({
+        email: member.email,
+        school: member.school,
+        studentId: member.studentNumber,
+        phoneNumber: member.phoneNumber,
+      }));
+      setExtractedInfoArray(extractedInfo);
+      setMemberEmails(extractedInfo.map((info) => info.email));
+      setMemberSchools(extractedInfo.map((info) => info.school));
+      setMemberStudentNumbers(extractedInfo.map((info) => info.studentId));
+      setMemberPhoneNumbers(extractedInfo.map((info) => info.phoneNumber));
+    }
+  };
+
   //AssigmentPage에 들어올 시 getAssignmentList 함수 작동 (새로고침 함수)
   useFocusEffect(
     React.useCallback(() => {
@@ -189,78 +217,15 @@ const AssignmentPage = () => {
     }, [])
   );
 
+  useEffect(() => {
+    extractInfo(memberInfo);
+  }, []);
+
   //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
   const [showModal, setShowModal] = useState(false);
   const handlePress = () => {
     setShowModal(!showModal);
   };
-
-  //팀원 정보 불러오기
-  const getMembers = async () => {
-    try {
-      const teamRef = doc(db, "team", teamCode);
-      const teamDoc = await getDoc(teamRef);
-
-      if (teamDoc.exists()) {
-        const memberRef = collection(teamRef, "members");
-        const memberSnapshot = await getDocs(memberRef);
-
-        const memberList = memberSnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const name = data.name;
-          const email = data.email;
-          const phoneNumber = data.phoneNumber || null;
-          const school = data.school || null;
-          const studentNumber = data.studentNumber || null;
-
-          return {
-            id: doc.id,
-            name,
-            phoneNumber,
-            school,
-            studentNumber,
-            email,
-          };
-        });
-
-        // 상태 업데이트
-        setMemberInfo(memberList);
-        //멤버 이름
-        const memberNameList = memberList.map((member) => member.name || null);
-        setMemberNames(memberNameList);
-        //멤버 전화번호
-        const memberPhoneNumberList = memberList.map(
-          (member) => member.phoneNumber || null
-        );
-        setMemberPhoneNumbers(memberPhoneNumberList);
-        //멤버 학교
-        const memberSchoolList = memberList.map(
-          (member) => member.school || null
-        );
-        setMemberSchools(memberSchoolList);
-        //멤버 학번
-        const memberStudentNumberList = memberList.map(
-          (member) => member.studentNumber || null
-        );
-        setMemberStudentNumbers(memberStudentNumberList);
-        //멤버 이메일
-        const memberEmailList = memberList.map(
-          (member) => member.email || null
-        );
-        setMemberEmails(memberEmailList);
-      } else {
-        console.log("팀 문서가 존재하지 않습니다.");
-        throw new Error("팀 문서가 존재하지 않습니다."); // 또는 다른 적절한 처리
-      }
-    } catch (error) {
-      console.error("데이터를 불러오는 중 오류가 발생했습니다.", error);
-      throw error;
-    }
-  };
-
-  useEffect(() => {
-    getMembers();
-  }, []);
 
   return (
     <View
@@ -270,7 +235,7 @@ const AssignmentPage = () => {
       }}
     >
       <StatusBar style={"dark"}></StatusBar>
-      {/* 헤더 */}
+
       <View
         style={{
           ...s.headContainer,

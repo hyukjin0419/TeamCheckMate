@@ -28,7 +28,6 @@ const TeamItem = (props) => {
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColor);
-  const [memberIdArray, setmemberIdArray] = useState(props.member_id_array);
   const [teamCode, setTeamCode] = useState(props.id);
   //멤버 정보 객체 배열
   const [memberInfo, setMemberInfo] = useState([]);
@@ -176,7 +175,7 @@ const TeamItem = (props) => {
     console.log(teamCode);
   };
 
-  //팀원 정보 불러오기
+  //모달창에 넣을 팀원정보 할당할기
   const getMembers = async () => {
     try {
       const teamRef = doc(db, "team", teamCode);
@@ -245,8 +244,8 @@ const TeamItem = (props) => {
 
   useEffect(() => {
     getMembers();
-    console.log(memberInfo);
-    console.log(memberNames);
+    // console.log(memberInfo);
+    // console.log(memberNames);
   }, []);
 
   return (
