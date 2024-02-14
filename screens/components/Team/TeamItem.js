@@ -18,6 +18,7 @@ import * as Clipboard from "expo-clipboard";
 import s from "../../styles/css";
 import { Feather } from "@expo/vector-icons";
 import { db, doc, getDoc, getDocs, collection } from "../../../firebase";
+import * as Haptics from "expo-haptics";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -44,6 +45,7 @@ const TeamItem = (props) => {
   //터치시 팀 나가는 함수
   const leavingtheTeam = () => {
     props.leaveTeam(props.id);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   //팀 이름 혹은 파일 아이콘 색상이 변경되었을 때 리-렌더링
@@ -172,6 +174,7 @@ const TeamItem = (props) => {
     Alert.alert(
       "참여코드가 클립보드에 복사 되었습니다!\n" + "(" + props.id + ")"
     );
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     console.log(teamCode);
   };
 
@@ -443,7 +446,7 @@ const styles = StyleSheet.create({
   teamMateModal: {
     backgroundColor: "white",
     borderRadius: 20,
-    minHeight: "25%",
+    minHeight: 210,
     marginBottom: "10%",
   },
   teamModalXBtn: {

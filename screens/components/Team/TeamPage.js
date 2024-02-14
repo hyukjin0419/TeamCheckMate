@@ -16,6 +16,7 @@ import s from "../../styles/css";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
 import Modal from "react-native-modal";
+import * as Haptics from "expo-haptics";
 import {
   db,
   doc,
@@ -46,6 +47,7 @@ export default TeamPage = () => {
   const teamAddedToast = () => {
     console.log("TeamPage: Toast Added Toast 작동중");
     showToast("success", "  ✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   //회원정보 가져오기

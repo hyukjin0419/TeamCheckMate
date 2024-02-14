@@ -28,6 +28,7 @@ import {
 import { arrayUnion } from "firebase/firestore";
 import { showToast, toastConfig } from "../Toast";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import * as Haptics from "expo-haptics";
 
 export default function TeamJoinPage() {
   const navigation = useNavigation();
@@ -109,6 +110,7 @@ export default function TeamJoinPage() {
               "success",
               " ✓  팀 참여 완료! 이번 팀플도 파이팅하세요 :)"
             );
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }
         } else {
           console.log("사용자 문서가 존재하지 않습니다.");

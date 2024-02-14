@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: "white",
     borderRadius: 20,
-    minHeight: "25%",
+    minHeight: 200,
     marginBottom: "10%",
     alignItems: "center",
     justifyContent: "space-evenly",

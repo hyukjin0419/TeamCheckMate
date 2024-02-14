@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
   teamMateModal: {
     backgroundColor: "white",
     borderRadius: 20,
-    minHeight: "25%",
+    minHeight: 210,
     marginBottom: "10%",
   },
   teamModalXBtn: {
