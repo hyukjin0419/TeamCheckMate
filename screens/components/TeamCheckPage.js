@@ -274,7 +274,7 @@ export default TeamCheckPage = (props) => {
             ...styles.teamMateContainer,
             backgroundColor: fileColor,
             borderColor: fileColor,
-            marginRight: "3%",
+            marginRight: "2%",
           }}
         >
           <Text style={{ ...styles.teamMateText }}>팀 메이트</Text>
@@ -439,8 +439,8 @@ export default TeamCheckPage = (props) => {
 const styles = StyleSheet.create({
   // --------------과제 타이틀 영역-----------------
   assignmentTitleContainer: {
+    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.096 : WINDOW_HEIGHT * 0.117,
     width: WINDOW_WIDHT * 0.9,
-    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
     //backgroundColor: "red",
     marginTop: "5%",
     marginBottom: "5%",
@@ -469,34 +469,33 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    // backgroundColor: "green",
+    //backgroundColor: "green",
+    width: WINDOW_WIDHT,
+    paddingRight: "5%",
   },
   teamMateContainer: {
-    borderRadius: 200,
-    borderWidth: 1,
-    marginRight: 7,
     alignItems: "center",
     justifyContent: "center",
+    height: 35,
+    borderWidth: 1,
+    borderRadius: 23,
+    paddingHorizontal: 13,
   },
   teamMateText: {
-    padding: 9,
-    paddingRight: 10,
-    paddingLeft: 10,
-    fontFamily: "SUIT-Medium",
+    fontFamily: "SUIT-Regular",
     fontSize: 12,
   },
   memberNameContainer: {
-    marginRight: 6,
-    borderRadius: 200,
-    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
+    height: 35,
+    borderWidth: 1,
+    borderRadius: 23,
+    marginHorizontal: 4,
+    paddingHorizontal: 13,
   },
   memberNameText: {
-    padding: 9,
-    paddingRight: 13,
-    paddingLeft: 13,
-    fontFamily: "SUIT-Medium",
+    fontFamily: "SUIT-Regular",
     fontSize: 12,
   },
   // ---------------------FlatList2--------------------
