@@ -15,6 +15,7 @@ import s from "../styles/css";
 import { color } from "../styles/colors";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/core";
+import Modal from "react-native-modal";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -24,6 +25,11 @@ const SettingPage = () => {
 
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  handleModalPress = () => {
+    setModalVisible(!modalVisible);
+  };
   return (
     <View style={s.container}>
       <StatusBar style={"dark"}></StatusBar>
@@ -41,6 +47,7 @@ const SettingPage = () => {
             thumbColor={"white"}
             ios_backgroundColor={color.deactivated}
             onValueChange={toggleSwitch}
+            style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
             value={isEnabled}
           />
         </View>
@@ -89,11 +96,53 @@ const SettingPage = () => {
           >
             <Text style={styles.logOutText}>로그아웃</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.accountDeleteBtn}>
+          <TouchableOpacity
+            style={styles.accountDeleteBtn}
+            onPress={() => {
+              handleModalPress();
+              console.log("계정 탈퇴");
+            }}
+          >
             <Text style={styles.accountDeleteText}>탈퇴</Text>
           </TouchableOpacity>
         </View>
       </View>
+      <Modal
+        onBackdropPress={handleModalPress}
+        isVisible={modalVisible}
+        animationIn="zoomIn"
+        animationOut="zoomOut"
+        animationInTiming={300}
+        animationOutTiming={200}
+        backdropTransitionInTiming={0}
+        backdropTransitionOutTiming={0}
+      >
+        <View style={styles.modal}>
+          <View marginTop="5%">
+            <Text style={styles.modalText}>
+              탈퇴 시 계정 정보가 모두 사라집니다.
+            </Text>
+            <Text style={styles.modalText}>정말 탈퇴하실 건가요?</Text>
+          </View>
+          <View style={styles.modalTeamBtnContainer}>
+            <TouchableOpacity
+              style={styles.cancelBtn}
+              onPress={() => handleModalPress()}
+            >
+              <Text style={styles.logOutText}>취소</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalAccountDeleteBtn}
+              onPress={() => {
+                handleModalPress();
+                console.log("계정 탈퇴 확인");
+              }}
+            >
+              <Text style={styles.accountDeleteText}>탈퇴</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -145,5 +194,42 @@ const styles = StyleSheet.create({
     fontFamily: "SUIT-Medium",
     color: color.activated,
     marginLeft: "1%",
+  },
+  modal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    minHeight: "25%",
+    marginBottom: "10%",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+  },
+  modalText: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 16,
+    textAlign: "center",
+    paddingTop: 3,
+  },
+  cancelBtn: {
+    width: WINDOW_WIDHT * 0.38,
+    height: 65,
+    backgroundColor: color.activated,
+    borderRadius: 10,
+    alignSelf: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalAccountDeleteBtn: {
+    width: WINDOW_WIDHT * 0.38,
+    height: 65,
+    backgroundColor: color.deletegrey,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignSelf: "flex-end",
+    alignItems: "center",
+  },
+  modalTeamBtnContainer: {
+    flexDirection: "row",
+    width: WINDOW_WIDHT * 0.9,
+    justifyContent: "space-evenly",
   },
 });

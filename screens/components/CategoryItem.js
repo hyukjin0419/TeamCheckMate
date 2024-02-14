@@ -102,7 +102,7 @@ const CategoryItem = (props) => {
 
   const handleCheckboxChange = async (writer, index, newValue) => {
     // 체크박스 상태 변경
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Haptics.impactAsync(Haptics.impactAsync.Medium);
     const updatedChecklists = [...checklists];
     const checklistToUpdate = updatedChecklists.find(
       (checklist) => checklist.writer === writer && checklist.index === index
