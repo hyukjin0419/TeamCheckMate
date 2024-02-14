@@ -9,6 +9,7 @@ import {
   Alert,
   FlatList,
   ScrollView,
+  Pressable,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
@@ -251,8 +252,25 @@ const TeamItem = (props) => {
     // console.log(memberNames);
   }, []);
 
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handlePressIn = () => {
+    setIsPressed(true);
+  };
+
+  const handlePressOut = () => {
+    setIsPressed(false);
+  };
+
   return (
-    <TouchableOpacity
+    <Pressable
+      onLongPress={handleTeamOptionPress}
+      delayLongPress={800}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.2 : 1,
+      })}
       onPress={() => {
         navigation.navigate("AssignmentPage", {
           title: title,
@@ -436,7 +454,7 @@ const TeamItem = (props) => {
           </Modal>
         </Modal>
       </ImageBackground>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
