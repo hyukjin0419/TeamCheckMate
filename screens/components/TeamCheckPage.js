@@ -9,8 +9,6 @@ import {
   ScrollView,
   FlatList,
   KeyboardAvoidingView,
-  Keyboard,
-  TouchableWithoutFeedback,
   ImageBackground,
 } from "react-native";
 import {
@@ -22,8 +20,8 @@ import {
   updateDoc,
 } from "../../firebase.js";
 import Modal from "react-native-modal";
-import { query, orderBy, arrayRemove } from "firebase/firestore";
-import React, { useEffect, useState, useRef } from "react";
+import { query, orderBy } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
 import { color } from "../styles/colors";
@@ -66,27 +64,32 @@ export default TeamCheckPage = (props) => {
     dueDate
   );*/
   const pressAddBtn = (memberName) => {
+    setAssignmentOptionModalVisible(false);
+    console.log(selectedMember);
+    // console.log(selectedChecklist);
+    console.log(isWritingNewTask);
     //isWritingNewTask를 순회하면서 현재 선택된 사람이 아니면 textinput을 닫는다.
-    Object.keys(isWritingNewTask).forEach((name) => {
-      if (name !== memberName && isWritingNewTask[name]) {
-        closeTextInput(name);
-      }
-    });
+    // Object.keys(isWritingNewTask).forEach((name) => {
+    //   if (name !== memberName && isWritingNewTask[name]) {
+    //     closeTextInput(name);
+    //   }
+    // });
 
     // 플러스 버튼을 누를 때 해당 팀 멤버에 대한 입력 창을 열도록 설정
     setIsWritingNewTask((prevIsWritingNewTask) => ({
       ...prevIsWritingNewTask,
       [memberName]: true,
     }));
+    console.log(isWritingNewTask);
   };
 
-  const closeTextInput = (memberName) => {
-    addNewTask(memberName);
-    setIsWritingNewTask((prevIsWritingNewTask) => ({
-      ...prevIsWritingNewTask,
-      [memberName]: false,
-    }));
-  };
+  // const closeTextInput = (memberName) => {
+  //   addNewTask(memberName);
+  //   setIsWritingNewTask((prevIsWritingNewTask) => ({
+  //     ...prevIsWritingNewTask,
+  //     [memberName]: false,
+  //   }));
+  // };
 
   const addNewTask = async (memberName, isSubmitedByEnter) => {
     if (newTaskText.trim() !== "") {
@@ -193,7 +196,6 @@ export default TeamCheckPage = (props) => {
               memberName,
               "checkList"
             ),
-            console.log("??:", memberNames, memberName),
             orderBy("regDate", "asc")
           )
         );
@@ -217,8 +219,8 @@ export default TeamCheckPage = (props) => {
 
   useEffect(() => {
     getCheckLists();
-    console.log("[TeamCheckPage]: ", checklists);
-    console.log("[TeamCheckPage]: memberNames", memberNames);
+    // console.log("[TeamCheckPage]: ", checklists);
+    // console.log("[TeamCheckPage]: memberNames", memberNames);
   }, []);
 
   const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
@@ -226,11 +228,13 @@ export default TeamCheckPage = (props) => {
   {
     /* 과제 옵션 모달창 띄우고/숨기는 함수 */
   }
-  const [selectedChecklist, setSelectedChecklist] = useState(null);
+  const [selectedChecklist, setSelectedChecklist] = useState();
+  const [selectedMember, setselectedMember] = useState();
 
   const handleAssignmentOptionPress = (checklist) => {
     setAssignmentOptionModalVisible(!assignmentOptionModalVisible);
     setSelectedChecklist(checklist.content);
+    setselectedMember(checklist.writer);
   };
 
   return (
@@ -410,7 +414,7 @@ export default TeamCheckPage = (props) => {
               {/* 수정 버튼 */}
               <TouchableOpacity
                 style={s.teamReviseBtn}
-                onPress={() => console.log("체크리스트 수정")}
+                onPress={() => pressAddBtn(selectedMember)}
               >
                 <Text style={s.teamReviseText}>수정</Text>
               </TouchableOpacity>
@@ -435,7 +439,7 @@ const styles = StyleSheet.create({
   assignmentTitleContainer: {
     width: WINDOW_WIDHT * 0.9,
     height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
-    //backgroundColor: "red",
+    // backgroundColor: "red",
     marginTop: "5%",
     marginBottom: "5%",
     flexDirection: "row",
@@ -449,7 +453,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "grey",
   },
   dueDateText: {
-    color: color.redpink,
+    // color: color.redpink,
     fontSize: 12,
     fontFamily: "SUIT-Regular",
   },
