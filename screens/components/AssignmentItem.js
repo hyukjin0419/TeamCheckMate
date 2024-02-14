@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/core";
 import { color } from "../styles/colors";
 import { db, collection, doc, deleteDoc } from "../../firebase";
 import s from "../styles/css";
+import * as Haptics from "expo-haptics";
 
 //스크린의 높이, 넓이 불러오기
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -79,8 +80,25 @@ const AssignmentItem = (props) => {
     props.getAssignmentList();
   };
 
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handlePressIn = () => {
+    setIsPressed(true);
+  };
+
+  const handlePressOut = () => {
+    setIsPressed(false);
+  };
+
   return (
-    <TouchableOpacity
+    <Pressable
+      onLongPress={handleAssignmentOptionPress}
+      delayLongPress={800}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.2 : 1,
+      })}
       onPress={() => {
         navigation.navigate("TeamCheckPage", {
           teamCode: teamCode,
@@ -164,7 +182,10 @@ const AssignmentItem = (props) => {
                 {/* 삭제 버튼 */}
                 <TouchableOpacity
                   style={s.teamDeleteBtn}
-                  onPress={handleDelete}
+                  onPress={() => {
+                    handleDelete();
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
                 >
                   {/* 터치 시 과제 삭제 */}
                   <Text style={s.teamDeleteText}>삭제</Text>
@@ -174,7 +195,7 @@ const AssignmentItem = (props) => {
           </View>
         </Modal>
       </ImageBackground>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

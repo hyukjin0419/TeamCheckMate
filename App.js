@@ -28,6 +28,7 @@ import * as Font from "expo-font";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import CategoryAdd from "./screens/components/Category/CategoryAdd";
 import TeamCheckPage from "./screens/components/TeamCheckPage";
+import AppInformationPage from "./screens/components/AppInformationPage";
 
 const Stack = createNativeStackNavigator();
 // - 스택 형태로 화면 전환을 관리한다
@@ -104,6 +105,10 @@ function SettingPageTab() {
       <SettingStack.Screen
         name="SettingPage"
         component={SettingPage}
+      ></SettingStack.Screen>
+      <SettingStack.Screen
+        name="AppInformationPage"
+        component={AppInformationPage}
       ></SettingStack.Screen>
     </SettingStack.Navigator>
   );

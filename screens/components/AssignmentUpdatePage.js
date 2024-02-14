@@ -19,6 +19,7 @@ import { db, collection, doc, updateDoc } from "../../firebase";
 import { useNavigation } from "@react-navigation/core";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import s from "../styles/css";
+import * as Haptics from "expo-haptics";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -57,6 +58,7 @@ export default AssignmentUpdatePage = () => {
   //날짜, 시간 선택 시 정보 저장
   const onChange = (e, selectedDate) => {
     setDate(selectedDate);
+    Keyboard.dismiss();
 
     const year = selectedDate.getFullYear();
     const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
@@ -132,6 +134,7 @@ export default AssignmentUpdatePage = () => {
   const [show, setShow] = useState(false);
   const handleDueDatePress = () => {
     setShow(!show);
+    Keyboard.dismiss();
   };
 
   const [textStyle, setTextStyle] = useState(
@@ -174,6 +177,7 @@ export default AssignmentUpdatePage = () => {
             disabled={buttonDisabled}
             onPress={() => {
               handleUpdate();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
             <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>

@@ -344,13 +344,13 @@ const AssignmentPage = () => {
           width: WINDOW_WIDHT,
         }}
       >
-        <View flexDirection="row">
+        <View style={styles.teamMembersNamesArrayContainer}>
           <View
             style={{
               ...styles.teamMateBtn,
               borderColor: fileColor,
               backgroundColor: fileColor,
-              marginLeft: 10,
+              marginRight: "1%",
             }}
           >
             <Text style={styles.teamMateBtnText}>팀 메이트</Text>
@@ -420,7 +420,7 @@ const AssignmentPage = () => {
         </View>
       </Modal>
       {/* Parent View for both FlatLists */}
-      <View style={{ flex: 18 }}>
+      <View style={{ flex: 25 }}>
         {/* 과제 리스트 */}
         <FlatList
           data={assignmentList}
@@ -491,8 +491,8 @@ const styles = StyleSheet.create({
     height: 35,
     borderWidth: 1,
     borderRadius: 23,
-    marginHorizontal: 4,
-    paddingHorizontal: 15,
+    marginHorizontal: 2,
+    paddingHorizontal: 13,
     marginTop: 10,
     marginLeft: 5,
   },
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   teamMateModal: {
     backgroundColor: "white",
     borderRadius: 20,
-    minHeight: "25%",
+    minHeight: 210,
     marginBottom: "10%",
   },
   teamModalXBtn: {
@@ -537,5 +537,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginHorizontal: "10%",
     marginBottom: "3%",
+  },
+  teamMembersNamesArrayContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    //backgroundColor: "green",
+    width: WINDOW_WIDHT,
+    paddingRight: "2.5%",
   },
 });
