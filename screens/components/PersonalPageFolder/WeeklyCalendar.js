@@ -348,8 +348,9 @@ const WeeklyCalendar = ( props ) => {
                             {isCalendarReady && checkEvent && checkEvent.get(weekdays[4].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
                                     {checkEvent.get(weekdays[4].format('YYYY-MM-DD').toString()).map(item => (
-                                        <View key={item.id}>
+                                        <View style={{width: "100%"}} key={item.id}>
                                             <Entypo name="check" size={13} color={item.checkColor} />
+                                            <Text style={{ position: "absolute",marginTop: 10, backgroundColor: "red"}}>{item.id}</Text>
                                         </View>
                                     ))}
                                 </View>
