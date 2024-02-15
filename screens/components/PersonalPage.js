@@ -18,7 +18,7 @@ import { EvilIcons } from "@expo/vector-icons";
 import { showToast, toastConfig } from "../components/Toast";
 import Modal from "react-native-modal";
 import { useEffect, useState } from "react";
-import { collection, doc, getDoc, getDocs, query } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import s from "../styles/css.js"
 import PersonalPageBtn from "./PersonalPageFolder/PersonalPageBtn";
@@ -29,7 +29,6 @@ import CategoryItem from "./CategoryItem";
 const PersonalPage = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
-  const [categoryList, setCategoryList] = useState([]);
   const email = auth.currentUser.email;
 
     // Visibility of modal
@@ -39,35 +38,6 @@ const PersonalPage = () => {
     setIsModalVisible(!isModalVisible);
   };
 
-  const getCategoryList = async() => {
-    try {
-      const userDocRef = doc(db, "user", email);
-      const userCategoryRef = collection(userDocRef, "personalCheckList");
-      const querySnapshot1 = await getDocs(query(userCategoryRef));
-      if(!querySnapshot1.empty) {
-        const list = [];
-        querySnapshot1.forEach((doc) => {
-          list.push({
-            id: doc.id,
-            ...doc.data(),
-          });
-        });
-        setCategoryList(list);
-        console.log(categoryList);
-      } else {
-        return;
-      }
-    } catch (error) {
-      console.error("Error getting category: ", error);
-    }
-  }
-  
-
-  useFocusEffect( 
-    React.useCallback(() => {
-      getCategoryList();
-    }, [])
-  );
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -93,7 +63,6 @@ const PersonalPage = () => {
       }
     }
     fetchUserData();
-    getCategoryList();
   }, [userEmail]);
 
   return(
@@ -105,10 +74,6 @@ const PersonalPage = () => {
       <Text style={styles.titleHeader}>{userName} 님 환영합니다</Text>
       <WeeklyCalendar style={{marginBottom: "5%"}}/>
 
-      {/* Go to CategoryItem.js and pass the categoryList value to it */}
-      <CategoryItem
-        categoryList={categoryList}
-      />
 
       <PersonalPageBtn />
 

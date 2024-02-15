@@ -11,6 +11,7 @@ import {
   Dimensions,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
@@ -22,21 +23,25 @@ import {
   doc,
   setDoc,
   getDoc,
+  updateDoc,
+  getDocs,
 } from "../../../firebase";
 import Modal from "react-native-modal";
 import s from "../../styles/css";
 import { useNavigation } from "@react-navigation/core";
 import { showToast } from "../Toast";
+import { deleteDoc, query } from "firebase/firestore";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default CategoryAdd = () => {
+export default CategoryChange = ({ route }) => {
   const navigation = useNavigation();
   //회원정보 가져오기
   const user = auth.currentUser;
   //가져온 정보에서 이메일 빼서 저장하기
   const email = user.email;
+  const category = route.params?.category;
 
   //색상 선택  띄우기/숨기기 (초기값: 숨기기)
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -76,14 +81,42 @@ export default CategoryAdd = () => {
       setConfirmBtnColor(color.deactivated);
     }
   };
-  
-  const addCategoryItem = async() => {
-    try {
-        if (buttonDisabled) {
-          return;
-        }
-        setButtonDisabled(true);
 
+  const [categoryID, setCategoryID] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+        setTextInputValue(route.params?.category);
+        setColorConfirmed(route.params?.color);
+        setSelectedColor(route.params?.color);
+
+        // Access the document user and go to the user email collection
+        const userRef = doc(db, "user", email);
+
+        // Call the document
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+            const personalCheckList = collection(userRef, "personalCheckList");
+            const querySnapshot = await getDocs(query(personalCheckList));
+
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach((child) => {
+                    if (child.data().category === category) {
+                        setCategoryID(child.id);
+                        console.log(child.id);
+                    }
+                });
+            }
+        }
+    };
+
+    fetchData();
+}, [route.params]);
+
+  
+  const updateCategoryItem = async() => {
+    try {
         // Access the document user and go to user email collection
         const userRef = doc(db, "user", email);
         // Call the document
@@ -91,13 +124,12 @@ export default CategoryAdd = () => {
 
         if(userDoc.exists()) {
             const personalCheckList = collection(userRef, "personalCheckList");
-            await setDoc(doc(personalCheckList), {
+            const changeCategoryName = doc(personalCheckList, categoryID);
+            await updateDoc(changeCategoryName, {
                 category: textInputValue,
                 color: selectedColor,
-                regDate: new Date(),
-                allCheckedConfirm: false,
             })
-            navigation.navigate("PersonalPage");
+            navigation.navigate("CategoryUpdate");
         } else {
             console.log("사용자 문서가 존재하지 않습니다.");
         }
@@ -106,6 +138,38 @@ export default CategoryAdd = () => {
         console.error("CategoryAdd: Error adding document: ", e);
     }
   };
+
+  const deleteCategory = async () => {
+    Alert.alert(
+      "카테고리 삭제",
+      "카테고리 정말 삭제 하겠습니까?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            // Access the document user and go to user email collection
+            const userRef = doc(db, "user", email);
+            // Call the document
+            const userDoc = await getDoc(userRef);
+  
+            if (userDoc.exists()) {
+              const personalCheckList = collection(userRef, "personalCheckList");
+              const deleteCategorySelect = doc(personalCheckList, categoryID);
+              await deleteDoc(deleteCategorySelect);
+            }
+            navigation.navigate("CategoryUpdate");
+          },
+          style: "destructive",
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+  
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -123,13 +187,12 @@ export default CategoryAdd = () => {
             </TouchableOpacity>
           </View>
 
-          <Text style={s.title}>카테고리 등록</Text>
+          <Text style={s.title}>카테고리 관리</Text>
 
           <TouchableOpacity
-            disabled={buttonDisabled}
             style={s.titleRightBtn}
             onPress={() => {
-              addCategoryItem();
+              updateCategoryItem();
             }}
           >
             <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
@@ -166,6 +229,21 @@ export default CategoryAdd = () => {
               ></Image>
             </View>
           </TouchableWithoutFeedback>
+        </View>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ ...s.button, backgroundColor: color.activated, width: "48%" }}
+            >
+            <Text style={s.buttonText}>종료</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+            onPress={() => deleteCategory()}
+            style={{...s.button, backgroundColor: "#EFEFEF", width: "48%"}}
+            >
+            <Text style={{...s.buttonText, color: "red"}}>삭제</Text>
+            </TouchableOpacity>
         </View>
 
         {/* 색상 선택 버튼 */}

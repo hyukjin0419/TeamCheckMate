@@ -24,7 +24,6 @@ export default PersonalPageBtn = () => {
 
   //회원정보 가져오기
   const user = auth.currentUser;
-  console.log("TeamPage: 이걸로도 갖올 수 있는겨?" + user.email);
   //플러스 버튼 터치시 팀 등록|팀 참여하기 버튼 모달창 띄우기|숨기기 함수
   const [showModal, setShowModal] = useState(false);
   const handlePress = () => {
@@ -69,7 +68,7 @@ export default PersonalPageBtn = () => {
                 <TouchableOpacity
                   style={styles.categoryManageBtn}
                   onPress={() => {
-                    navigation.navigate(), setShowModal(false);
+                    navigation.navigate("CategoryUpdate"), setShowModal(false);
                   }}
                 >
                   <Text style={styles.categoryManageText}>카테고리 관리</Text>
@@ -112,7 +111,7 @@ const styles = StyleSheet.create({
   addBtnContainer: {
     position: "absolute",
     right: "1%",
-    bottom: 10,
+    bottom: 43,
     zIndex: 1,
   },
   closeBtnContainer: {
