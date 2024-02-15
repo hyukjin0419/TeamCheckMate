@@ -12,23 +12,36 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
 import { color } from "../../styles/colors";
-import { db, collection, addDoc, auth, doc } from "../../../firebase";
+import {
+  db,
+  collection,
+  addDoc,
+  auth,
+  doc,
+  setDoc,
+  getDoc,
+} from "../../../firebase";
 import Modal from "react-native-modal";
+import s from "../../styles/css";
+import { useNavigation } from "@react-navigation/core";
+import { showToast } from "../Toast";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-export default TeamAddPage = ({ navigation }) => {
+export default TeamAddPage = () => {
+  const navigation = useNavigation();
   //회원정보 가져오기
   const user = auth.currentUser;
+  //가져온 정보에서 이메일 빼서 저장하기
   const email = user.email;
 
   //색상 선택  띄우기/숨기기 (초기값: 숨기기)
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const openModal = () => {
+  const handleModalPress = () => {
     setIsModalVisible(!isModalVisible);
+    setSelectedColor(colorConfirmed);
   };
 
   // 색상 옵션 (확정된 색상 아님) (초기값: 기본 색상)
@@ -40,20 +53,24 @@ export default TeamAddPage = ({ navigation }) => {
   //확인버튼 누른 후 확정된 색상
   const [colorConfirmed, setColorConfirmed] = useState(color.colors1[0]);
 
+  //팀생성시 확인 버튼 한번 누르면, 다음부터는 안눌릴 수 있도록 하기 위한 변수
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
+
   //모달에서 색상 선택 후 확인 누르면 색상 변경 -> 모달 close
   const confirmColor = () => {
     console.log(selectedColor);
     setColorConfirmed(selectedColor);
-    openModal();
+    handleModalPress();
   };
 
   //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
-  const [confirmBtnColor, setConfirmBtnColor] = useState(color.deactivated);
+  const [confirmBtnColor, setConfirmBtnColor] = useState(color.placeholdergrey);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [textInputValue, setTextInputValue] = useState("");
 
-  //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
+  const [maxLength, setMaxLength] = useState(40); // 기본값은 영어일 때의 maxLength
 
+  //팀 등록 입력란에 문자 입력시 확인버튼 활성화, 확인버튼 터치 시 파일 아이콘 색상 확정
   const onTextInputChange = (text) => {
     setTextInputValue(text);
     if (text.length > 0) {
@@ -61,73 +78,109 @@ export default TeamAddPage = ({ navigation }) => {
       setConfirmBtnColor(color.activated);
     } else {
       setButtonDisabled(true);
-      setConfirmBtnColor(color.deactivated);
+      setConfirmBtnColor(color.placeholdergrey);
     }
+    //한국어인 경우 제목 글자제한을 20으로 변경
+    const isKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(text);
+    setMaxLength(isKorean ? 20 : 40);
   };
 
   const addTeamItem = async () => {
     try {
+      if (isButtonClicked) {
+        return;
+      }
+      setIsButtonClicked(true);
+
       const timestamp = new Date();
+
+      //사용자 문서 참조
+      const userRef = doc(db, "user", email);
+      //사용자 문서 가져오가
+      const userDoc = await getDoc(userRef);
+
+      let userObject;
+      //사용자 문서에서 정보 추출하기
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const { name, phoneNumber, school, studentNumber } = userData;
+
+        userObject = {
+          name: name || "undefined",
+          email: email || "undefined",
+          phoneNumber: phoneNumber || "undefined",
+          school: school || "undefined",
+          studentNumber: studentNumber || "undefined",
+          joinedTime: timestamp,
+          updateTime: null,
+        };
+      } else {
+        console.log("사용자 문서가 존재하지 않습니다.");
+      }
+
       const teamDocRef = await addDoc(collection(db, "team"), {
         title: textInputValue,
         fileImage: colorConfirmed,
         timestamp: timestamp,
       });
-      console.log("Document written with ID: ", teamDocRef.id);
-      const userDocRef = doc(db, "user", email);
-      addTeamIdtoUser(userDocRef, teamDocRef.id);
+      console.log("TeamAddPage: Document written with ID: ", teamDocRef.id);
+      const memberDocRef = doc(collection(teamDocRef, "members"), email);
+      await setDoc(memberDocRef, userObject);
+
+      addTeamIdtoUser(userRef, teamDocRef.id);
+
+      navigation.navigate("TeamMemberAddPage", {
+        teamID: teamDocRef.id,
+      });
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error("TeamAddPage: Error adding document: ", e);
     }
   };
 
   const addTeamIdtoUser = async (userDocRef, teamDocRefID) => {
     const teamListCollectionRef = collection(userDocRef, "teamList");
-    await addDoc(teamListCollectionRef, {
+    await setDoc(doc(teamListCollectionRef, teamDocRefID), {
       teamID: teamDocRefID,
     });
   };
 
-  confirmBtnPressed = () => {
-    addTeamItem();
-  };
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
+      <View style={s.container}>
         <StatusBar style={"dark"}></StatusBar>
         {/* 뒤로가기 버튼, 팀 등록 헤더와 확인버튼 컨테이너 */}
-        <View style={styles.headerContainer}>
-          <View style={styles.backBtn}>
+        <View style={s.headContainer}>
+          <View style={s.headBtn}>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("TeamPage");
               }}
             >
-              <AntDesign name="left" size={30} color="black" />
+              <Image
+                style={{
+                  width: 8,
+                  height: 14,
+                }}
+                source={require("../../images/backBtn.png")}
+              />
             </TouchableOpacity>
           </View>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerText}>팀 등록</Text>
-          </View>
+
+          <Text style={s.title}>팀 등록</Text>
+
           <TouchableOpacity
             disabled={buttonDisabled}
-            style={styles.confirmBtn}
+            style={s.titleRightBtn}
             onPress={() => {
-              confirmBtnPressed();
+              addTeamItem();
             }}
           >
-            <Text
-              style={{ ...styles.headerText, color: confirmBtnColor }}
-              onPress={() => {
-                confirmBtnPressed();
-                navigation.navigate("TeamPage");
-              }}
-            >
-              확인
+            <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>
+              다음
             </Text>
           </TouchableOpacity>
         </View>
+
         {/* 팀 이름 입력란과 색상 선택 버튼*/}
         <View
           style={{
@@ -139,13 +192,14 @@ export default TeamAddPage = ({ navigation }) => {
             <TextInput
               placeholder="팀 이름"
               value={textInputValue}
+              maxLength={maxLength}
               returnKeyType="done"
               onChangeText={onTextInputChange}
-              style={{ ...styles.colorTextInput, color: colorConfirmed }}
+              style={styles.colorTextInput}
             ></TextInput>
           </View>
           {/* 색상 선택 버튼 */}
-          <TouchableWithoutFeedback onPress={openModal}>
+          <TouchableWithoutFeedback onPress={handleModalPress}>
             <View style={styles.circleContainer}>
               <View
                 style={{ ...styles.circle, backgroundColor: colorConfirmed }}
@@ -157,201 +211,180 @@ export default TeamAddPage = ({ navigation }) => {
             </View>
           </TouchableWithoutFeedback>
         </View>
-        <View style={styles.descriptionContainter}>
-          <Text style={{ ...styles.description, color: colorConfirmed }}>
-            색상을 변경할 수 있습니다
-          </Text>
-        </View>
+
         {/* 색상 선택 버튼 */}
-        <View>
-          {/* 색상 팔레트 모달창 회색 배경 */}
+        <View flex={1}>
           <Modal
-            animationType="fade"
-            visible={isModalVisible}
-            transparent={true}
+            onBackButtonPress={handleModalPress}
+            onBackdropPress={handleModalPress}
+            isVisible={isModalVisible}
+            swipeDirection="down"
+            onSwipeComplete={handleModalPress}
+            animationIn="slideInUp"
+            animationOut="slideOutDown"
+            animationInTiming={200}
+            animationOutTiming={200}
+            backdropTransitionInTiming={200}
+            backdropTransitionOutTiming={0}
+            style={{ margin: 0 }}
           >
-            <View style={styles.modalBackground}>
-              {/* 색상 팔레트 swipeable 모달창 */}
-              <Modal
-                onSwipeComplete={() => setIsModalVisible(false)}
-                swipeDirection={"down"}
-                animationType="slide"
-                visible={isModalVisible}
-                onBackdropPress={openModal}
-                backdropOpacity={0.2}
-                transparent={true}
-              >
-                <View style={styles.modalView}>
-                  {/* 색상 팔레트 모달창 내 색상, 확인버튼 컨테이너 */}
-                  <View style={styles.modalItemContainter}>
-                    {/* 모달창 상위 부분 회색 막대기 */}
-                    <View style={styles.modalVector}></View>
-                    {/* 모달창 내 색상 옵션 컨테이너 */}
-                    <View style={styles.colorContainer}>
-                      {/* 6x6 색상 옵션 컨테이너 (rowColorsContainer 하나당 색상 6개씩 총 6줄) */}
-                      <View style={styles.modalColorsContainer}>
-                        {/* 팔레트 첫 번째 줄 */}
-                        {color.colors1.map((color, index) => (
-                          <TouchableWithoutFeedback
-                            key={index}
-                            onPress={() => handleColorSelect(color)}
-                          >
-                            <View
-                              style={[
-                                styles.circleSelected,
-                                {
-                                  borderColor:
-                                    selectedColor === color ? "grey" : "white",
-                                },
-                              ]}
-                            >
-                              <View
-                                style={[
-                                  styles.circles,
-                                  { backgroundColor: color },
-                                ]}
-                              ></View>
-                            </View>
-                          </TouchableWithoutFeedback>
-                        ))}
-                      </View>
-                      <View style={styles.modalColorsContainer}>
-                        {color.colors2.map((color, index) => (
-                          <TouchableWithoutFeedback
-                            key={index}
-                            onPress={() => handleColorSelect(color)}
-                          >
-                            <View
-                              style={[
-                                styles.circleSelected,
-                                {
-                                  borderColor:
-                                    selectedColor === color ? "grey" : "white",
-                                },
-                              ]}
-                            >
-                              <View
-                                style={[
-                                  styles.circles,
-                                  { backgroundColor: color },
-                                ]}
-                              ></View>
-                            </View>
-                          </TouchableWithoutFeedback>
-                        ))}
-                      </View>
-                      <View style={styles.modalColorsContainer}>
-                        {color.colors3.map((color, index) => (
-                          <TouchableWithoutFeedback
-                            key={index}
-                            onPress={() => handleColorSelect(color)}
-                          >
-                            <View
-                              style={[
-                                styles.circleSelected,
-                                {
-                                  borderColor:
-                                    selectedColor === color ? "grey" : "white",
-                                },
-                              ]}
-                            >
-                              <View
-                                style={[
-                                  styles.circles,
-                                  { backgroundColor: color },
-                                ]}
-                              ></View>
-                            </View>
-                          </TouchableWithoutFeedback>
-                        ))}
-                      </View>
-                      <View style={styles.modalColorsContainer}>
-                        {color.colors4.map((color, index) => (
-                          <TouchableWithoutFeedback
-                            key={index}
-                            onPress={() => handleColorSelect(color)}
-                          >
-                            <View
-                              style={[
-                                styles.circleSelected,
-                                {
-                                  borderColor:
-                                    selectedColor === color ? "grey" : "white",
-                                },
-                              ]}
-                            >
-                              <View
-                                style={[
-                                  styles.circles,
-                                  { backgroundColor: color },
-                                ]}
-                              ></View>
-                            </View>
-                          </TouchableWithoutFeedback>
-                        ))}
-                      </View>
-                      <View style={styles.modalColorsContainer}>
-                        {color.colors5.map((color, index) => (
-                          <TouchableWithoutFeedback
-                            key={index}
-                            onPress={() => handleColorSelect(color)}
-                          >
-                            <View
-                              style={[
-                                styles.circleSelected,
-                                {
-                                  borderColor:
-                                    selectedColor === color ? "grey" : "white",
-                                },
-                              ]}
-                            >
-                              <View
-                                style={[
-                                  styles.circles,
-                                  { backgroundColor: color },
-                                ]}
-                              ></View>
-                            </View>
-                          </TouchableWithoutFeedback>
-                        ))}
-                      </View>
-                      <View style={styles.modalColorsContainer}>
-                        {color.colors6.map((color, index) => (
-                          <TouchableWithoutFeedback
-                            key={index}
-                            onPress={() => handleColorSelect(color)}
-                          >
-                            <View
-                              style={[
-                                styles.circleSelected,
-                                {
-                                  borderColor:
-                                    selectedColor === color ? "grey" : "white",
-                                },
-                              ]}
-                            >
-                              <View
-                                style={[
-                                  styles.circles,
-                                  { backgroundColor: color },
-                                ]}
-                              ></View>
-                            </View>
-                          </TouchableWithoutFeedback>
-                        ))}
-                      </View>
-                    </View>
-                    <View style={styles.modalBtnContainer}>
-                      <TouchableOpacity onPress={confirmColor}>
-                        <Image
-                          style={styles.modalConfirmBtn}
-                          source={require("../../images/modalConfirmBtn.png")}
-                        ></Image>
-                      </TouchableOpacity>
-                    </View>
+            <View style={styles.modalView}>
+              {/* 색상 팔레트 모달창 내 색상, 확인버튼 컨테이너 */}
+              <View style={styles.modalItemContainter}>
+                {/* 모달창 상위 부분 회색 막대기 */}
+                <View style={styles.modalVector}></View>
+                <Text
+                  style={{
+                    marginTop: 15,
+                    fontFamily: "SUIT-Medium",
+                    fontSize: 14,
+                  }}
+                >
+                  색상
+                </Text>
+                {/* 모달창 내 색상 옵션 컨테이너 */}
+                <View style={styles.colorContainer}>
+                  {/* 6x6 색상 옵션 컨테이너 (rowColorsContainer 하나당 색상 6개씩 총 6줄) */}
+                  <View style={styles.modalColorsContainer}>
+                    {/* 팔레트 첫 번째 줄 */}
+                    {color.colors1.map((color, index) => (
+                      <TouchableWithoutFeedback
+                        key={index}
+                        onPress={() => handleColorSelect(color)}
+                      >
+                        <View
+                          style={[
+                            styles.circleSelected,
+                            {
+                              borderColor:
+                                selectedColor === color ? "grey" : "white",
+                            },
+                          ]}
+                        >
+                          <View
+                            style={[styles.circles, { backgroundColor: color }]}
+                          ></View>
+                        </View>
+                      </TouchableWithoutFeedback>
+                    ))}
+                  </View>
+                  <View style={styles.modalColorsContainer}>
+                    {color.colors2.map((color, index) => (
+                      <TouchableWithoutFeedback
+                        key={index}
+                        onPress={() => handleColorSelect(color)}
+                      >
+                        <View
+                          style={[
+                            styles.circleSelected,
+                            {
+                              borderColor:
+                                selectedColor === color ? "grey" : "white",
+                            },
+                          ]}
+                        >
+                          <View
+                            style={[styles.circles, { backgroundColor: color }]}
+                          ></View>
+                        </View>
+                      </TouchableWithoutFeedback>
+                    ))}
+                  </View>
+                  <View style={styles.modalColorsContainer}>
+                    {color.colors3.map((color, index) => (
+                      <TouchableWithoutFeedback
+                        key={index}
+                        onPress={() => handleColorSelect(color)}
+                      >
+                        <View
+                          style={[
+                            styles.circleSelected,
+                            {
+                              borderColor:
+                                selectedColor === color ? "grey" : "white",
+                            },
+                          ]}
+                        >
+                          <View
+                            style={[styles.circles, { backgroundColor: color }]}
+                          ></View>
+                        </View>
+                      </TouchableWithoutFeedback>
+                    ))}
+                  </View>
+                  <View style={styles.modalColorsContainer}>
+                    {color.colors4.map((color, index) => (
+                      <TouchableWithoutFeedback
+                        key={index}
+                        onPress={() => handleColorSelect(color)}
+                      >
+                        <View
+                          style={[
+                            styles.circleSelected,
+                            {
+                              borderColor:
+                                selectedColor === color ? "grey" : "white",
+                            },
+                          ]}
+                        >
+                          <View
+                            style={[styles.circles, { backgroundColor: color }]}
+                          ></View>
+                        </View>
+                      </TouchableWithoutFeedback>
+                    ))}
+                  </View>
+                  <View style={styles.modalColorsContainer}>
+                    {color.colors5.map((color, index) => (
+                      <TouchableWithoutFeedback
+                        key={index}
+                        onPress={() => handleColorSelect(color)}
+                      >
+                        <View
+                          style={[
+                            styles.circleSelected,
+                            {
+                              borderColor:
+                                selectedColor === color ? "grey" : "white",
+                            },
+                          ]}
+                        >
+                          <View
+                            style={[styles.circles, { backgroundColor: color }]}
+                          ></View>
+                        </View>
+                      </TouchableWithoutFeedback>
+                    ))}
+                  </View>
+                  <View style={styles.modalColorsContainer}>
+                    {color.colors6.map((color, index) => (
+                      <TouchableWithoutFeedback
+                        key={index}
+                        onPress={() => handleColorSelect(color)}
+                      >
+                        <View
+                          style={[
+                            styles.circleSelected,
+                            {
+                              borderColor:
+                                selectedColor === color ? "grey" : "white",
+                            },
+                          ]}
+                        >
+                          <View
+                            style={[styles.circles, { backgroundColor: color }]}
+                          ></View>
+                        </View>
+                      </TouchableWithoutFeedback>
+                    ))}
                   </View>
                 </View>
-              </Modal>
+                <TouchableOpacity onPress={confirmColor}>
+                  <View style={styles.modalConfirmBtn}>
+                    <Text style={styles.modalText}>확인</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
           </Modal>
         </View>
@@ -369,36 +402,36 @@ const styles = StyleSheet.create({
   colorTextInputContainer: {
     flexDirection: "row",
     //backgroundColor: "blue",
-    borderBottomWidth: 2,
+    borderBottomWidth: 1.5,
+    marginTop: "3%",
   },
   colorTextInput: {
     height: 50,
-    fontSize: 18,
-    fontWeight: "500",
+    fontSize: 16,
     marginLeft: "1%",
-    //marginTop: "5%",
+    fontFamily: "SUIT-Regular",
     paddingTop: "2%",
+  },
+  modalText: {
+    fontSize: 14,
+    fontFamily: "SUIT-Medium",
   },
   modalItemContainter: {
     flex: 1,
     alignItems: "center",
     //justifyContent: "space-evenly",
-    //backgroundColor: "red",
     marginBottom: "5%",
   },
   colorContainer: {
     flex: 1.5,
     justifyContent: "space-evenly",
-    //backgroundColor: "yellow"
+    //backgroundColor: "yellow",
   },
   modalBtnContainer: {
     flex: 0.2,
     alignItems: "center",
-    //backgroundColor: "red"
-  },
-  modalText: {
-    marginTop: "3%",
-    fontSize: 16,
+    //backgroundColor: "red",
+    marginBottom: 20,
   },
   circleSelected: {
     height: 40,
@@ -411,37 +444,31 @@ const styles = StyleSheet.create({
   modalColorsContainer: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    width: "95%",
+    width: "100%",
+    //backgroundColor: "red",
   },
   modalConfirmBtn: {
     borderRadius: 10,
     width: WINDOW_WIDHT * 0.9,
-    height: WINDOW_HEIGHT * 0.06,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+    backgroundColor: color.deletegrey,
   },
   modalVector: {
     height: 5,
     width: 50,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: color.deactivated,
     borderRadius: 10,
     marginTop: 10,
   },
-  modalBackground: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    height: WINDOW_HEIGHT * 2,
-    width: WINDOW_WIDHT * 2,
-    marginHorizontal: "-50%",
-    marginVertical: "-50%",
-  },
   modalView: {
-    //flex: 1,
     backgroundColor: "white",
     borderStartStartRadius: 20,
     borderStartEndRadius: 20,
-    height: 550 /*WINDOW_HEIGHT * 0.6*/,
     marginTop: "auto",
-    marginHorizontal: "-5.5%",
-    marginVertical: "-7%",
+    minHeight: 460,
   },
   descriptionContainter: {
     alignItems: "flex-end",
@@ -464,7 +491,7 @@ const styles = StyleSheet.create({
   triangle: {
     width: 10,
     height: 10,
-    marginLeft: "3%",
+    marginLeft: 10,
     marginRight: "5%",
   },
   circleContainer: {
@@ -473,25 +500,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end",
     flexDirection: "row",
-  },
-  headerContainer: {
-    marginTop: "5%",
-    flex: 0.13,
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
-    //backgroundColor: "red",
-  },
-  backBtn: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  headerTitleContainer: {
-    flex: 1,
-    alignItems: "center",
-    marginLeft: "3%",
+    marginRight: "2%",
   },
   confirmBtn: {
     flex: 1,
@@ -499,9 +508,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-end",
     marginRight: "3%",
-  },
-  headerText: {
-    fontSize: 19,
-    fontWeight: "500",
   },
 });

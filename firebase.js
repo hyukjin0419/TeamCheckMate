@@ -12,11 +12,14 @@ import {
   doc, //문서
   addDoc, //C
   getDocs, //R
+  getDoc,
   updateDoc, //U
   deleteDoc, //D
   setDoc,
   orderBy,
   query,
+  arrayUnion,
+  deleteField,
 } from "firebase/firestore";
 //import { getDatabase } from "firebase/database";
 // Uncomment the line below if you need to use Firebase Analytics
@@ -51,10 +54,13 @@ export {
   getFirestore,
   collection,
   addDoc,
+  getDoc,
   getDocs,
   doc,
   setDoc,
   updateDoc,
   deleteDoc,
   onAuthStateChanged,
+  arrayUnion,
+  deleteField,
 };
