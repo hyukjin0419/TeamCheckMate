@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/core";
 import { color } from "../styles/colors";
 import { db, collection, doc, deleteDoc } from "../../firebase";
 import s from "../styles/css";
+import * as Haptics from "expo-haptics";
 
 //스크린의 높이, 넓이 불러오기
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -29,7 +30,8 @@ const AssignmentItem = (props) => {
   const [assignmentName, setAssignmentName] = useState(props.assignmentName);
   const [assignmentId, setAssignmentId] = useState(props.assignmentId);
   const [dueDate, setDueDate] = useState(props.dueDate);
-  console.log("[AssignmentItem] teamCode", teamCode, "여기까지는 로드 됨");
+  // console.log("[AssignmentItem] teamCode", teamCode, "여기까지는 로드 됨");
+  // console.log(teamCode, title, fileColor, memberInfo, memberNames);
   const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
     useState(false);
 
@@ -61,7 +63,7 @@ const AssignmentItem = (props) => {
       const teamDocumentRef = doc(collection(db, "team"), teamCode);
       const assignmentListCollectionRef = collection(
         teamDocumentRef,
-        "과제 list"
+        "assignmentList"
       );
       //과제 list colloection에 접근
       const assignmentDocRef = doc(
@@ -78,8 +80,30 @@ const AssignmentItem = (props) => {
     props.getAssignmentList();
   };
 
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handlePressIn = () => {
+    setIsPressed(true);
+  };
+
+  const handlePressOut = () => {
+    setIsPressed(false);
+  };
+
+  const [askingModalVisible, setaskingModalVisible] = useState(false);
+  handleAskingModalPress = () => {
+    setaskingModalVisible(!askingModalVisible);
+  };
+
   return (
-    <TouchableOpacity
+    <Pressable
+      onLongPress={handleAssignmentOptionPress}
+      delayLongPress={800}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.2 : 1,
+      })}
       onPress={() => {
         navigation.navigate("TeamCheckPage", {
           teamCode: teamCode,
@@ -105,7 +129,7 @@ const AssignmentItem = (props) => {
         <Pressable
           style={styles.optionBtn}
           onPress={() => {
-            handleAssignmentOptionPress(props);
+            handleAssignmentOptionPress();
           }}
         ></Pressable>
         {/* 과제 설정 모달창 */}
@@ -163,7 +187,9 @@ const AssignmentItem = (props) => {
                 {/* 삭제 버튼 */}
                 <TouchableOpacity
                   style={s.teamDeleteBtn}
-                  onPress={handleDelete}
+                  onPress={() => {
+                    handleAskingModalPress();
+                  }}
                 >
                   {/* 터치 시 과제 삭제 */}
                   <Text style={s.teamDeleteText}>삭제</Text>
@@ -171,9 +197,43 @@ const AssignmentItem = (props) => {
               </View>
             </View>
           </View>
+          <Modal
+            onBackdropPress={handleAskingModalPress}
+            isVisible={askingModalVisible}
+            animationIn="zoomIn"
+            animationOut="zoomOut"
+            animationInTiming={300}
+            animationOutTiming={200}
+            backdropTransitionInTiming={0}
+            backdropTransitionOutTiming={0}
+          >
+            <View style={s.askingModal}>
+              <View marginTop="5%">
+                <Text style={s.askingModalText}>과제를 삭제하시겠습니까?</Text>
+              </View>
+              <View style={s.askingModalBtnContainer}>
+                <TouchableOpacity
+                  style={s.askingModalCancelBtn}
+                  onPress={() => handleAskingModalPress()}
+                >
+                  <Text style={s.askingModalCancelText}>취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={s.askingModalConfirmBtn}
+                  onPress={() => {
+                    handleAskingModalPress();
+                    handleDelete();
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                >
+                  <Text style={s.askingModalConfirmText}>삭제</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </Modal>
       </ImageBackground>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

@@ -9,10 +9,19 @@ import {
   ScrollView,
   FlatList,
   KeyboardAvoidingView,
-  Keyboard,
-  TouchableWithoutFeedback,
+  ImageBackground,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import {
+  db,
+  collection,
+  addDoc,
+  doc,
+  getDocs,
+  updateDoc,
+} from "../../firebase.js";
+import Modal from "react-native-modal";
+import { query, orderBy, deleteDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
 import { color } from "../styles/colors";
@@ -26,6 +35,7 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 
 export default TeamCheckPage = (props) => {
   const navigation = useNavigation();
+  //AssignmentItem에서 가져온 정보
   const route = useRoute();
   const {
     teamCode,
@@ -38,109 +48,318 @@ export default TeamCheckPage = (props) => {
     dueDate,
   } = route.params;
 
-  /*
-필요한 함수가 뭘까..
-1. 플러스 버튼 눌렀을 때 입력창이 열려야함 -> 입력창 state
-2. 입력창이 입력이 끝났을 때 checklists에 체크박스컨테이너 하나가 추가 되어야함 (addTask)
-3. 만약 체크박스 눌렀을 때 상태가 바뀌어야 함
-4. update 및 delete도 구현해야 함
-*/
-
+  //firebase에서 가져온 체크리스트를 저장할 객체배열
   const [checklists, setChecklists] = useState([]);
+  //체크리스트 add시 input을 받을 textinput에 사용될 text
   const [newTaskText, setNewTaskText] = useState("");
+  //체크리스트 edit시 input을 받을 textinput에 사용될 text
+  const [editTaskText, setEditTaskText] = useState("");
+  //체크리스트 add시 textinput을 렌더링 하기 위해 boolean값을 담는 객체
   const [isWritingNewTask, setIsWritingNewTask] = useState({});
 
-  const pressAddBtn = (memberName) => {
-    //isWritingNewTask를 순회하면서 현재 선택된 사람이 아니면 textinput을 닫는다.
-    Object.keys(isWritingNewTask).forEach((name) => {
-      if (name !== memberName && isWritingNewTask[name]) {
-        closeTextInput(name);
-      }
-    });
+  //Read from Firebase and store in an object array
+  const getCheckLists = async () => {
+    console.log("[TeamcheckPage]: getCheckLists 함수 실행");
+    //체크가 안된 체크리스트가 배열 앞부분에 존재하도록 함수가 작동함.
+    //체크 안된 체크리스트를 담을 배열
+    const uncheckedChecklists = [];
+    //체크 된 체크리스트를 담을 배열
+    const checkedChecklists = [];
 
-    // 플러스 버튼을 누를 때 해당 팀 멤버에 대한 입력 창을 열도록 설정
+    //firebase에서 체크리스트 정보를 가져옴
+    await Promise.all(
+      memberNames.map(async (memberName) => {
+        const querySnapshot = await getDocs(
+          query(
+            collection(
+              db,
+              "team",
+              teamCode,
+              "assignmentList",
+              assignmentId,
+              "memberName",
+              memberName,
+              "checkList"
+            ),
+            //시간별로
+            orderBy("regDate", "asc")
+          )
+        );
+        querySnapshot.forEach((doc) => {
+          const data = { id: doc.id, ...doc.data() };
+          //체크 여부에 따라 다른 배열에 넣고...
+          if (data.isChecked) {
+            checkedChecklists.push(data);
+          } else {
+            uncheckedChecklists.push(data);
+          }
+        });
+      })
+    );
+
+    // 체크된 항목과 체크되지 않은 항목을 합쳐서 최종적인 배열을 생성
+    const combinedChecklists = [...uncheckedChecklists, ...checkedChecklists];
+
+    //프론트에 반영하기 위해 상태 업데이트 함수 사용
+    setChecklists(combinedChecklists);
+  };
+
+  //앱이 처음 렌더링 될때 getCheckList() 실행
+  useEffect(() => {
+    getCheckLists();
+    console.log("[TeamcheckPage]: useEffect[] 실행");
+  }, []);
+
+  //add시 체크리스트 생성을 위한 입력창을 열어주는 함수
+  const pressAddBtn = (memberName) => {
+    console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
+    //1. 멤버 이름을 parameter로 받는다.
+    //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
     setIsWritingNewTask((prevIsWritingNewTask) => ({
       ...prevIsWritingNewTask,
       [memberName]: true,
     }));
   };
 
-  const closeTextInput = (memberName) => {
-    addNewTask(memberName);
-    setIsWritingNewTask((prevIsWritingNewTask) => ({
-      ...prevIsWritingNewTask,
-      [memberName]: false,
-    }));
-  };
+  //Create a new checklist
+  const addNewTask = async (memberName, isSubmitedByEnter) => {
+    console.log("[TeamcheckPage]: addNewTask 함수 실행");
+    //프론트 먼저 반영 후 firebase 실행 -> 어플의 속도를 높이기 위해
+    //너무 빠른 연속 터치시 문제가 발생할 수 있으나, 사용자가 그런 빠른 터치를 할 상황이 거의 없다고 판단되어 일단 진행.
 
-  const addNewTask = (memberName) => {
+    //textinput창에 아무것도 입력되지 않았는데 함수가 실행되었다면, 아무것도 추가하지 않고 textinput창을 닫아버리는 (렌더링을 멈춘다) 조건문
     if (newTaskText.trim() !== "") {
-      const updatedChecklists = [...checklists];
-      updatedChecklists.push({
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      //새로운 객체를 생성한다.
+      //이때 이름은 파라미터로, content는 useState를 사용한다
+      const newChecklist = {
         writer: memberName,
-        index: updatedChecklists.filter(
-          (checklist) => checklist.writer === memberName
-        ).length,
-        isWriting: false,
         isChecked: false,
         content: newTaskText,
         regDate: new Date(),
         modDate: new Date(),
-      });
-      setChecklists(updatedChecklists);
+      };
 
-      const updatedIsWritingNewTask = { ...isWritingNewTask };
-      updatedIsWritingNewTask[memberName] = false;
-      setIsWritingNewTask(updatedIsWritingNewTask);
+      //프론트에 반영
+      //새로 생성된 체크리스트를 기존에 체크리스트에 이어 붙힌다
+      setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
 
-      // 입력창 비우기
+      //firestorage 참조
+      const checkListDoc = addDoc(
+        collection(
+          db,
+          "team",
+          teamCode,
+          "assignmentList",
+          assignmentId,
+          "memberName",
+          memberName,
+          "checkList"
+        ),
+        newChecklist
+      );
+
+      //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
+      if (!isSubmitedByEnter) {
+        setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
+        // console.log(updatedIsWritingNewTask);
+      }
+      //textinput을 비운다.
       setNewTaskText("");
     } else {
       setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
     }
+    await getCheckLists();
   };
 
-  const continueAddingNewTask = (memberName) => {
-    if (newTaskText.trim() !== "") {
-      const updatedChecklists = [...checklists];
-      updatedChecklists.push({
-        writer: memberName,
-        index: updatedChecklists.filter(
-          (checklist) => checklist.writer === memberName
-        ).length,
-        isWriting: false,
-        isChecked: false,
-        content: newTaskText,
-        regDate: new Date(),
-        modDate: new Date(),
-      });
-      setChecklists(updatedChecklists);
+  //Check 누를 때 상태 업데이트 하는 함수
+  const handleCheckboxChange = async (writer, id, newValue) => {
+    console.log("[TeamcheckPage]: handleCheckBoxChange함수 실행");
+    // 마찬가지로 프론트 먼저 상태 업데이트 후 백엔드 반영
+    //햅틱 추가
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-      // 입력창 비우기
-      setNewTaskText("");
-    } else {
-      setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
-    }
-  };
-
-  const handleCheckboxChange = (writer, index, newValue) => {
-    // 체크박스 상태 변경
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const updatedChecklists = [...checklists];
-    const checklistToUpdate = updatedChecklists.find(
-      (checklist) => checklist.writer === writer && checklist.index === index
+    //파라미터로 작성자와, 체크리스트 id(from firebase), 그리고 newValue (checkbox에서 제공)을 받는다
+    //전체 객체 배열인 checklists를 순회하며 작성자와 id가 같으면
+    //찾아낸 객체의 value를 바꾸고 modDate를 업데이트 한 후 updateChecklists에 넣는다
+    //아니면 기존 객체를 updateChecklist에 넣는다
+    const updatedChecklists = checklists.map((checklist) =>
+      checklist.writer === writer && checklist.id === id
+        ? { ...checklist, isChecked: newValue, modDate: new Date() }
+        : checklist
     );
 
-    if (checklistToUpdate) {
-      checklistToUpdate.isChecked = newValue;
-      checklistToUpdate.modDate = new Date();
+    //체크여부에 따라 정렬은 바꾼다.
+    //반환 값이 음수일 경우 a가 앞에 위치
+    //반환 값이 양수일 경우 b가 a보다 앞에 위치
+    //0일경우 변경되지 않음
+    updatedChecklists.sort((a, b) => {
+      if (a.isChecked === b.isChecked) {
+        // 체크 여부가 동일하다면 타임스탬프로 정렬
+        return a.regDate - b.regDate;
+      } else if (a.isChecked && !b.isChecked) {
+        // 체크된 항목이 뒤로 가도록 설정
+        return 1;
+      } else {
+        // 체크되지 않은 항목이 앞으로 가도록 설정
+        return -1;
+      }
+    });
+
+    //업데이트 된 체크리스트를 프론트에 반영
+    setChecklists(updatedChecklists);
+
+    //업데이트 된 체크리스트를 firestorage에 반영 -> 백엔드에서는 체크리스트가 객체배열로 되어있지 않기 때문에, 그냥 해당 문서를 참조해서 값을 바꾼다
+    try {
+      const docRef = doc(
+        db,
+        "team",
+        teamCode,
+        "assignmentList",
+        assignmentId,
+        "memberName",
+        writer,
+        "checkList",
+        id
+      );
+      await updateDoc(docRef, {
+        isChecked: newValue,
+        modDate: new Date(),
+      });
+    } catch (error) {
+      console.error("Error updating documents: ", error);
+    }
+  };
+
+  //체크리스트 content 업데이트 버튼을 모달에서 눌렀을따
+  const pressEditBtn = () => {
+    console.log("[TeamcheckPage]: pressEditBtn 함수 실행");
+    //우선 모달을 닫은 후
+    setAssignmentOptionModalVisible(false);
+    //Textinput을 띄워주는 함수를 실행
+    //이때 setTimeout은 모달이 닫는 렌더링과 textinput을 focusing하는 렌더링이 겹치지 않게 분리해주는 역할을 함
+    setTimeout(() => {
+      readyToUpdateTask(); // 두 번째 함수를 500ms(0.5초) 후에 실행
+    }, 400);
+  };
+
+  //content를 edit하기 위한 textinput을 열어주는 함수
+  const readyToUpdateTask = () => {
+    console.log("[TeamcheckPage]: readyToUpdateTask 함수 실행");
+
+    //flatlist안에 checklists배열을 filter과 map을 통해서 렌더링한다.
+    //이때 flatlist는 memberInfo객체 배열 (AssignmentItem에서 route) 가져옴.
+    //checklists는 firebase에서 (getCheckList를 통해) 가져옴.
+    //checklists의 writer과 flatlist item의 이름이 같으면 map을 통해 렌더링
+    //isadditing이 참일때에는 edit을 위한 textinput을 렌더링 하고
+    //그렇지 않다면 해당하는 checklist를 렌더링 해준다
+    const foundChecklist = checklists.find(
+      //이때 seletedChecklist는 모달창을 띄울때 설정된다
+      (checklist) => checklist.id === selectedChecklist.id
+    );
+
+    if (foundChecklist) {
+      //isadditing을 참으로 설정하며, textinput을 열어준다.
+      foundChecklist.isadditing = true;
+      //원래 입력되었던 내용을 textinput에 렌더링하기 위한 작업
+      setEditTaskText(foundChecklist.content);
+      //checklists객체배열을 새로 만들어 업데이트 해주는 작업
+      const updatedChecklists = checklists.map((checklist) =>
+        checklist.id === foundChecklist.id ? foundChecklist : checklist
+      );
+      //프론트에 반영
       setChecklists(updatedChecklists);
     }
   };
-  console.log(JSON.stringify(checklists, null, 2));
+
+  //사용자가 edit을 맞추었을때 실행되는 함수
+  const editTask = async () => {
+    console.log("[TeamcheckPage]: editTask 함수 실행");
+    //프론트 먼저 반영 후 백엔드 작업
+    const foundChecklist = checklists.find(
+      (checklist) => checklist.id === selectedChecklist.id
+    );
+    if (foundChecklist) {
+      if (editTaskText.trim() !== "") {
+        foundChecklist.content = editTaskText;
+      }
+      foundChecklist.isadditing = false;
+      const updatedChecklists = checklists.map((checklist) =>
+        checklist.id === foundChecklist.id ? foundChecklist : checklist
+      );
+      setChecklists(updatedChecklists);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    try {
+      const docRef = doc(
+        db,
+        "team",
+        teamCode,
+        "assignmentList",
+        assignmentId,
+        "memberName",
+        selectedChecklist.writer,
+        "checkList",
+        selectedChecklist.id
+      );
+      await updateDoc(docRef, {
+        content: editTaskText,
+        modDate: new Date(),
+      });
+    } catch (error) {
+      console.error("Error updating documents: ", error);
+    }
+  };
+
+  //delete함수
+  const deleteTask = async () => {
+    console.log("[TeamcheckPage]: deleteTask 함수 실행");
+    //모달창 닫기
+    setAssignmentOptionModalVisible(false);
+    //마찬가지로 프론트 반영 후 백엔드 작업
+    try {
+      const updatedChecklists = checklists.filter(
+        (checklist) => checklist.id !== selectedChecklist.id
+      );
+      setChecklists(updatedChecklists);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      console.log(
+        teamCode,
+        assignmentId,
+        selectedChecklist.writer,
+        selectedChecklist.id
+      );
+
+      await deleteDoc(
+        doc(
+          db,
+          "team",
+          teamCode,
+          "assignmentList",
+          assignmentId,
+          "memberName",
+          selectedChecklist.writer,
+          "checkList",
+          selectedChecklist.id
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  };
+
+  //모달
+  const [assignmentOptionModalVisible, setAssignmentOptionModalVisible] =
+    useState(false);
+  //모달창 선택시
+  const [selectedChecklist, setselectedChecklist] = useState({});
+  const handleAssignmentOptionPress = (checklist) => {
+    console.log("[TeamcheckPage]: handleAssignmentOptionPress 함수 실행");
+    setAssignmentOptionModalVisible(!assignmentOptionModalVisible);
+    setselectedChecklist(checklist);
+  };
 
   return (
-    //헤더 부분
     <KeyboardAvoidingView
       style={s.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -162,12 +381,15 @@ export default TeamCheckPage = (props) => {
         <View style={s.titleRightBtn}></View>
       </View>
       {/* 과제 제목 부분 */}
-      <View style={styles.assignmentTitleContainer}>
+      <ImageBackground
+        style={styles.assignmentTitleContainer}
+        source={require("../images/AssignmentContainer.png")}
+      >
         <TouchableOpacity style={styles.assignmentTitleInfoContainer}>
           <Text style={styles.dueDateText}>{dueDate}</Text>
           <Text style={styles.assignmentTitleText}>{assignmentName}</Text>
         </TouchableOpacity>
-      </View>
+      </ImageBackground>
       {/* 팀원 목록 부분 */}
 
       <View style={styles.teamMembersNamesArrayContainer}>
@@ -177,7 +399,7 @@ export default TeamCheckPage = (props) => {
             ...styles.teamMateContainer,
             backgroundColor: fileColor,
             borderColor: fileColor,
-            marginRight: "3%",
+            marginRight: "2%",
           }}
         >
           <Text style={{ ...styles.teamMateText }}>팀 메이트</Text>
@@ -188,14 +410,13 @@ export default TeamCheckPage = (props) => {
           data={memberNames}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.toString()}
-          renderItem={({ item }) => (
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => (
             <TouchableOpacity
               style={{
                 ...styles.memberNameContainer,
                 borderColor: fileColor,
               }}
-              // onPress={() => createChecklist(item.name)}
             >
               <Text style={styles.memberNameText}>{item}</Text>
             </TouchableOpacity>
@@ -211,7 +432,7 @@ export default TeamCheckPage = (props) => {
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
-            <View style={styles.contentContainer}>
+            <View style={styles.contentContainer} key={item.name}>
               <TouchableOpacity
                 style={{
                   ...styles.memberNameContainerTwo,
@@ -225,33 +446,65 @@ export default TeamCheckPage = (props) => {
                   style={styles.taskAddBtn}
                 />
               </TouchableOpacity>
-
               {/* 생성된 체크리스트 렌더링 */}
-
               {/* 체크리스트 항목 추가 입력 창 */}
               {checklists
-                .filter((checklist) => checklist.writer === item.name)
-                .map((checklist, index) => (
-                  <View key={index} style={styles.checkBoxContainer}>
-                    <Checkbox
-                      value={checklist.isChecked}
-                      style={styles.checkbox}
-                      color={fileColor}
-                      onValueChange={(newValue) =>
-                        handleCheckboxChange(checklist.writer, index, newValue)
-                      }
-                    />
-                    <Text style={styles.checkBoxContent}>
-                      {checklist.content}
-                    </Text>
-                    <TouchableOpacity>
-                      <Image
-                        source={require("../images/icons/three_dots.png")}
-                        style={styles.threeDots}
+                .filter(
+                  (checklist) =>
+                    checklist.writer === item.name &&
+                    checklist.isChecked === false
+                )
+                .map((checklist) =>
+                  checklist.isadditing ? (
+                    <View style={styles.checkBoxContainer}>
+                      <Checkbox style={styles.checkbox} color={fileColor} />
+                      <TextInput
+                        style={{
+                          ...styles.checkBoxContentTextInput,
+                          borderBottomColor: fileColor,
+                        }}
+                        value={editTaskText}
+                        autoFocus={true}
+                        returnKeyType="done"
+                        onChangeText={(text) => setEditTaskText(text)}
+                        onSubmitEditing={() => editTask()}
+                        onBlur={() => editTask()}
                       />
-                    </TouchableOpacity>
-                  </View>
-                ))}
+                      <View>
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </View>
+                    </View>
+                  ) : (
+                    <View key={checklist.id} style={styles.checkBoxContainer}>
+                      <Checkbox
+                        value={checklist.isChecked}
+                        style={styles.checkbox}
+                        color={fileColor}
+                        onValueChange={(newValue) =>
+                          handleCheckboxChange(
+                            checklist.writer,
+                            checklist.id,
+                            newValue
+                          )
+                        }
+                      />
+                      <Text style={styles.checkBoxContent}>
+                        {checklist.content}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => handleAssignmentOptionPress(checklist)}
+                      >
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )
+                )}
 
               {/* 입력창 생성 */}
               {isWritingNewTask[item.name] ? (
@@ -259,13 +512,16 @@ export default TeamCheckPage = (props) => {
                   <Checkbox style={styles.checkbox} color={fileColor} />
                   <TextInput
                     placeholder="할 일 추가..."
-                    style={styles.checkBoxContent}
+                    style={{
+                      ...styles.checkBoxContentTextInput,
+                      borderBottomColor: fileColor,
+                    }}
                     value={newTaskText}
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => continueAddingNewTask(item.name)}
-                    onBlur={() => addNewTask(item.name)}
+                    onSubmitEditing={() => addNewTask(item.name, true)}
+                    onBlur={() => addNewTask(item.name, false)}
                     blurOnSubmit={false}
                   />
                   <TouchableOpacity>
@@ -276,10 +532,113 @@ export default TeamCheckPage = (props) => {
                   </TouchableOpacity>
                 </KeyboardAvoidingView>
               ) : null}
+
+              {checklists
+                .filter(
+                  (checklist) =>
+                    checklist.writer === item.name &&
+                    checklist.isChecked === true
+                )
+                .map((checklist) =>
+                  checklist.isadditing ? (
+                    <View style={styles.checkBoxContainer}>
+                      <Checkbox style={styles.checkbox} color={fileColor} />
+                      <TextInput
+                        style={{
+                          ...styles.checkBoxContentTextInput,
+                          borderBottomColor: fileColor,
+                        }}
+                        value={editTaskText}
+                        autoFocus={true}
+                        returnKeyType="done"
+                        onChangeText={(text) => setEditTaskText(text)}
+                        onSubmitEditing={() => editTask()}
+                        onBlur={() => editTask()}
+                      />
+                      <View>
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </View>
+                    </View>
+                  ) : (
+                    <View key={checklist.id} style={styles.checkBoxContainer}>
+                      <Checkbox
+                        value={checklist.isChecked}
+                        style={styles.checkbox}
+                        color={fileColor}
+                        onValueChange={(newValue) =>
+                          handleCheckboxChange(
+                            checklist.writer,
+                            checklist.id,
+                            newValue
+                          )
+                        }
+                      />
+                      <Text style={styles.checkBoxContent}>
+                        {checklist.content}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => handleAssignmentOptionPress(checklist)}
+                      >
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )
+                )}
             </View>
           )}
         />
       </View>
+
+      <Modal
+        onBackButtonPress={handleAssignmentOptionPress}
+        onBackdropPress={handleAssignmentOptionPress}
+        isVisible={assignmentOptionModalVisible}
+        swipeDirection="down"
+        onSwipeComplete={handleAssignmentOptionPress}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        animationInTiming={200}
+        animationOutTiming={200}
+        backdropTransitionInTiming={200}
+        backdropTransitionOutTiming={0}
+        style={{ justifyContent: "flex-end", margin: 0 }}
+      >
+        {/* 과제 설정 모달창 */}
+        <View style={styles.modalView}>
+          {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
+          <View style={s.modalItemContainter}>
+            {/* 모달창 상단 회색 막대 */}
+            <View style={s.modalVector}></View>
+            {/* 모달창 상단 과제 이름 표시 */}
+            <Text style={s.modalTitle}>{selectedChecklist.content}</Text>
+            <View flex={1}></View>
+            {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
+            <View style={s.modalTeamBtnContainer}>
+              {/* 수정 버튼 */}
+              <TouchableOpacity
+                style={s.teamReviseBtn}
+                onPress={() => pressEditBtn()}
+              >
+                <Text style={s.teamReviseText}>수정</Text>
+              </TouchableOpacity>
+              {/* 삭제 버튼 */}
+              <TouchableOpacity
+                style={s.teamDeleteBtn}
+                onPress={() => deleteTask()}
+              >
+                {/* 터치 시 과제 삭제 */}
+                <Text style={s.teamDeleteText}>삭제</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };
@@ -287,11 +646,8 @@ export default TeamCheckPage = (props) => {
 const styles = StyleSheet.create({
   // --------------과제 타이틀 영역-----------------
   assignmentTitleContainer: {
+    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.096 : WINDOW_HEIGHT * 0.117,
     width: WINDOW_WIDHT * 0.9,
-    height: WINDOW_HEIGHT > 800 ? WINDOW_HEIGHT * 0.095 : WINDOW_HEIGHT * 0.12,
-    //backgroundColor: "red",
-    borderWidth: 1,
-    borderRadius: 9,
     marginTop: "5%",
     marginBottom: "5%",
     flexDirection: "row",
@@ -319,34 +675,33 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    // backgroundColor: "green",
+    //backgroundColor: "green",
+    width: WINDOW_WIDHT,
+    paddingRight: "5%",
   },
   teamMateContainer: {
-    borderRadius: 200,
-    borderWidth: 1,
-    marginRight: 7,
     alignItems: "center",
     justifyContent: "center",
+    height: 35,
+    borderWidth: 1,
+    borderRadius: 23,
+    paddingHorizontal: 13,
   },
   teamMateText: {
-    padding: 9,
-    paddingRight: 10,
-    paddingLeft: 10,
-    fontFamily: "SUIT-Medium",
+    fontFamily: "SUIT-Regular",
     fontSize: 12,
   },
   memberNameContainer: {
-    marginRight: 6,
-    borderRadius: 200,
-    borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
+    height: 35,
+    borderWidth: 1,
+    borderRadius: 23,
+    marginHorizontal: 4,
+    paddingHorizontal: 13,
   },
   memberNameText: {
-    padding: 9,
-    paddingRight: 13,
-    paddingLeft: 13,
-    fontFamily: "SUIT-Medium",
+    fontFamily: "SUIT-Regular",
     fontSize: 12,
   },
   // ---------------------FlatList2--------------------
@@ -407,7 +762,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 14,
     // backgroundColor: "green",
+    borderBottomColor: "green",
   },
+  checkBoxContentTextInput: {
+    flex: 1,
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginLeft: 14,
+    marginRight: 14,
+    borderBottomWidth: 1, // 테두리 두께
+  },
+
   checklistTextInput: {
     fontFamily: "SUIT-Regular",
     fontSize: 14,
@@ -416,5 +781,13 @@ const styles = StyleSheet.create({
   threeDots: {
     width: 17.5,
     height: 4,
+  },
+  modalView: {
+    backgroundColor: "white",
+    paddingTop: 12,
+    paddingHorizontal: 12,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    minHeight: 200, // This property determines the minimum height of the modal
   },
 });

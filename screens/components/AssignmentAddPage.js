@@ -19,6 +19,7 @@ import { db, collection, addDoc } from "../../firebase";
 import { useNavigation } from "@react-navigation/core";
 import s from "../styles/css";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import * as Haptics from "expo-haptics";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -76,6 +77,7 @@ export default AssignmentAddPage = () => {
   //날짜, 시간 선택 시 정보 저장
   const onChange = (e, selectedDate) => {
     setDate(selectedDate);
+    Keyboard.dismiss();
 
     const year = selectedDate.getFullYear();
     const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
@@ -114,6 +116,7 @@ export default AssignmentAddPage = () => {
   const [show, setShow] = useState(false);
   const handleDueDatePress = () => {
     setShow(!show);
+    Keyboard.dismiss();
   };
 
   const [textStyle, setTextStyle] = useState(
@@ -125,7 +128,12 @@ export default AssignmentAddPage = () => {
   }
   const addAssignment = async () => {
     try {
-      const teamCollectionRef = collection(db, "team", teamCode, "과제 list");
+      const teamCollectionRef = collection(
+        db,
+        "team",
+        teamCode,
+        "assignmentList"
+      );
       const assignmentDocRef = await addDoc(teamCollectionRef, {
         assignmentName: assignmentName,
         dueDate: dueDate,
@@ -193,6 +201,7 @@ export default AssignmentAddPage = () => {
             disabled={buttonDisabled}
             onPress={() => {
               addAssignment();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
             <Text style={{ ...s.titleRightText, color: confirmBtnColor }}>

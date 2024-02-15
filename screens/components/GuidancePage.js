@@ -29,7 +29,7 @@ const YourComponent = () => {
           style={styles.noPostIcon}
           source={require("../images/GuidancePageNoPost.png")}
         ></Image>
-        <Text style={styles.noPostText}>등록된 내용이 없습니다.</Text>
+        <Text style={styles.noPostText}>등록된 내용이 없어요.</Text>
       </View>
     </View>
   );
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     color: "#797979",
-    marginTop: "5%",
+    marginTop: "3%",
   },
 });
 

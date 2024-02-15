@@ -6,7 +6,6 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Modal,
   FlatList,
   Dimensions,
   TouchableWithoutFeedback,
@@ -16,6 +15,8 @@ import { useState, useEffect } from "react";
 import s from "../../styles/css";
 import { useFocusEffect, useRoute } from "@react-navigation/native";
 import TeamItem from "./TeamItem";
+import Modal from "react-native-modal";
+import * as Haptics from "expo-haptics";
 import {
   db,
   doc,
@@ -46,6 +47,7 @@ export default TeamPage = () => {
   const teamAddedToast = () => {
     console.log("TeamPage: Toast Added Toast 작동중");
     showToast("success", "  ✓ 팀 등록 완료! 이번 팀플도 파이팅하세요 :)");
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   //회원정보 가져오기
@@ -165,11 +167,14 @@ export default TeamPage = () => {
       <View style={s.headContainer}></View>
       {/* 모달 뷰 */}
       <Modal
-        //animationType="fade"
-        transparent={true}
-        visible={showModal}
-        animationInTiming={20} // 애니메이션 속도 조절 (단위: 밀리초)
-        animationOutTiming={20}
+        isVisible={showModal}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        animationInTiming={100}
+        animationOutTiming={100}
+        backdropTransitionInTiming={0}
+        backdropTransitionOutTiming={0}
+        backdropOpacity={0.6}
       >
         <TouchableWithoutFeedback onPress={handlePress}>
           {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
@@ -223,6 +228,21 @@ export default TeamPage = () => {
       {/* 저장된 팀 리스트를 TeamItem페이지로 보내어서 생성하여 생성된 TeamIteam들을 TeamPage화면에 렌더링*/}
       {isLoading ? (
         <ActivityIndicator style={styles.loadingIndicator} />
+      ) : teamList.length === 0 ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: "5%",
+          }}
+        >
+          <Image
+            style={styles.noPostIcon}
+            source={require("../../images/GuidancePageNoPost.png")}
+          ></Image>
+          <Text style={styles.noPostText}>등록된 팀이 없어요.</Text>
+        </View>
       ) : (
         <FlatList
           numColumns={2}
@@ -243,6 +263,7 @@ export default TeamPage = () => {
           keyExtractor={(item) => item.id}
         ></FlatList>
       )}
+
       {/* 팀 추가에 점근할 수 있는 버튼 */}
       <TouchableOpacity style={styles.addBtnContainer} onPress={handlePress}>
         <Image
@@ -287,9 +308,10 @@ const styles = StyleSheet.create({
     height: 80,
   },
   modalView: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     flexDirection: "column",
+    width: WINDOW_WIDHT,
+    height: WINDOW_HEIGHT,
+    alignSelf: "center",
   },
   modalInsideView: {
     flexDirection: "column-reverse",
@@ -332,5 +354,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     size: "large",
     color: color.activated,
+  },
+  noPostText: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+    textAlign: "center",
+    color: "#797979",
+    marginTop: "3%",
+  },
+  noPostIcon: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
   },
 });

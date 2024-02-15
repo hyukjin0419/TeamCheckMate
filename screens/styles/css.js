@@ -243,6 +243,54 @@ const commonStyles = StyleSheet.create({
     width: 80,
     height: 80,
   },
+  /* 삭제/팀 나가기/탈퇴 확인 모달 */
+  askingModal: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    minHeight: 200,
+    marginBottom: "10%",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+  },
+  askingModalText: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 16,
+    textAlign: "center",
+    paddingTop: 3,
+  },
+  askingModalCancelBtn: {
+    width: WINDOW_WIDHT * 0.38,
+    height: 65,
+    backgroundColor: color.activated,
+    borderRadius: 10,
+    alignSelf: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  askingModalConfirmBtn: {
+    width: WINDOW_WIDHT * 0.38,
+    height: 65,
+    backgroundColor: color.deletegrey,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignSelf: "flex-end",
+    alignItems: "center",
+  },
+  askingModalBtnContainer: {
+    flexDirection: "row",
+    width: WINDOW_WIDHT * 0.9,
+    justifyContent: "space-evenly",
+  },
+  askingModalCancelText: {
+    color: "white",
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+  },
+  askingModalConfirmText: {
+    color: color.redpink,
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+  },
 });
 
 export default commonStyles;

@@ -9,6 +9,7 @@ import {
   Alert,
   FlatList,
   ScrollView,
+  Pressable,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
@@ -18,6 +19,7 @@ import * as Clipboard from "expo-clipboard";
 import s from "../../styles/css";
 import { Feather } from "@expo/vector-icons";
 import { db, doc, getDoc, getDocs, collection } from "../../../firebase";
+import * as Haptics from "expo-haptics";
 
 //반응형 디자인을 위한 스크린의 높이, 넓이 설정
 const WINDOW_WIDHT = Dimensions.get("window").width;
@@ -28,7 +30,6 @@ const TeamItem = (props) => {
   /* 팀 이름과 파일 아이콘 색상 */
   const [title, setTitle] = useState(props.title);
   const [fileColor, setFileColor] = useState(props.fileColor);
-  const [memberIdArray, setmemberIdArray] = useState(props.member_id_array);
   const [teamCode, setTeamCode] = useState(props.id);
   //멤버 정보 객체 배열
   const [memberInfo, setMemberInfo] = useState([]);
@@ -45,6 +46,7 @@ const TeamItem = (props) => {
   //터치시 팀 나가는 함수
   const leavingtheTeam = () => {
     props.leaveTeam(props.id);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   //팀 이름 혹은 파일 아이콘 색상이 변경되었을 때 리-렌더링
@@ -173,10 +175,11 @@ const TeamItem = (props) => {
     Alert.alert(
       "참여코드가 클립보드에 복사 되었습니다!\n" + "(" + props.id + ")"
     );
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     console.log(teamCode);
   };
 
-  //팀원 정보 불러오기
+  //모달창에 넣을 팀원정보 할당할기
   const getMembers = async () => {
     try {
       const teamRef = doc(db, "team", teamCode);
@@ -245,12 +248,34 @@ const TeamItem = (props) => {
 
   useEffect(() => {
     getMembers();
-    console.log(memberInfo);
-    console.log(memberNames);
+    // console.log(memberInfo);
+    // console.log(memberNames);
   }, []);
 
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handlePressIn = () => {
+    setIsPressed(true);
+  };
+
+  const handlePressOut = () => {
+    setIsPressed(false);
+  };
+
+  const [askingModalVisible, setaskingModalVisible] = useState(false);
+  handleAskingModalPress = () => {
+    setaskingModalVisible(!askingModalVisible);
+  };
+
   return (
-    <TouchableOpacity
+    <Pressable
+      onLongPress={handleTeamOptionPress}
+      delayLongPress={800}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.2 : 1,
+      })}
       onPress={() => {
         navigation.navigate("AssignmentPage", {
           title: title,
@@ -258,6 +283,10 @@ const TeamItem = (props) => {
           teamCode: teamCode,
           memberInfo: memberInfo,
           memberNames: memberNames,
+          memberPhoneNumbers: memberPhoneNumbers,
+          memberEmails: memberEmails,
+          memberSchools: memberSchools,
+          memberStudentNumbers: memberStudentNumbers,
         });
       }}
     >
@@ -374,13 +403,46 @@ const TeamItem = (props) => {
               {/* 팀 삭제 버튼 */}
               <TouchableOpacity
                 style={s.teamDeleteBtn}
-                onPress={leavingtheTeam}
+                onPress={() => handleAskingModalPress()}
               >
                 {/* 터치 시 팀 삭제 */}
                 <Text style={s.teamDeleteText}>팀 나가기</Text>
               </TouchableOpacity>
             </View>
           </View>
+          <Modal
+            onBackdropPress={handleAskingModalPress}
+            isVisible={askingModalVisible}
+            animationIn="zoomIn"
+            animationOut="zoomOut"
+            animationInTiming={300}
+            animationOutTiming={200}
+            backdropTransitionInTiming={0}
+            backdropTransitionOutTiming={0}
+          >
+            <View style={s.askingModal}>
+              <View marginTop="5%">
+                <Text style={s.askingModalText}>팀을 나가시겠습니까?</Text>
+              </View>
+              <View style={s.askingModalBtnContainer}>
+                <TouchableOpacity
+                  style={s.askingModalCancelBtn}
+                  onPress={() => handleAskingModalPress()}
+                >
+                  <Text style={s.askingModalCancelText}>취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={s.askingModalConfirmBtn}
+                  onPress={() => {
+                    handleAskingModalPress();
+                    leavingtheTeam();
+                  }}
+                >
+                  <Text style={s.askingModalConfirmText}>나가기</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
           <Modal
             onBackdropPress={handleTeamMateLabelPress}
             isVisible={teamMateModalVisible}
@@ -430,7 +492,7 @@ const TeamItem = (props) => {
           </Modal>
         </Modal>
       </ImageBackground>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -440,7 +502,7 @@ const styles = StyleSheet.create({
   teamMateModal: {
     backgroundColor: "white",
     borderRadius: 20,
-    minHeight: "25%",
+    minHeight: 210,
     marginBottom: "10%",
   },
   teamModalXBtn: {
