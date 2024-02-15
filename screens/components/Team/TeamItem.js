@@ -138,8 +138,6 @@ const TeamItem = (props) => {
     }
   }, [fileColor]);
 
-  const [teamOptionModalOpacity, setTeamOptionModalOpacity] = useState(0.7);
-
   //팀 파일 아이콘 옵션 버튼 터치시 팀 설정 모달창 띄우기
   const [teamOptionModalVisible, setTeamOptionModalVisible] = useState(false);
   handleTeamOptionPress = () => {
@@ -163,11 +161,6 @@ const TeamItem = (props) => {
     setSelectedTeamMateStudentNumber(memberStudentNumbers[index]);
     setSelectedTeamMateEmail(memberEmails[index]);
     setTeamMateModalVisible(!teamMateModalVisible);
-    if (teamMateModalVisible == true) {
-      setTeamOptionModalOpacity(0.7);
-    } else {
-      setTeamOptionModalOpacity(0);
-    }
   };
 
   const copyToClipboard = async (teamCode) => {
@@ -317,7 +310,6 @@ const TeamItem = (props) => {
           backdropTransitionOutTiming={0}
           propagateSwipe={true} //모달 내에서 수행한 스와이프 동작이 모달 외부의 스와이프 동작에 영향을 주지 않도록 함
           backdropColor="black"
-          backdropOpacity={teamOptionModalOpacity}
           style={{ justifyContent: "flex-end", margin: 0 }}
         >
           {/* 팀 설정 모달창 */}
@@ -419,6 +411,7 @@ const TeamItem = (props) => {
             animationOutTiming={200}
             backdropTransitionInTiming={0}
             backdropTransitionOutTiming={0}
+            backdropOpacity={0.5}
           >
             <View style={s.askingModal}>
               <View marginTop="5%">
@@ -452,6 +445,7 @@ const TeamItem = (props) => {
             animationOutTiming={200}
             backdropTransitionInTiming={0}
             backdropTransitionOutTiming={0}
+            backdropOpacity={0.5}
           >
             <View style={styles.teamMateModal}>
               <TouchableOpacity onPress={handleTeamMateLabelPress}>
