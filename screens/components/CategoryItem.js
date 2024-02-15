@@ -140,67 +140,48 @@ const CategoryItem = (props) => {
 
         const checkColorList = [...checkColor];
         const querySnapshot = await getDocs(userTaskRef);
-        let allChecked = true;
-        let compareDate = null;
           if(!querySnapshot.empty) {
             for (const child of querySnapshot.docs) {
               const childModDate = child.data().modDate.toDate();
 
-              if (!compareDate || childModDate > compareDate) {
-                compareDate = childModDate;
-              }
-              if (child.data().isChecked === false) {
-                allChecked = false;
-                await updateDoc(userCategoryRef, {
-                  allCheckedDate: null,
-                });
-                break; // Skip to the next iteration if isChecked is false
-              } else {
-                allChecked = true;
-                await updateDoc(userCategoryRef, {
-                  allCheckedDate: new Date(),
-                });
-              }
-            }
-          }
-          // if all the checkboxes are checked
-          if (allChecked) {
-            // get the color of the category
-            const colorData = await getDoc(userCategoryRef);
-            if (colorData.exists()) {
-              // add the color and set id to id of category
-              const colorAdd = {
-                id: checklistToUpdate.writer,
-                checkColor: colorData.data().color,
-                regDate: compareDate,
-              };
-          
-               // Check if id is already in the array
-              const index = checkColorList.findIndex(item => item.id === colorAdd.id);
+              if(child.data().isChecked) {
+                // get the color of the category
+                const colorData = await getDoc(userCategoryRef);
+                if (colorData.exists()) {
+                  // add the color and set id to id of category
+                  const colorAdd = {
+                    id: child.id,
+                    checkColor: colorData.data().color,
+                    regDate: childModDate,
+                  };
+              
+                  // Check if id is already in the array
+                  const index = checkColorList.findIndex(item => item.id === colorAdd.id);
 
-              if (index !== -1) {
-                // Update existing entry
-                if (checkColorList[index].checkColor !== colorAdd.checkColor) {
-                  // Update existing entry with the new color
-                  const updatedCheckColorList = [...checkColorList];
-                  updatedCheckColorList[index] = colorAdd;
+                  if (index !== -1) {
+                    // Update existing entry
+                    if (checkColorList[index].checkColor !== colorAdd.checkColor) {
+                      // Update existing entry with the new color
+                      const updatedCheckColorList = [...checkColorList];
+                      updatedCheckColorList[index] = colorAdd;
+                      setCheckColor(updatedCheckColorList);
+                    }
+                  } else {
+                    // Add a new entry
+                    const updatedCheckColorList = [...checkColorList, colorAdd];
+                    setCheckColor(updatedCheckColorList);
+                  }
+                }
+              } 
+              // if not all checkboxes are checked, remove the category info from array
+              else {
+                if (checkColorList.some(item => item.id === child.id)) {
+                  const updatedCheckColorList = checkColorList.filter(item => item.id !== child.id);
                   setCheckColor(updatedCheckColorList);
                 }
-              } else {
-                // Add a new entry
-                const updatedCheckColorList = [...checkColorList, colorAdd];
-                setCheckColor(updatedCheckColorList);
-              }
+              } 
             }
           }
-          // if not all checkboxes are checked, remove the category info from array
-          else {
-            if (checkColorList.some(item => item.id === checklistToUpdate.writer)) {
-              const updatedCheckColorList = checkColorList.filter(item => item.id !== checklistToUpdate.writer);
-              setCheckColor(updatedCheckColorList);
-            }
-          } 
-
           let dateMap = new Map()
           // add all the dates of tasks being checked into new map
           for (let i = 0; i < checkColor.length; i++) {
@@ -212,7 +193,7 @@ const CategoryItem = (props) => {
               } else {
                   dateMap.set(checkedDate, [checkColor[i]])
               }
-          }     
+          } 
           setCheckMap(dateMap);  
       } catch (e) {
         console.log(e.message);
@@ -265,9 +246,11 @@ const CategoryItem = (props) => {
       setCategoryList(props.categoryList);
       // Load all tasks inside categories that are saved in firebase
       fecthTaskData();
-      props.onCheckColorChange(checkColor);
+    }, [props.categoryList]);
+
+    useEffect(() => {
       props.checkEvent(checkMap);
-    }, [props.categoryList, checkColor]);
+    }, [checkMap]);
 
   return (
     <KeyboardAvoidingView 
@@ -277,7 +260,6 @@ const CategoryItem = (props) => {
       {/* 체크리스트 구현 부분 */}
       <View style={styles.checkContainer}>
         <FlatList
-          style = {{ flexGrow: 0 }}
           data={categoryList}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
@@ -357,7 +339,7 @@ const CategoryItem = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    height: "60%",
+    height: "70%",
     backgroundColor: "white",
     marginLeft: "4%",
   },

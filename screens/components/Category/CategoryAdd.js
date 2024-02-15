@@ -95,7 +95,7 @@ export default CategoryAdd = () => {
                 category: textInputValue,
                 color: selectedColor,
                 regDate: new Date(),
-                allCheckedDate: null,
+                allCheckedConfirm: false,
             })
             navigation.navigate("PersonalPage");
         } else {

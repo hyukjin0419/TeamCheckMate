@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   addBtnContainer: {
     position: "absolute",
     right: "1%",
-    bottom: 10,
+    bottom: 43,
     zIndex: 1,
   },
   closeBtnContainer: {

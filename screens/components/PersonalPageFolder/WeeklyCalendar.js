@@ -21,53 +21,73 @@ const WeeklyCalendar = ( props ) => {
     const [isCalendarReady, setCalendarReady] = useState(false)
     const [date, setDate] = useState(new Date());
     const [categoryList, setCategoryList] = useState([]);
-    const [checkColor, setCheckColor] = useState("");
     const [checkEvent, setCheckEvent] = useState(undefined);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const email = auth.currentUser.email;
-
-    const handleCheckColorChange = (color) => {
-        setCheckColor(color);
-      };
       
       const handleCheckEvent = (event) => {
         setCheckEvent(event);
+        console.log("asfasdfasdf",checkEvent);
       }
 
-    const getCategoryList = async(selectedDate) => {
+      const getCategoryList = async (selectedDate) => {
         try {
-          const userDocRef = doc(db, "user", email);
-          const userCategoryRef = collection(userDocRef, "personalCheckList");
-          const querySnapshot1 = await getDocs(query(userCategoryRef, orderBy("regDate", "asc")));
-          if(!querySnapshot1.empty) {
-            const list = [];
-            let allCheckedDate = null;
-            let checkedDateCompare = null;
-            let temp = new Date(selectedDate).toLocaleDateString();
-            querySnapshot1.forEach((doc) => {
-                if(doc.data().allCheckedDate !== null) {
-                    allCheckedDate = doc.data().allCheckedDate.toDate();
-                    checkedDateCompare = allCheckedDate.toLocaleDateString();
+            const userDocRef = doc(db, "user", email);
+            const userCheckListRef = collection(userDocRef, "personalCheckList");
+            const querySnapshot1 = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
+            if (!querySnapshot1.empty) {
+                const list = [];
+                let temp = new Date(selectedDate).toLocaleDateString();
+    
+                for (const child1 of querySnapshot1.docs) {
+                    let compareDate = null;
+                    if (child1.data().allCheckedConfirm === true) {
+                        const userCategoryRef = doc(userCheckListRef, child1.id);
+                        const userTaskRef = collection(userCategoryRef, "tasks");
+                        const querySnapshot2 = await getDocs(query(userTaskRef));
+    
+                        if (!querySnapshot2.empty) {
+                            for (const child2 of querySnapshot2.docs) {
+                                const childModDate = child2.data().modDate.toDate();
+    
+                                if (!compareDate || childModDate > compareDate) {
+                                    compareDate = childModDate;
+                                }
+    
+                                const comp = compareDate.toLocaleDateString();
+                                if (comp >= temp) {
+                                    const existingIndex = list.findIndex(item => item.id === child1.id);
+
+                                if (existingIndex === -1) {
+                                    list.push({
+                                        id: child1.id,
+                                        ...child1.data(),
+                                    });
+                                }
+                                }
+                            }
+                        }
+                    } else if (child1.data().allCheckedConfirm === false) {
+                        const existingIndex = list.findIndex(item => item.id === child1.id);
+
+                                if (existingIndex === -1) {
+                                    list.push({
+                                        id: child1.id,
+                                        ...child1.data(),
+                                    });
+                                }
+                    }
                 }
-                else {
-                    allCheckedDate = null;
-                    checkedDateCompare = null;
-                }
-                if(checkedDateCompare === null || checkedDateCompare >= temp) {
-                    list.push({
-                        id: doc.id,
-                        ...doc.data(),
-                        });
-                }
-            });
-            setCategoryList(list);
-          } else {
-            return;
-          }
+    
+                setCategoryList(list);
+            } else {
+                return;
+            }
         } catch (error) {
-          console.error("Error getting category: ", error);
+            console.error("Error getting category: ", error);
         }
-      }
+    };
+    
 
       useFocusEffect( 
         React.useCallback(() => {
@@ -77,10 +97,13 @@ const WeeklyCalendar = ( props ) => {
     
     useEffect(() => { // only first mount
         // When this is set to true, display calendar
-        setCalendarReady(true)
+        const fetchData = async() => {
+            await getCategoryList(selectedDate);
+        }
         // Create Weekdays
         createWeekdays(currDate);
-        getCategoryList(selectedDate);
+        setCalendarReady(true);
+        fetchData();
     }, [selectedDate])
 
     const toggleModal = () => {
@@ -137,7 +160,6 @@ const WeeklyCalendar = ( props ) => {
     // if user presses on a day
     const onDayPress = (weekday, i) => {
         setSelectedDate(weekday.clone());
-        console.log(selectedDate);
         if (props.onDayPress !== undefined) props.onDayPress(weekday.clone(), i)
     }
 
@@ -249,9 +271,9 @@ const WeeklyCalendar = ( props ) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[0]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
-                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[0].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[0].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkColor.map(item => (
+                                    {checkEvent.get(weekdays[0].format('YYYY-MM-DD').toString()).map(item => (
                                         <View key={item.id}>
                                             <Entypo name="check" size={13} color={item.checkColor} />
                                         </View>
@@ -269,9 +291,9 @@ const WeeklyCalendar = ( props ) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[1]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
-                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[1].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[1].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkColor.map(item => (
+                                    {checkEvent.get(weekdays[1].format('YYYY-MM-DD').toString()).map(item => (
                                         <View key={item.id}>
                                             <Entypo name="check" size={13} color={item.checkColor} />
                                         </View>
@@ -288,9 +310,9 @@ const WeeklyCalendar = ( props ) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[2]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
-                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[2].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[2].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkColor.map(item => (
+                                    {checkEvent.get(weekdays[2].format('YYYY-MM-DD').toString()).map(item => (
                                         <View key={item.id}>
                                             <Entypo name="check" size={13} color={item.checkColor} />
                                         </View>
@@ -307,9 +329,9 @@ const WeeklyCalendar = ( props ) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[3]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
-                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[3].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[3].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkColor.map(item => (
+                                    {checkEvent.get(weekdays[3].format('YYYY-MM-DD').toString()).map(item => (
                                         <View key={item.id}>
                                             <Entypo name="check" size={13} color={item.checkColor} />
                                         </View>
@@ -323,9 +345,9 @@ const WeeklyCalendar = ( props ) => {
                                     {isCalendarReady ? weekdays[4].date() : ''}
                                 </Text>
                             </View>
-                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[4].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[4].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkColor.map(item => (
+                                    {checkEvent.get(weekdays[4].format('YYYY-MM-DD').toString()).map(item => (
                                         <View key={item.id}>
                                             <Entypo name="check" size={13} color={item.checkColor} />
                                         </View>
@@ -343,11 +365,12 @@ const WeeklyCalendar = ( props ) => {
                             {/* {isCalendarReady && 
                                 <View style={isSelectedDate(weekdays[5]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
-                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[5].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[5].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkColor.map(item => (
+                                    {checkEvent.get(weekdays[5].format('YYYY-MM-DD').toString()).map(item => (
                                         <View key={item.id}>
                                             <Entypo name="check" size={13} color={item.checkColor} />
+                                            <Text>{item.id}</Text>
                                         </View>
                                     ))}
                                 </View>
@@ -362,9 +385,9 @@ const WeeklyCalendar = ( props ) => {
                             {/* {isCalendarReady && eventMap.get(weekdays[6].format('YYYY-MM-DD').toString()) !== undefined && 
                                 <View style={isSelectedDate(weekdays[6]) ? [styles.dot, { backgroundColor: 'white' }] : [styles.dot, { backgroundColor: props.themeColor }]} />
                             } */}
-                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[6].format('YYYY-MM-DD').toString()) !== undefined && checkColor && (
+                            {isCalendarReady && checkEvent && checkEvent.get(weekdays[6].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkColor.map(item => (
+                                    {checkEvent.get(weekdays[6].format('YYYY-MM-DD').toString()).map(item => (
                                         <View key={item.id}>
                                             <Entypo name="check" size={13} color={item.checkColor} />
                                         </View>
@@ -377,10 +400,9 @@ const WeeklyCalendar = ( props ) => {
                 {/* Go to CategoryItem.js and pass the categoryList value to it */}
             </View>
             <CategoryItem
-                                categoryList={categoryList}
-                                onCheckColorChange={handleCheckColorChange}
-                                checkEvent={handleCheckEvent}
-                            />
+                categoryList={categoryList}
+                checkEvent={handleCheckEvent}
+            />
         </View>
     )
 
