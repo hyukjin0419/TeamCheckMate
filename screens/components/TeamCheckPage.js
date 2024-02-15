@@ -447,7 +447,11 @@ export default TeamCheckPage = (props) => {
               {/* 생성된 체크리스트 렌더링 */}
               {/* 체크리스트 항목 추가 입력 창 */}
               {checklists
-                .filter((checklist) => checklist.writer === item.name)
+                .filter(
+                  (checklist) =>
+                    checklist.writer === item.name &&
+                    checklist.isChecked === false
+                )
                 .map((checklist) =>
                   checklist.isadditing ? (
                     <View style={styles.checkBoxContainer}>
@@ -526,10 +530,69 @@ export default TeamCheckPage = (props) => {
                   </TouchableOpacity>
                 </KeyboardAvoidingView>
               ) : null}
+
+              {checklists
+                .filter(
+                  (checklist) =>
+                    checklist.writer === item.name &&
+                    checklist.isChecked === true
+                )
+                .map((checklist) =>
+                  checklist.isadditing ? (
+                    <View style={styles.checkBoxContainer}>
+                      <Checkbox style={styles.checkbox} color={fileColor} />
+                      <TextInput
+                        style={{
+                          ...styles.checkBoxContentTextInput,
+                          borderBottomColor: fileColor,
+                        }}
+                        value={editTaskText}
+                        autoFocus={true}
+                        returnKeyType="done"
+                        onChangeText={(text) => setEditTaskText(text)}
+                        onSubmitEditing={() => editTask()}
+                        onBlur={() => editTask()}
+                      />
+                      <View>
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </View>
+                    </View>
+                  ) : (
+                    <View key={checklist.id} style={styles.checkBoxContainer}>
+                      <Checkbox
+                        value={checklist.isChecked}
+                        style={styles.checkbox}
+                        color={fileColor}
+                        onValueChange={(newValue) =>
+                          handleCheckboxChange(
+                            checklist.writer,
+                            checklist.id,
+                            newValue
+                          )
+                        }
+                      />
+                      <Text style={styles.checkBoxContent}>
+                        {checklist.content}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => handleAssignmentOptionPress(checklist)}
+                      >
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )
+                )}
             </View>
           )}
         />
       </View>
+
       <Modal
         onBackButtonPress={handleAssignmentOptionPress}
         onBackdropPress={handleAssignmentOptionPress}
