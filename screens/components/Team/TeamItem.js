@@ -262,6 +262,11 @@ const TeamItem = (props) => {
     setIsPressed(false);
   };
 
+  const [askingModalVisible, setaskingModalVisible] = useState(false);
+  handleAskingModalPress = () => {
+    setaskingModalVisible(!askingModalVisible);
+  };
+
   return (
     <Pressable
       onLongPress={handleTeamOptionPress}
@@ -398,13 +403,46 @@ const TeamItem = (props) => {
               {/* 팀 삭제 버튼 */}
               <TouchableOpacity
                 style={s.teamDeleteBtn}
-                onPress={leavingtheTeam}
+                onPress={() => handleAskingModalPress()}
               >
                 {/* 터치 시 팀 삭제 */}
                 <Text style={s.teamDeleteText}>팀 나가기</Text>
               </TouchableOpacity>
             </View>
           </View>
+          <Modal
+            onBackdropPress={handleAskingModalPress}
+            isVisible={askingModalVisible}
+            animationIn="zoomIn"
+            animationOut="zoomOut"
+            animationInTiming={300}
+            animationOutTiming={200}
+            backdropTransitionInTiming={0}
+            backdropTransitionOutTiming={0}
+          >
+            <View style={s.askingModal}>
+              <View marginTop="5%">
+                <Text style={s.askingModalText}>팀을 나가시겠습니까?</Text>
+              </View>
+              <View style={s.askingModalBtnContainer}>
+                <TouchableOpacity
+                  style={s.askingModalCancelBtn}
+                  onPress={() => handleAskingModalPress()}
+                >
+                  <Text style={s.askingModalCancelText}>취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={s.askingModalConfirmBtn}
+                  onPress={() => {
+                    handleAskingModalPress();
+                    leavingtheTeam();
+                  }}
+                >
+                  <Text style={s.askingModalConfirmText}>나가기</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
           <Modal
             onBackdropPress={handleTeamMateLabelPress}
             isVisible={teamMateModalVisible}

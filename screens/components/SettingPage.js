@@ -94,7 +94,7 @@ const SettingPage = () => {
             style={styles.logOutBtn}
             onPress={() => signOut(auth)}
           >
-            <Text style={styles.logOutText}>로그아웃</Text>
+            <Text style={s.askingModalCancelText}>로그아웃</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.accountDeleteBtn}
@@ -103,7 +103,7 @@ const SettingPage = () => {
               console.log("계정 탈퇴");
             }}
           >
-            <Text style={styles.accountDeleteText}>탈퇴</Text>
+            <Text style={s.askingModalConfirmText}>탈퇴</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -117,28 +117,28 @@ const SettingPage = () => {
         backdropTransitionInTiming={0}
         backdropTransitionOutTiming={0}
       >
-        <View style={styles.modal}>
+        <View style={s.askingModal}>
           <View marginTop="5%">
-            <Text style={styles.modalText}>
+            <Text style={s.askingModalText}>
               탈퇴 시 계정 정보가 모두 사라집니다.
             </Text>
-            <Text style={styles.modalText}>정말 탈퇴하실 건가요?</Text>
+            <Text style={s.askingModalText}>정말 탈퇴하실 건가요?</Text>
           </View>
-          <View style={styles.modalTeamBtnContainer}>
+          <View style={s.askingModalBtnContainer}>
             <TouchableOpacity
-              style={styles.cancelBtn}
+              style={s.askingModalCancelBtn}
               onPress={() => handleModalPress()}
             >
-              <Text style={styles.logOutText}>취소</Text>
+              <Text style={s.askingModalCancelText}>취소</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.modalAccountDeleteBtn}
+              style={s.askingModalConfirmBtn}
               onPress={() => {
                 handleModalPress();
                 console.log("계정 탈퇴 확인");
               }}
             >
-              <Text style={styles.accountDeleteText}>탈퇴</Text>
+              <Text style={s.askingModalConfirmText}>탈퇴</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -171,11 +171,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  logOutText: {
-    color: "white",
-    fontFamily: "SUIT-Medium",
-    fontSize: 14,
-  },
   accountDeleteBtn: {
     width: WINDOW_WIDHT * 0.41,
     height: 55,
@@ -184,52 +179,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  accountDeleteText: {
-    color: color.redpink,
-    fontFamily: "SUIT-Medium",
-    fontSize: 14,
-  },
   text: {
     fontSize: 14,
     fontFamily: "SUIT-Medium",
     color: color.activated,
     marginLeft: "1%",
-  },
-  modal: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    minHeight: 200,
-    marginBottom: "10%",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-  },
-  modalText: {
-    fontFamily: "SUIT-Medium",
-    fontSize: 16,
-    textAlign: "center",
-    paddingTop: 3,
-  },
-  cancelBtn: {
-    width: WINDOW_WIDHT * 0.38,
-    height: 65,
-    backgroundColor: color.activated,
-    borderRadius: 10,
-    alignSelf: "flex-end",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalAccountDeleteBtn: {
-    width: WINDOW_WIDHT * 0.38,
-    height: 65,
-    backgroundColor: color.deletegrey,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignSelf: "flex-end",
-    alignItems: "center",
-  },
-  modalTeamBtnContainer: {
-    flexDirection: "row",
-    width: WINDOW_WIDHT * 0.9,
-    justifyContent: "space-evenly",
   },
 });
