@@ -280,7 +280,9 @@ export default TeamCheckPage = (props) => {
       (checklist) => checklist.id === selectedChecklist.id
     );
     if (foundChecklist) {
-      foundChecklist.content = editTaskText;
+      if (editTaskText.trim() !== "") {
+        foundChecklist.content = editTaskText;
+      }
       foundChecklist.isadditing = false;
       const updatedChecklists = checklists.map((checklist) =>
         checklist.id === foundChecklist.id ? foundChecklist : checklist
