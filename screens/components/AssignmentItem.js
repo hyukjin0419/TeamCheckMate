@@ -206,6 +206,7 @@ const AssignmentItem = (props) => {
             animationOutTiming={200}
             backdropTransitionInTiming={0}
             backdropTransitionOutTiming={0}
+            backdropOpacity={0.5}
           >
             <View style={s.askingModal}>
               <View marginTop="5%">
