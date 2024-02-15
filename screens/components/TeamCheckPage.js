@@ -56,6 +56,7 @@ export default TeamCheckPage = (props) => {
 
   //체크리스트 생성을 위한 입력창을 열어주는 함수
   const pressAddBtn = (memberName) => {
+    console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
     // 플러스 버튼을 누를 때 해당 팀 멤버에 대한 입력 창을 열도록 설정
     setIsWritingNewTask((prevIsWritingNewTask) => ({
       ...prevIsWritingNewTask,
@@ -65,6 +66,7 @@ export default TeamCheckPage = (props) => {
 
   //Create a new checklist
   const addNewTask = async (memberName, isSubmitedByEnter) => {
+    console.log("[TeamcheckPage]: addNewTask 함수 실행");
     if (newTaskText.trim() !== "") {
       const newChecklist = {
         writer: memberName,
@@ -105,6 +107,7 @@ export default TeamCheckPage = (props) => {
 
   //CheckBox Update
   const handleCheckboxChange = async (writer, id, newValue) => {
+    console.log("[TeamcheckPage]: handleCheckBoxChange함수 실행");
     // 체크박스 상태 변경
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
@@ -152,6 +155,7 @@ export default TeamCheckPage = (props) => {
 
   //Read from Firebase and store in an object array
   const getCheckLists = async () => {
+    console.log("[TeamcheckPage]: getCheckLists 함수 실행");
     const uncheckedChecklists = [];
     const checkedChecklists = [];
 
@@ -191,11 +195,22 @@ export default TeamCheckPage = (props) => {
 
   useEffect(() => {
     getCheckLists();
+    console.log("[TeamcheckPage]: useEffect[] 실행");
   }, []);
 
   //Update
-  const readyToUpdateTask = () => {
+  const pressEditBtn = () => {
+    console.log("[TeamcheckPage]: pressEditBtn 함수 실행");
     setAssignmentOptionModalVisible(false);
+    setTimeout(() => {
+      readyToUpdateTask(); // 두 번째 함수를 500ms(0.5초) 후에 실행
+    }, 400);
+  };
+
+  const readyToUpdateTask = () => {
+    console.log("[TeamcheckPage]: readyToUpdateTask 함수 실행");
+    // setAssignmentOptionModalVisible(false);
+
     // 체크리스트를 찾습니다.
     const foundChecklist = checklists.find(
       (checklist) => checklist.id === selectedChecklist.id
@@ -211,10 +226,10 @@ export default TeamCheckPage = (props) => {
       );
       setChecklists(updatedChecklists);
     }
-    console.log(JSON.stringify(checklists, null, 2));
   };
 
-  const editTask = async (memberName) => {
+  const editTask = async () => {
+    console.log("[TeamcheckPage]: editTask 함수 실행");
     const foundChecklist = checklists.find(
       (checklist) => checklist.id === selectedChecklist.id
     );
@@ -234,7 +249,7 @@ export default TeamCheckPage = (props) => {
         "assignmentList",
         assignmentId,
         "memberName",
-        memberName,
+        selectedChecklist.writer,
         "checkList",
         selectedChecklist.id
       );
@@ -248,6 +263,7 @@ export default TeamCheckPage = (props) => {
   };
 
   const deleteTask = async () => {
+    console.log("[TeamcheckPage]: deleteTask 함수 실행");
     setAssignmentOptionModalVisible(false);
     try {
       // 클라이언트 상태에서 선택된 체크리스트를 찾습니다.
@@ -287,6 +303,7 @@ export default TeamCheckPage = (props) => {
   const [selectedChecklist, setselectedChecklist] = useState({});
 
   const handleAssignmentOptionPress = (checklist) => {
+    console.log("[TeamcheckPage]: handleAssignmentOptionPress 함수 실행");
     setAssignmentOptionModalVisible(!assignmentOptionModalVisible);
     setselectedChecklist(checklist);
   };
@@ -386,7 +403,7 @@ export default TeamCheckPage = (props) => {
                 .filter((checklist) => checklist.writer === item.name)
                 .map((checklist) =>
                   checklist.isadditing ? (
-                    <View key={checklist.id} style={styles.checkBoxContainer}>
+                    <View style={styles.checkBoxContainer}>
                       <Checkbox style={styles.checkbox} color={fileColor} />
                       <TextInput
                         style={{
@@ -397,16 +414,16 @@ export default TeamCheckPage = (props) => {
                         autoFocus={true}
                         returnKeyType="done"
                         onChangeText={(text) => setEditTaskText(text)}
-                        onSubmitEditing={() => editTask(item.name)}
-                        // onBlur={() => addNewTask(item.name, false)}
-                        blurOnSubmit={false}
+                        onSubmitEditing={() => editTask()}
+                        onBlur={() => editTask()}
+                        // blurOnSubmit={false}
                       />
-                      <TouchableOpacity>
+                      <View>
                         <Image
                           source={require("../images/icons/three_dots.png")}
                           style={styles.threeDots}
                         />
-                      </TouchableOpacity>
+                      </View>
                     </View>
                   ) : (
                     <View key={checklist.id} style={styles.checkBoxContainer}>
@@ -498,7 +515,7 @@ export default TeamCheckPage = (props) => {
               {/* 수정 버튼 */}
               <TouchableOpacity
                 style={s.teamReviseBtn}
-                onPress={() => readyToUpdateTask()}
+                onPress={() => pressEditBtn()}
               >
                 <Text style={s.teamReviseText}>수정</Text>
               </TouchableOpacity>
