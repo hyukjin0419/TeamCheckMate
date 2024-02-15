@@ -90,6 +90,11 @@ const AssignmentItem = (props) => {
     setIsPressed(false);
   };
 
+  const [askingModalVisible, setaskingModalVisible] = useState(false);
+  handleAskingModalPress = () => {
+    setaskingModalVisible(!askingModalVisible);
+  };
+
   return (
     <Pressable
       onLongPress={handleAssignmentOptionPress}
@@ -183,8 +188,7 @@ const AssignmentItem = (props) => {
                 <TouchableOpacity
                   style={s.teamDeleteBtn}
                   onPress={() => {
-                    handleDelete();
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    handleAskingModalPress();
                   }}
                 >
                   {/* 터치 시 과제 삭제 */}
@@ -193,6 +197,40 @@ const AssignmentItem = (props) => {
               </View>
             </View>
           </View>
+          <Modal
+            onBackdropPress={handleAskingModalPress}
+            isVisible={askingModalVisible}
+            animationIn="zoomIn"
+            animationOut="zoomOut"
+            animationInTiming={300}
+            animationOutTiming={200}
+            backdropTransitionInTiming={0}
+            backdropTransitionOutTiming={0}
+          >
+            <View style={s.askingModal}>
+              <View marginTop="5%">
+                <Text style={s.askingModalText}>과제를 삭제하시겠습니까?</Text>
+              </View>
+              <View style={s.askingModalBtnContainer}>
+                <TouchableOpacity
+                  style={s.askingModalCancelBtn}
+                  onPress={() => handleAskingModalPress()}
+                >
+                  <Text style={s.askingModalCancelText}>취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={s.askingModalConfirmBtn}
+                  onPress={() => {
+                    handleAskingModalPress();
+                    handleDelete();
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                >
+                  <Text style={s.askingModalConfirmText}>삭제</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </Modal>
       </ImageBackground>
     </Pressable>
