@@ -500,6 +500,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end",
     flexDirection: "row",
+    marginRight: "2%",
   },
   confirmBtn: {
     flex: 1,

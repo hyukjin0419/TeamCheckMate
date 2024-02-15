@@ -10,6 +10,7 @@ import {
   Image,
   ScrollView,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/core";
@@ -194,6 +195,7 @@ const AssignmentPage = () => {
     }
   };
 
+  //memberInfo객체에서 정보 배열로 할당
   const extractInfo = (memberInfo) => {
     if (memberInfo && Array.isArray(memberInfo)) {
       const extractedInfo = memberInfo.map((member) => ({
@@ -226,6 +228,17 @@ const AssignmentPage = () => {
   const handlePress = () => {
     setShowModal(!showModal);
   };
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  //1초동안 로딩창 보여주기
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false); // 1초 후에 로딩 상태 변경
+    }, 1000);
+
+    return () => clearTimeout(timer); // 컴포넌트가 언마운트되면 타이머 해제
+  }, []); // 빈 배열을 전달하여 컴포넌트가 처음 렌더링될 때만 실행
 
   return (
     <View
@@ -343,13 +356,13 @@ const AssignmentPage = () => {
           width: WINDOW_WIDHT,
         }}
       >
-        <View flexDirection="row">
+        <View style={styles.teamMembersNamesArrayContainer}>
           <View
             style={{
               ...styles.teamMateBtn,
               borderColor: fileColor,
               backgroundColor: fileColor,
-              marginLeft: 10,
+              marginRight: "1%",
             }}
           >
             <Text style={styles.teamMateBtnText}>팀 메이트</Text>
@@ -419,29 +432,48 @@ const AssignmentPage = () => {
         </View>
       </Modal>
       {/* Parent View for both FlatLists */}
-      <View style={{ flex: 18 }}>
-        {/* 과제 리스트 */}
-        <FlatList
-          data={assignmentList}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <View>
-              <AssignmentItem
-                teamCode={teamCode}
-                title={title}
-                fileColor={fileColor}
-                memberInfo={memberInfo}
-                memberNames={memberNames}
-                assignmentName={item.assignmentName}
-                assignmentId={item.assignmentId}
-                dueDate={item.dueDate}
-                getAssignmentList={getAssignmentList}
-              ></AssignmentItem>
-            </View>
-          )}
-          keyExtractor={(item) => item.id}
-        ></FlatList>
-      </View>
+      {isLoading ? (
+        <ActivityIndicator style={styles.loadingIndicator} />
+      ) : assignmentList.length === 0 ? (
+        <View
+          style={{
+            flex: 25,
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: "25%",
+          }}
+        >
+          <Image
+            style={styles.noPostIcon}
+            source={require("../images/GuidancePageNoPost.png")}
+          ></Image>
+          <Text style={styles.noPostText}>추가된 과제가 없어요.</Text>
+        </View>
+      ) : (
+        <View style={{ flex: 25 }}>
+          {/* 과제 리스트 */}
+          <FlatList
+            data={assignmentList}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View>
+                <AssignmentItem
+                  teamCode={teamCode}
+                  title={title}
+                  fileColor={fileColor}
+                  memberInfo={memberInfo}
+                  memberNames={memberNames}
+                  assignmentName={item.assignmentName}
+                  assignmentId={item.assignmentId}
+                  dueDate={item.dueDate}
+                  getAssignmentList={getAssignmentList}
+                ></AssignmentItem>
+              </View>
+            )}
+            keyExtractor={(item) => item.id}
+          ></FlatList>
+        </View>
+      )}
       {/* 팀 추가에 점근할 수 있는 버튼 */}
       <TouchableOpacity style={styles.addBtnContainer} onPress={handlePress}>
         <Image
@@ -490,8 +522,8 @@ const styles = StyleSheet.create({
     height: 35,
     borderWidth: 1,
     borderRadius: 23,
-    marginHorizontal: 4,
-    paddingHorizontal: 15,
+    marginHorizontal: 2,
+    paddingHorizontal: 13,
     marginTop: 10,
     marginLeft: 5,
   },
@@ -521,7 +553,7 @@ const styles = StyleSheet.create({
   teamMateModal: {
     backgroundColor: "white",
     borderRadius: 20,
-    minHeight: "25%",
+    minHeight: 210,
     marginBottom: "10%",
   },
   teamModalXBtn: {
@@ -536,5 +568,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginHorizontal: "10%",
     marginBottom: "3%",
+  },
+  teamMembersNamesArrayContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    //backgroundColor: "green",
+    width: WINDOW_WIDHT,
+    paddingRight: "2.5%",
+  },
+  loadingIndicator: {
+    flex: 25,
+    justifyContent: "center",
+    marginBottom: "25%",
+    size: "large",
+    color: color.activated,
+  },
+  noPostText: {
+    fontFamily: "SUIT-Medium",
+    fontSize: 14,
+    textAlign: "center",
+    color: "#797979",
+    marginTop: "3%",
+  },
+  noPostIcon: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
   },
 });
