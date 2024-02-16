@@ -75,8 +75,8 @@ const PersonalPage = () => {
         <Text style={{marginTop: 100, marginLeft: 20, fontSize: 20}}>{userName} 님 환영합니다</Text>
         <PersonalPageBtn />
       </View> */}
-      <Text style={styles.titleHeader}>{userName} 님 환영합니다</Text>
-      <WeeklyCalendar style={{ marginBottom: "5%" }} />
+      <Text style={styles.titleHeader}>{userName} 님 오늘도 파이팅!</Text>
+      <WeeklyCalendar style={{marginBottom: "5%"}}/>
 
       <PersonalPageBtn />
     </View>
