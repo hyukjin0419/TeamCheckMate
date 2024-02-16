@@ -1,189 +1,250 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  TextInput,
-  FlatList,
-  KeyboardAvoidingView,
-} from "react-native";
-import React, { useState, useEffect, useRef } from "react";
-import {
-  auth,
-  collection,
-  db,
-  doc,
-  setDoc,
-  updateDoc,
-  listCollections,
-} from "../../firebase";
-import Checkbox from "expo-checkbox";
+import { View, Text , StyleSheet, TouchableOpacity, Image, TextInput, FlatList, KeyboardAvoidingView } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import { auth, collection, db, doc, setDoc, updateDoc, listCollections } from '../../firebase';
+import Checkbox from 'expo-checkbox';
 import * as Haptics from "expo-haptics";
-import s from "../styles/css.js";
-import { getDocs, onSnapshot, query } from "firebase/firestore";
-import { useFocusEffect } from "@react-navigation/native";
+import s from "../styles/css.js"
+import moment from 'moment';
+import { addDoc, getDoc, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { useFocusEffect } from '@react-navigation/native';
 
-const CategoryItem = (props) => {
-  const [categoryList, setCategoryList] = useState(props.categoryList);
-  const [checklists, setChecklists] = useState([]);
-  const [newTaskText, setNewTaskText] = useState("");
-  const [isWritingNewTask, setIsWritingNewTask] = useState({});
-  const TextInputRef = useRef(null);
-  const user = auth.currentUser;
+export default CategoryItem = (props) => {
+    const [categoryList, setCategoryList] = useState(props.categoryCode);
+    const [checklists, setChecklists] = useState([]);
+    const [newTaskText, setNewTaskText] = useState("");
+    const [isWritingNewTask, setIsWritingNewTask] = useState({});
+    const [checkColor, setCheckColor] = useState([]);
+    const [checkMap, setCheckMap] = useState(undefined)
+    const TextInputRef = useRef(null);
+    const [categoryCode, setCategoryCode] = useState([]);
+    const user = auth.currentUser;
 
-  const pressAddBtn = (id) => {
-    // 다른 텍스트 입력 창이 열려있는지 확인하고 있다면 닫기
-    Object.keys(isWritingNewTask).forEach((name) => {
-      if (name !== id && isWritingNewTask[id]) {
-        closeTextInput(name);
-      }
-    });
-
-    // 플러스 버튼을 누를 때 해당 팀 멤버에 대한 입력 창을 열도록 설정
-    setIsWritingNewTask((prevIsWritingNewTask) => ({
-      ...prevIsWritingNewTask,
-      [id]: true,
-    }));
-  };
-
-  const closeTextInput = (code) => {
-    setIsWritingNewTask((prevIsWritingNewTask) => ({
-      ...prevIsWritingNewTask,
-      [code]: false,
-    }));
-  };
-
-  const addNewTask = async (code) => {
-    if (newTaskText.trim() !== "") {
-      const updatedChecklists = [...checklists];
-      try {
-        const userRef = doc(db, "user", user.email);
-        const userCheckListRef = collection(userRef, "personalCheckList");
-        const userCategoryRef = doc(userCheckListRef, code);
-        const userTaskRef = collection(userCategoryRef, "tasks");
-        const userInputTaskRef = doc(userTaskRef);
-
-        const userInputTaskRefId = userInputTaskRef.id;
-
-        updatedChecklists.push({
-          writer: code,
-          index: updatedChecklists.filter(
-            (checklist) => checklist.writer === code
-          ).length,
-          taskCode: userInputTaskRefId,
-          isWriting: false,
-          isChecked: false,
-          content: newTaskText,
-          regDate: new Date(),
-          modDate: new Date(),
-        });
-
-        await setDoc(userInputTaskRef, {
+    const pressAddBtn = (category) => {
+      console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
+      //1. 멤버 이름을 parameter로 받는다.
+      //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
+      setIsWritingNewTask((prevIsWritingNewTask) => ({
+        ...prevIsWritingNewTask,
+        [category]: true,
+      }));
+    };
+  
+    const addNewTask = async(code, isSubmitedByEnter) => {
+      if (newTaskText.trim() !== "") {
+        const newChecklist = {
+          category: code,
           isChecked: false,
           task: newTaskText,
-        });
-      } catch (e) {
-        console.log(e.message);
+          regDate: new Date(),
+          modDate: new Date(),
+        };
+        
+        setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
+
+        const checkListDoc = addDoc(
+          collection(
+            db,
+            "user",
+            user.email,
+            "personalCheckList",
+            code,
+            "tasks",
+          ),
+          newChecklist
+        );
+  
+        //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
+        if (!isSubmitedByEnter) {
+          setIsWritingNewTask((prev) => ({ ...prev, [code]: false }));
+          // console.log(updatedIsWritingNewTask);
+        }
+        //textinput을 비운다.
+        setNewTaskText("");
+      } else {
+        setIsWritingNewTask((prev) => ({ ...prev, [code]: false }));
       }
-      setChecklists(updatedChecklists);
-
-      // 입력이 완료되면 입력 상태 초기화
-      const updatedIsWritingNewTask = { ...isWritingNewTask };
-      updatedIsWritingNewTask[code] = false;
-      setIsWritingNewTask(updatedIsWritingNewTask);
-
-      // 입력창 비우기
-      setNewTaskText("");
-    } else {
-      setIsWritingNewTask((prev) => ({ ...prev, [code]: false }));
-    }
-  };
-
-  const handleCheckboxChange = async (writer, index, newValue) => {
-    // 체크박스 상태 변경
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const updatedChecklists = [...checklists];
-    const checklistToUpdate = updatedChecklists.find(
-      (checklist) => checklist.writer === writer && checklist.index === index
-    );
-
-    if (checklistToUpdate) {
-      checklistToUpdate.isChecked = newValue;
-      checklistToUpdate.modDate = new Date();
-      setChecklists(updatedChecklists);
-      try {
-        const userRef = doc(db, "user", user.email);
-        const userCheckListRef = collection(userRef, "personalCheckList");
-        const userCategoryRef = doc(userCheckListRef, checklistToUpdate.writer);
-        const userTaskRef = collection(userCategoryRef, "tasks");
-        const userInputTaskRef = doc(userTaskRef, checklistToUpdate.taskCode);
-
-        await updateDoc(userInputTaskRef, {
-          isChecked: newValue,
-        });
-      } catch (e) {
-        console.log(e.message);
-      }
-    }
-  };
-
-  const fecthTaskData = async () => {
-    // Access the docs and collections
-    const userDocRef = doc(db, "user", user.email);
-    const userCheckListRef = collection(userDocRef, "personalCheckList");
-    const querySnapshot1 = await getDocs(query(userCheckListRef));
-    // Create a temporary list to store tasks
-    let tempChecklists = [];
-    // If collection personalCheckList is not empty
-    if (!querySnapshot1.empty) {
-      // Iterate each document inside the collection
-      querySnapshot1.forEach(async (child1) => {
-        // Get the document id
-        const userCategoryRef = doc(userCheckListRef, child1.id);
-        // Access the tasks collection inside the document
-        const userTaskRef = collection(userCategoryRef, "tasks");
-        const querySnapshot2 = await getDocs(userTaskRef);
-        // if tasks is not empty
-        if (!querySnapshot2.empty) {
-          querySnapshot2.forEach((child2) => {
-            // Add all the tasks that were read into tempCheckLists
-            tempChecklists = [...tempChecklists];
-            // Push new task read into tempCheckLists
-            tempChecklists.push({
-              writer: child1.id,
-              index: tempChecklists.filter(
-                (checklist) => checklist.writer === child1.id
-              ).length,
-              taskCode: child2.id,
-              isWriting: false,
-              isChecked: child2.data().isChecked,
-              content: child2.data().task,
-              regDate: new Date(),
-              modDate: new Date(),
-            });
-            setChecklists(tempChecklists);
-          });
+      await fetchTaskData();
+    };
+  
+    const handleCheckboxChange = async (category, id, newValue) => {
+      // 마찬가지로 프론트 먼저 상태 업데이트 후 백엔드 반영
+      //햅틱 추가
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  
+      //파라미터로 작성자와, 체크리스트 id(from firebase), 그리고 newValue (checkbox에서 제공)을 받는다
+      //전체 객체 배열인 checklists를 순회하며 작성자와 id가 같으면
+      //찾아낸 객체의 value를 바꾸고 modDate를 업데이트 한 후 updateChecklists에 넣는다
+      //아니면 기존 객체를 updateChecklist에 넣는다
+      const updatedChecklists = checklists.map((checklist) =>
+        checklist.category === category && checklist.id === id
+          ? { ...checklist, isChecked: newValue, modDate: new Date() }
+          : checklist
+      );
+  
+      //체크여부에 따라 정렬은 바꾼다.
+      //반환 값이 음수일 경우 a가 앞에 위치
+      //반환 값이 양수일 경우 b가 a보다 앞에 위치
+      //0일경우 변경되지 않음
+      updatedChecklists.sort((a, b) => {
+        if (a.isChecked === b.isChecked) {
+          // 체크 여부가 동일하다면 타임스탬프로 정렬
+          return a.regDate - b.regDate;
+        } else if (a.isChecked && !b.isChecked) {
+          // 체크된 항목이 뒤로 가도록 설정
+          return 1;
+        } else {
+          // 체크되지 않은 항목이 앞으로 가도록 설정
+          return -1;
         }
       });
-    }
-  };
+  
+      //업데이트 된 체크리스트를 프론트에 반영
+      setChecklists(updatedChecklists);
+  
+      //업데이트 된 체크리스트를 firestorage에 반영 -> 백엔드에서는 체크리스트가 객체배열로 되어있지 않기 때문에, 그냥 해당 문서를 참조해서 값을 바꾼다
+      try {
+        const docRef = doc(
+          db,
+          "user",
+          user.email,
+          "personalCheckList",
+          category,
+          "tasks",
+          id
+        );
+        await updateDoc(docRef, {
+          isChecked: newValue,
+          modDate: new Date(),
+        });
+      } catch (error) {
+        console.error("Error updating documents: ", error);
+      }
+    };
 
-  useEffect(() => {
-    setCategoryList(props.categoryList);
-    // Load all tasks inside categories that are saved in firebase
-    fecthTaskData();
-  }, [props.categoryList]);
+    // //Show the check mark if all category is checked
+    // const showCheck = async(list, category, index) => {
+    //   const updateList = [...list];
+    //   // Get the specific category
+    //   const checklistToUpdate = updateList.find(
+    //     (checklist) => checklist.category === category && checklist.index === index
+    //   );
+    //   try {
+    //     const userRef = doc(db, "user", user.email);
+    //     const userCheckListRef = collection(userRef, "personalCheckList");
+    //     const userCategoryRef = doc(userCheckListRef, checklistToUpdate.category);
+    //     const userTaskRef = collection(userCategoryRef, "tasks");
+
+    //     const checkColorList = [...checkColor];
+    //     const querySnapshot = await getDocs(userTaskRef);
+    //       if(!querySnapshot.empty) {
+    //         for (const child of querySnapshot.docs) {
+    //           const childModDate = child.data().modDate.toDate();
+
+    //           if(child.data().isChecked) {
+    //             // get the color of the category
+    //             const colorData = await getDoc(userCategoryRef);
+    //             if (colorData.exists()) {
+    //               // add the color and set id to id of category
+    //               const colorAdd = {
+    //                 id: child.id,
+    //                 checkColor: colorData.data().color,
+    //                 regDate: childModDate,
+    //               };
+              
+    //               // Check if id is already in the array
+    //               const index = checkColorList.findIndex(item => item.id === colorAdd.id);
+
+    //               if (index !== -1) {
+    //                 // Update existing entry
+    //                 if (checkColorList[index].checkColor !== colorAdd.checkColor) {
+    //                   // Update existing entry with the new color
+    //                   const updatedCheckColorList = [...checkColorList];
+    //                   updatedCheckColorList[index] = colorAdd;
+    //                   setCheckColor(updatedCheckColorList);
+    //                 }
+    //               } else {
+    //                 // Add a new entry
+    //                 const updatedCheckColorList = [...checkColorList, colorAdd];
+    //                 setCheckColor(updatedCheckColorList);
+    //               }
+    //             }
+    //           } 
+    //           // if not all checkboxes are checked, remove the category info from array
+    //           else {
+    //             if (checkColorList.some(item => item.id === child.id)) {
+    //               const updatedCheckColorList = checkColorList.filter(item => item.id !== child.id);
+    //               setCheckColor(updatedCheckColorList);
+    //             }
+    //           } 
+    //         }
+    //       }
+    //       let dateMap = new Map()
+    //       // add all the dates of tasks being checked into new map
+    //       for (let i = 0; i < checkColor.length; i++) {
+    //           let checkedDate = moment(checkColor[i].regDate).format('YYYY-MM-DD').toString()
+    //           if (dateMap.has(checkedDate)) {
+    //               let checkArr = dateMap.get(checkedDate)
+    //               checkArr.push(checkColor[i])
+    //               dateMap.set(checkedDate, checkArr) 
+    //           } else {
+    //               dateMap.set(checkedDate, [checkColor[i]])
+    //           }
+    //       } 
+    //       setCheckMap(dateMap);  
+    //   } catch (e) {
+    //     console.log(e.message);
+    //   }
+    // };
+    
+    const fetchTaskData = async () => {
+      const list = []
+
+      await Promise.all(
+        categoryList.map(async(code) => {
+          const querySnapshot = await getDocs(
+            query(
+              collection(
+                db,
+                "user",
+                user.email,
+                "personalCheckList",
+                code.id,
+                "tasks"
+              ),
+              orderBy("regDate", "asc")
+            )
+          );
+          querySnapshot.forEach((doc) => {
+            const data = { id: doc.id, ...doc.data() };
+            list.push(data);
+          })
+        })
+      )
+      console.log("test", list);
+      setChecklists(list);
+      console.log(checklists);
+      // showCheck(categoryList, )
+    }
+
+    useEffect(() => {
+      // setCategoryList(props.categoryCode);
+      // Load all tasks inside categories that are saved in firebase
+      fetchTaskData();
+      props.getCategoryList(categoryList)
+    }, [props.categoryList]);
+
+    // useEffect(() => {
+    //   props.checkEvent(checkMap);
+    // }, [checkMap]);
 
   return (
-    <KeyboardAvoidingView
-      style={{ ...styles.container }}
+    <KeyboardAvoidingView 
+      style={{...styles.container}}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       {/* 체크리스트 구현 부분 */}
       <View style={styles.checkContainer}>
         <FlatList
-          style={{ flexGrow: 0 }}
           data={categoryList}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
@@ -207,7 +268,8 @@ const CategoryItem = (props) => {
 
               {/* 체크리스트 항목 추가 입력 창 */}
               {checklists
-                .filter((checklist) => checklist.writer === item.id)
+                .filter((checklist) => checklist.category === item.id 
+                && checklist.isChecked === false)
                 .map((checklist, index) => (
                   <View key={index} style={styles.checkBoxContainer}>
                     <Checkbox
@@ -215,35 +277,39 @@ const CategoryItem = (props) => {
                       style={styles.checkbox}
                       color={item.color}
                       onValueChange={(newValue) =>
-                        handleCheckboxChange(checklist.writer, index, newValue)
+                        handleCheckboxChange(checklist.category, checklist.id, newValue)
                       }
                     />
                     <Text style={styles.checkBoxContent}>
-                      {checklist.content}
+                      {checklist.task}
                     </Text>
                     <TouchableOpacity>
                       <Image
-                        source={require("../images/icons/three_dots.png")}
-                        style={styles.threeDots}
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
                       />
                     </TouchableOpacity>
                   </View>
-                ))}
+                ))
+              }
 
               {/* 입력창 생성 */}
-              {isWritingNewTask[item.id] ? (
-                <View style={styles.checkBoxContainer}>
+              {isWritingNewTask[item.category] ? (
+                <KeyboardAvoidingView style={styles.checkBoxContainer}>
                   <Checkbox style={styles.checkbox} color={item.color} />
                   <TextInput
-                    ref={TextInputRef} // ref 설정
                     placeholder="할 일 추가..."
-                    style={styles.checkBoxContent}
+                    style={{
+                      ...styles.checkBoxContentTextInput,
+                      borderBottomColor: item.color,
+                    }}
                     value={newTaskText}
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.id)}
-                    //onBlur={() => addNewTask(item.id)}
+                    onSubmitEditing={() => addNewTask(item.category, true)}
+                    onBlur={() => addNewTask(item.category, false)}
+                    blurOnSubmit={false}
                   />
                   <TouchableOpacity>
                     <Image
@@ -251,19 +317,44 @@ const CategoryItem = (props) => {
                       style={styles.threeDots}
                     />
                   </TouchableOpacity>
-                </View>
+                </KeyboardAvoidingView>
               ) : null}
+              {checklists
+                .filter((checklist) => checklist.category === item.id
+                && checklist.isChecked === true)
+                .map((checklist, index) => (
+                  <View key={index} style={styles.checkBoxContainer}>
+                    <Checkbox
+                      value={checklist.isChecked}
+                      style={styles.checkbox}
+                      color={item.color}
+                      onValueChange={(newValue) =>
+                        handleCheckboxChange(checklist.category, checklist.id, newValue)
+                      }
+                    />
+                    <Text style={styles.checkBoxContent}>
+                      {checklist.task}
+                    </Text>
+                    <TouchableOpacity>
+                      <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                ))
+              }
             </View>
           )}
         />
       </View>
     </KeyboardAvoidingView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
-    height: "60%",
+    height: "70%",
     backgroundColor: "white",
     marginLeft: "4%",
   },
@@ -277,14 +368,14 @@ const styles = StyleSheet.create({
     marginLeft: "3%",
     fontFamily: "SUIT-Regular",
     borderBottomWidth: 1,
-    width: "60%",
+    width: "60%"
   },
   optionSelect: {
     marginRight: "6%",
     fontSize: 18,
     position: "absolute",
     right: 0,
-    top: -7,
+    top: -7
   },
   checkContainer: {
     flex: 1,
@@ -328,6 +419,14 @@ const styles = StyleSheet.create({
     marginBottom: "7%",
     alignSelf: "center",
   },
+  checkBoxContentTextInput: {
+    flex: 1,
+    fontFamily: "SUIT-Regular",
+    fontSize: 14,
+    marginLeft: 14,
+    marginRight: 14,
+    borderBottomWidth: 1, // 테두리 두께
+  },
   checkbox: {
     width: 20,
     height: 20,
@@ -350,5 +449,3 @@ const styles = StyleSheet.create({
     height: 4,
   },
 });
-
-export default CategoryItem;

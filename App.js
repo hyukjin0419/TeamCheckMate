@@ -34,6 +34,9 @@ import PrivatePolicyPage from "./screens/components/PrivatePolicyPage";
 import OpenSourcePage from "./screens/components/OpenSourcePage";
 import UserInfoUpdatePage from "./screens/components/UserInfoUpdatePage";
 import PasswordResetPage from "./screens/components/PasswordResetPage";
+import CategoryUpdate from "./screens/components/Category/CategoryUpdate";
+import CategoryChange from "./screens/components/Category/CategoryChange";
+
 
 const Stack = createNativeStackNavigator();
 // - 스택 형태로 화면 전환을 관리한다
@@ -59,6 +62,8 @@ function PersonalPageTab() {
     <PersonalStack.Navigator screenOptions={{ headerShown: false }}>
       <PersonalStack.Screen name="PersonalPage" component={PersonalPage} />
       <PersonalStack.Screen name="CategoryAdd" component={CategoryAdd} />
+      <PersonalStack.Screen name="CategoryUpdate" component={CategoryUpdate} />
+      <PersonalStack.Screen name="CategoryChange" component={CategoryChange} />
     </PersonalStack.Navigator>
   );
 }
