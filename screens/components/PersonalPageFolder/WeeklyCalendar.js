@@ -57,7 +57,6 @@ export default WeeklyCalendar = ( props ) => {
         //   const categoryGetCode = categoryCode.map((category) => category.id || null);
           setCategoryCode(categoryCode);
           setLoad(true);
-          console.log("test", categoryCode);
         }
       };
 
@@ -124,11 +123,13 @@ export default WeeklyCalendar = ( props ) => {
     };
     
 
-    //   useFocusEffect( 
-    //     React.useCallback(() => {
-    //       getCategoryList(selectedDate);
-    //     }, [])
-    //   );  
+      useFocusEffect( 
+        React.useCallback(() => {
+        //   getCategoryList(selectedDate);
+            setLoad(false);
+            getCategoryCode();
+        }, [])
+      );  
     
     useEffect(() => { // only first mount
         // When this is set to true, display calendar
@@ -136,6 +137,7 @@ export default WeeklyCalendar = ( props ) => {
         //     await getCategoryList(selectedDate);
         // }
         // Create Weekdays
+        setLoad(false);
         createWeekdays(currDate);
         setCalendarReady(true);
         // fetchData();
