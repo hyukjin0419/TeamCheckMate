@@ -45,27 +45,36 @@ const AppInformationPage = () => {
           <Text style={styles.text}>버전</Text>
           <Text style={{ marginRight: "2%" }}>Alpha</Text>
         </View>
-        <View style={styles.optionContainer}>
+        <TouchableOpacity
+          style={styles.optionContainer}
+          onPress={() => navigation.navigate("TermsOfServicePage")}
+        >
           <Text style={styles.text}>이용약관</Text>
           <Image
             style={{ width: 7, height: 12, marginRight: "2%" }}
             source={require("../images/optionRight.png")}
           />
-        </View>
-        <View style={styles.optionContainer}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.optionContainer}
+          onPress={() => navigation.navigate("PrivatePolicyPage")}
+        >
           <Text style={styles.text}>개인정보 정책</Text>
           <Image
             style={{ width: 7, height: 12, marginRight: "2%" }}
             source={require("../images/optionRight.png")}
           />
-        </View>
-        <View style={styles.optionContainer}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.optionContainer}
+          onPress={() => navigation.navigate("OpenSourcePage")}
+        >
           <Text style={styles.text}>오픈소스</Text>
           <Image
             style={{ width: 7, height: 12, marginRight: "2%" }}
             source={require("../images/optionRight.png")}
           />
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );

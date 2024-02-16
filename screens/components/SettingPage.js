@@ -8,14 +8,16 @@ import {
   Dimensions,
   Switch,
 } from "react-native";
-import { auth } from "../../firebase";
+import { db, doc, getDocs, collection, auth, getDoc } from "../../firebase";
 import React, { useState, useEffect } from "react";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import { signOut } from "firebase/auth";
 import s from "../styles/css";
 import { color } from "../styles/colors";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/core";
 import Modal from "react-native-modal";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
 const WINDOW_WIDHT = Dimensions.get("window").width;
 const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -26,10 +28,68 @@ const SettingPage = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
-  const [modalVisible, setModalVisible] = useState(false);
-  handleModalPress = () => {
-    setModalVisible(!modalVisible);
+  const [askingModalVisible, setaskingModalVisible] = useState(false);
+  handleAskingModalPress = () => {
+    setaskingModalVisible(!askingModalVisible);
   };
+
+  const user = auth.currentUser;
+  const email = user.email;
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [school, setSchool] = useState("");
+  const [studentNumber, setStudentNumber] = useState("");
+
+  const sendResetEmail = () => {
+    if (user) {
+      sendPasswordResetEmail(auth, email)
+        .then(() => {
+          // Password reset email sent!
+          // ..
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // ..
+        });
+    }
+  };
+
+  const getUserInfo = async () => {
+    try {
+      // "user" collection에 접근
+      const userCollection = collection(db, "user");
+
+      // 특정 문서에 접근하기 위해 getDoc 사용 (email이 문서 ID인 경우)
+      const userDoc = await getDoc(doc(userCollection, email));
+
+      if (userDoc.exists()) {
+        // 문서가 존재하는 경우 데이터 가져오기
+        const userData = {
+          name: userDoc.data().name,
+          phoneNumber: userDoc.data().phoneNumber,
+          school: userDoc.data().school,
+          studentNumber: userDoc.data().studentNumber,
+          // ... 기타 필드들
+        };
+        setName(userDoc.data().name);
+        setPhoneNumber(userDoc.data().phoneNumber);
+        setSchool(userDoc.data().school);
+        setStudentNumber(userDoc.data().studentNumber);
+      } else {
+        console.log("해당 사용자의 문서가 존재하지 않습니다.");
+      }
+    } catch (error) {
+      console.error("데이터 불러오기 중 오류 발생:", error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getUserInfo();
+    }, [])
+  );
+
   return (
     <View style={s.container}>
       <StatusBar style={"dark"}></StatusBar>
@@ -51,27 +111,37 @@ const SettingPage = () => {
             value={isEnabled}
           />
         </View>
-        <View style={styles.optionContainer}>
-          <Text style={styles.text}>이메일 변경</Text>
-          <Image
-            style={{ width: 7, height: 12, marginRight: "2%" }}
-            source={require("../images/optionRight.png")}
-          />
-        </View>
-        <View style={styles.optionContainer}>
+        <TouchableOpacity
+          style={styles.optionContainer}
+          onPress={() => {
+            navigation.navigate("PasswordResetPage");
+            sendResetEmail();
+          }}
+        >
           <Text style={styles.text}>비밀번호 변경</Text>
           <Image
             style={{ width: 7, height: 12, marginRight: "2%" }}
             source={require("../images/optionRight.png")}
           />
-        </View>
-        <View style={styles.optionContainer}>
-          <Text style={styles.text}>계정 정보 수정</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.optionContainer}
+          onPress={() => {
+            navigation.navigate("UserInfoUpdatePage", {
+              email: email,
+              name: name,
+              phoneNumber: phoneNumber,
+              school: school,
+              studentNumber: studentNumber,
+            });
+          }}
+        >
+          <Text style={styles.text}>계정 정보</Text>
           <Image
             style={{ width: 7, height: 12, marginRight: "2%" }}
             source={require("../images/optionRight.png")}
           />
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.optionContainer}
           onPress={() => navigation.navigate("AppInformationPage")}
@@ -99,7 +169,7 @@ const SettingPage = () => {
           <TouchableOpacity
             style={styles.accountDeleteBtn}
             onPress={() => {
-              handleModalPress();
+              handleAskingModalPress();
               console.log("계정 탈퇴");
             }}
           >
@@ -108,8 +178,8 @@ const SettingPage = () => {
         </View>
       </View>
       <Modal
-        onBackdropPress={handleModalPress}
-        isVisible={modalVisible}
+        onBackdropPress={handleAskingModalPress}
+        isVisible={askingModalVisible}
         animationIn="zoomIn"
         animationOut="zoomOut"
         animationInTiming={300}
@@ -127,14 +197,14 @@ const SettingPage = () => {
           <View style={s.askingModalBtnContainer}>
             <TouchableOpacity
               style={s.askingModalCancelBtn}
-              onPress={() => handleModalPress()}
+              onPress={() => handleAskingModalPress()}
             >
               <Text style={s.askingModalCancelText}>취소</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={s.askingModalConfirmBtn}
               onPress={() => {
-                handleModalPress();
+                handleAskingModalPress();
                 console.log("계정 탈퇴 확인");
               }}
             >

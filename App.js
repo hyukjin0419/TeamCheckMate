@@ -29,6 +29,11 @@ import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import CategoryAdd from "./screens/components/Category/CategoryAdd";
 import TeamCheckPage from "./screens/components/TeamCheckPage";
 import AppInformationPage from "./screens/components/AppInformationPage";
+import TermsOfServicePage from "./screens/components/TermsOfServicePage";
+import PrivatePolicyPage from "./screens/components/PrivatePolicyPage";
+import OpenSourcePage from "./screens/components/OpenSourcePage";
+import UserInfoUpdatePage from "./screens/components/UserInfoUpdatePage";
+import PasswordResetPage from "./screens/components/PasswordResetPage";
 
 const Stack = createNativeStackNavigator();
 // - 스택 형태로 화면 전환을 관리한다
@@ -109,6 +114,26 @@ function SettingPageTab() {
       <SettingStack.Screen
         name="AppInformationPage"
         component={AppInformationPage}
+      ></SettingStack.Screen>
+      <SettingStack.Screen
+        name="TermsOfServicePage"
+        component={TermsOfServicePage}
+      ></SettingStack.Screen>
+      <SettingStack.Screen
+        name="PrivatePolicyPage"
+        component={PrivatePolicyPage}
+      ></SettingStack.Screen>
+      <SettingStack.Screen
+        name="OpenSourcePage"
+        component={OpenSourcePage}
+      ></SettingStack.Screen>
+      <SettingStack.Screen
+        name="UserInfoUpdatePage"
+        component={UserInfoUpdatePage}
+      ></SettingStack.Screen>
+      <SettingStack.Screen
+        name="PasswordResetPage"
+        component={PasswordResetPage}
       ></SettingStack.Screen>
     </SettingStack.Navigator>
   );
