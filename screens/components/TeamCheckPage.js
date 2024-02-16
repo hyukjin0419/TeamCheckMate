@@ -18,9 +18,10 @@ import {
   doc,
   getDocs,
   updateDoc,
+  setDoc,
 } from "../../firebase.js";
 import Modal from "react-native-modal";
-import { query, orderBy, deleteDoc } from "firebase/firestore";
+import { query, orderBy, deleteDoc, where } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/core";
 import { useRoute } from "@react-navigation/native";
@@ -140,25 +141,6 @@ export default TeamCheckPage = (props) => {
         modDate: new Date(),
       };
 
-      //프론트에 반영
-      //새로 생성된 체크리스트를 기존에 체크리스트에 이어 붙힌다
-      setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
-
-      //firestorage 참조
-      const checkListDoc = addDoc(
-        collection(
-          db,
-          "team",
-          teamCode,
-          "assignmentList",
-          assignmentId,
-          "memberEmail",
-          email,
-          "checkList"
-        ),
-        newChecklist
-      );
-
       //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
       if (!isSubmitedByEnter) {
         setIsWritingNewTask((prev) => ({ ...prev, [email]: false }));
@@ -166,6 +148,46 @@ export default TeamCheckPage = (props) => {
       }
       //textinput을 비운다.
       setNewTaskText("");
+
+      //프론트에 반영
+      //새로 생성된 체크리스트를 기존에 체크리스트에 이어 붙힌다
+      setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
+
+      //team firestorage 참조
+      const teamChecklistRef = collection(
+        db,
+        "team",
+        teamCode,
+        "assignmentList",
+        assignmentId,
+        "memberEmail",
+        email,
+        "checkList"
+      );
+      const teamChecklist = await addDoc(teamChecklistRef, newChecklist);
+
+      //user firestorage 참조
+      // const userRef = collection(db, "user");
+
+      // const userQuery = query(userRef, where("email", "==", email));
+      // const userQuerySnapshot = await getDocs(userQuery);
+
+      // userQuerySnapshot.forEach(async (doc) => {
+      // try {
+      // 사용자 문서 내에 새로운 컬렉션 "checklists"를 만들고, 해당 컬렉션에 새로운 문서를 추가함
+      const userChecklistRef = doc(
+        db,
+        "user",
+        email,
+        "teamCheckList",
+        teamChecklist.id
+      );
+
+      const userCheckList = await setDoc(userChecklistRef, newChecklist);
+      // } catch (error) {
+      //   console.error("checklists 추가 중 에러 발생:", error);
+      // }
+      // });
     } else {
       setIsWritingNewTask((prev) => ({ ...prev, [email]: false }));
     }
