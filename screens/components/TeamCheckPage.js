@@ -451,7 +451,11 @@ export default TeamCheckPage = (props) => {
                 .map((checklist) =>
                   checklist.isadditing ? (
                     <View style={styles.checkBoxContainer}>
-                      <Checkbox style={styles.checkbox} color={fileColor} />
+                      <Checkbox
+                        value={checklist.isChecked}
+                        style={styles.checkbox}
+                        color={fileColor}
+                      />
                       <TextInput
                         style={{
                           ...styles.checkBoxContentTextInput,
@@ -536,7 +540,11 @@ export default TeamCheckPage = (props) => {
                 .map((checklist) =>
                   checklist.isadditing ? (
                     <View style={styles.checkBoxContainer}>
-                      <Checkbox style={styles.checkbox} color={fileColor} />
+                      <Checkbox
+                        value={checklist.isChecked}
+                        style={styles.checkbox}
+                        color={fileColor}
+                      />
                       <TextInput
                         style={{
                           ...styles.checkBoxContentTextInput,
