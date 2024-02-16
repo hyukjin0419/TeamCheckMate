@@ -167,14 +167,6 @@ export default TeamCheckPage = (props) => {
       const teamChecklist = await addDoc(teamChecklistRef, newChecklist);
 
       //user firestorage 참조
-      // const userRef = collection(db, "user");
-
-      // const userQuery = query(userRef, where("email", "==", email));
-      // const userQuerySnapshot = await getDocs(userQuery);
-
-      // userQuerySnapshot.forEach(async (doc) => {
-      // try {
-      // 사용자 문서 내에 새로운 컬렉션 "checklists"를 만들고, 해당 컬렉션에 새로운 문서를 추가함
       const userChecklistRef = doc(
         db,
         "user",
@@ -184,10 +176,6 @@ export default TeamCheckPage = (props) => {
       );
 
       const userCheckList = await setDoc(userChecklistRef, newChecklist);
-      // } catch (error) {
-      //   console.error("checklists 추가 중 에러 발생:", error);
-      // }
-      // });
     } else {
       setIsWritingNewTask((prev) => ({ ...prev, [email]: false }));
     }
@@ -233,7 +221,7 @@ export default TeamCheckPage = (props) => {
 
     //업데이트 된 체크리스트를 firestorage에 반영 -> 백엔드에서는 체크리스트가 객체배열로 되어있지 않기 때문에, 그냥 해당 문서를 참조해서 값을 바꾼다
     try {
-      const docRef = doc(
+      const teamDocRef = doc(
         db,
         "team",
         teamCode,
@@ -244,7 +232,12 @@ export default TeamCheckPage = (props) => {
         "checkList",
         id
       );
-      await updateDoc(docRef, {
+      const userDocRef = doc(db, "user", email, "teamCheckList", id);
+      await updateDoc(teamDocRef, {
+        isChecked: newValue,
+        modDate: new Date(),
+      });
+      await updateDoc(userDocRef, {
         isChecked: newValue,
         modDate: new Date(),
       });
@@ -313,7 +306,7 @@ export default TeamCheckPage = (props) => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     try {
-      const docRef = doc(
+      const teamDocRef = doc(
         db,
         "team",
         teamCode,
@@ -324,7 +317,18 @@ export default TeamCheckPage = (props) => {
         "checkList",
         selectedChecklist.id
       );
-      await updateDoc(docRef, {
+      const userDocRef = doc(
+        db,
+        "user",
+        selectedChecklist.email,
+        "teamCheckList",
+        selectedChecklist.id
+      );
+      await updateDoc(teamDocRef, {
+        content: editTaskText,
+        modDate: new Date(),
+      });
+      await updateDoc(userDocRef, {
         content: editTaskText,
         modDate: new Date(),
       });
@@ -356,6 +360,16 @@ export default TeamCheckPage = (props) => {
           "memberEmail",
           selectedChecklist.email,
           "checkList",
+          selectedChecklist.id
+        )
+      );
+
+      await deleteDoc(
+        doc(
+          db,
+          "user",
+          selectedChecklist.email,
+          "teamCheckList",
           selectedChecklist.id
         )
       );
