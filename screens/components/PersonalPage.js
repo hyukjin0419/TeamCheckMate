@@ -38,6 +38,7 @@ const PersonalPage = () => {
     setIsModalVisible(!isModalVisible);
   };
 
+  
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -71,7 +72,7 @@ const PersonalPage = () => {
         <Text style={{marginTop: 100, marginLeft: 20, fontSize: 20}}>{userName} 님 환영합니다</Text>
         <PersonalPageBtn />
       </View> */}
-      <Text style={styles.titleHeader}>{userName} 님 환영합니다</Text>
+      <Text style={styles.titleHeader}>{userName} 님 오늘도 파이팅!</Text>
       <WeeklyCalendar style={{marginBottom: "5%"}}/>
 
 
