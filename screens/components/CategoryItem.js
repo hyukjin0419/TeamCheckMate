@@ -268,7 +268,8 @@ export default CategoryItem = (props) => {
 
               {/* 체크리스트 항목 추가 입력 창 */}
               {checklists
-                .filter((checklist) => checklist.category === item.id)
+                .filter((checklist) => checklist.category === item.id 
+                && checklist.isChecked === false)
                 .map((checklist, index) => (
                   <View key={index} style={styles.checkBoxContainer}>
                     <Checkbox
@@ -289,7 +290,8 @@ export default CategoryItem = (props) => {
                       />
                     </TouchableOpacity>
                   </View>
-                ))}
+                ))
+              }
 
               {/* 입력창 생성 */}
               {isWritingNewTask[item.category] ? (
@@ -317,6 +319,31 @@ export default CategoryItem = (props) => {
                   </TouchableOpacity>
                 </KeyboardAvoidingView>
               ) : null}
+              {checklists
+                .filter((checklist) => checklist.category === item.id
+                && checklist.isChecked === true)
+                .map((checklist, index) => (
+                  <View key={index} style={styles.checkBoxContainer}>
+                    <Checkbox
+                      value={checklist.isChecked}
+                      style={styles.checkbox}
+                      color={item.color}
+                      onValueChange={(newValue) =>
+                        handleCheckboxChange(checklist.category, checklist.id, newValue)
+                      }
+                    />
+                    <Text style={styles.checkBoxContent}>
+                      {checklist.task}
+                    </Text>
+                    <TouchableOpacity>
+                      <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                ))
+              }
             </View>
           )}
         />
