@@ -68,7 +68,7 @@ export default TeamCheckPage = (props) => {
 
     //firebase에서 체크리스트 정보를 가져옴
     await Promise.all(
-      memberNames.map(async (memberName) => {
+      memberInfo.map(async (memberInfo) => {
         const querySnapshot = await getDocs(
           query(
             collection(
@@ -77,8 +77,8 @@ export default TeamCheckPage = (props) => {
               teamCode,
               "assignmentList",
               assignmentId,
-              "memberName",
-              memberName,
+              "memberEmail",
+              memberInfo.email,
               "checkList"
             ),
             //시간별로
@@ -111,18 +111,18 @@ export default TeamCheckPage = (props) => {
   }, []);
 
   //add시 체크리스트 생성을 위한 입력창을 열어주는 함수
-  const pressAddBtn = (memberName) => {
+  const pressAddBtn = (email) => {
     console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
     //1. 멤버 이름을 parameter로 받는다.
     //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
     setIsWritingNewTask((prevIsWritingNewTask) => ({
       ...prevIsWritingNewTask,
-      [memberName]: true,
+      [email]: true,
     }));
   };
 
   //Create a new checklist
-  const addNewTask = async (memberName, isSubmitedByEnter) => {
+  const addNewTask = async (email, isSubmitedByEnter) => {
     console.log("[TeamcheckPage]: addNewTask 함수 실행");
     //프론트 먼저 반영 후 firebase 실행 -> 어플의 속도를 높이기 위해
     //너무 빠른 연속 터치시 문제가 발생할 수 있으나, 사용자가 그런 빠른 터치를 할 상황이 거의 없다고 판단되어 일단 진행.
@@ -133,7 +133,7 @@ export default TeamCheckPage = (props) => {
       //새로운 객체를 생성한다.
       //이때 이름은 파라미터로, content는 useState를 사용한다
       const newChecklist = {
-        writer: memberName,
+        email: email,
         isChecked: false,
         content: newTaskText,
         regDate: new Date(),
@@ -152,8 +152,8 @@ export default TeamCheckPage = (props) => {
           teamCode,
           "assignmentList",
           assignmentId,
-          "memberName",
-          memberName,
+          "memberEmail",
+          email,
           "checkList"
         ),
         newChecklist
@@ -161,19 +161,19 @@ export default TeamCheckPage = (props) => {
 
       //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
       if (!isSubmitedByEnter) {
-        setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
+        setIsWritingNewTask((prev) => ({ ...prev, [email]: false }));
         // console.log(updatedIsWritingNewTask);
       }
       //textinput을 비운다.
       setNewTaskText("");
     } else {
-      setIsWritingNewTask((prev) => ({ ...prev, [memberName]: false }));
+      setIsWritingNewTask((prev) => ({ ...prev, [email]: false }));
     }
     await getCheckLists();
   };
 
   //Check 누를 때 상태 업데이트 하는 함수
-  const handleCheckboxChange = async (writer, id, newValue) => {
+  const handleCheckboxChange = async (email, id, newValue) => {
     console.log("[TeamcheckPage]: handleCheckBoxChange함수 실행");
     // 마찬가지로 프론트 먼저 상태 업데이트 후 백엔드 반영
     //햅틱 추가
@@ -184,7 +184,7 @@ export default TeamCheckPage = (props) => {
     //찾아낸 객체의 value를 바꾸고 modDate를 업데이트 한 후 updateChecklists에 넣는다
     //아니면 기존 객체를 updateChecklist에 넣는다
     const updatedChecklists = checklists.map((checklist) =>
-      checklist.writer === writer && checklist.id === id
+      checklist.email === email && checklist.id === id
         ? { ...checklist, isChecked: newValue, modDate: new Date() }
         : checklist
     );
@@ -217,8 +217,8 @@ export default TeamCheckPage = (props) => {
         teamCode,
         "assignmentList",
         assignmentId,
-        "memberName",
-        writer,
+        "memberEmail",
+        email,
         "checkList",
         id
       );
@@ -250,7 +250,7 @@ export default TeamCheckPage = (props) => {
     //flatlist안에 checklists배열을 filter과 map을 통해서 렌더링한다.
     //이때 flatlist는 memberInfo객체 배열 (AssignmentItem에서 route) 가져옴.
     //checklists는 firebase에서 (getCheckList를 통해) 가져옴.
-    //checklists의 writer과 flatlist item의 이름이 같으면 map을 통해 렌더링
+    //checklists의 email과 flatlist item의 email이 같으면 map을 통해 렌더링
     //isadditing이 참일때에는 edit을 위한 textinput을 렌더링 하고
     //그렇지 않다면 해당하는 checklist를 렌더링 해준다
     const foundChecklist = checklists.find(
@@ -297,8 +297,8 @@ export default TeamCheckPage = (props) => {
         teamCode,
         "assignmentList",
         assignmentId,
-        "memberName",
-        selectedChecklist.writer,
+        "memberEmail",
+        selectedChecklist.email,
         "checkList",
         selectedChecklist.id
       );
@@ -323,12 +323,6 @@ export default TeamCheckPage = (props) => {
       );
       setChecklists(updatedChecklists);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      console.log(
-        teamCode,
-        assignmentId,
-        selectedChecklist.writer,
-        selectedChecklist.id
-      );
 
       await deleteDoc(
         doc(
@@ -337,8 +331,8 @@ export default TeamCheckPage = (props) => {
           teamCode,
           "assignmentList",
           assignmentId,
-          "memberName",
-          selectedChecklist.writer,
+          "memberEmail",
+          selectedChecklist.email,
           "checkList",
           selectedChecklist.id
         )
@@ -430,15 +424,15 @@ export default TeamCheckPage = (props) => {
           keyboardShouldPersistTaps="handled"
           data={memberInfo}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item) => item.email}
           renderItem={({ item }) => (
-            <View style={styles.contentContainer} key={item.name}>
+            <View style={styles.contentContainer} key={item.email}>
               <TouchableOpacity
                 style={{
                   ...styles.memberNameContainerTwo,
                   borderColor: fileColor,
                 }}
-                onPress={() => pressAddBtn(item.name)}
+                onPress={() => pressAddBtn(item.email)}
               >
                 <Text style={styles.memberNameTextTwo}>{item.name}</Text>
                 <Image
@@ -451,7 +445,7 @@ export default TeamCheckPage = (props) => {
               {checklists
                 .filter(
                   (checklist) =>
-                    checklist.writer === item.name &&
+                    checklist.email === item.email &&
                     checklist.isChecked === false
                 )
                 .map((checklist) =>
@@ -485,7 +479,7 @@ export default TeamCheckPage = (props) => {
                         color={fileColor}
                         onValueChange={(newValue) =>
                           handleCheckboxChange(
-                            checklist.writer,
+                            checklist.email,
                             checklist.id,
                             newValue
                           )
@@ -507,7 +501,7 @@ export default TeamCheckPage = (props) => {
                 )}
 
               {/* 입력창 생성 */}
-              {isWritingNewTask[item.name] ? (
+              {isWritingNewTask[item.email] ? (
                 <KeyboardAvoidingView style={styles.checkBoxContainer}>
                   <Checkbox style={styles.checkbox} color={fileColor} />
                   <TextInput
@@ -520,8 +514,8 @@ export default TeamCheckPage = (props) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.name, true)}
-                    onBlur={() => addNewTask(item.name, false)}
+                    onSubmitEditing={() => addNewTask(item.email, true)}
+                    onBlur={() => addNewTask(item.email, false)}
                     blurOnSubmit={false}
                   />
                   <TouchableOpacity>
@@ -536,7 +530,7 @@ export default TeamCheckPage = (props) => {
               {checklists
                 .filter(
                   (checklist) =>
-                    checklist.writer === item.name &&
+                    checklist.email === item.email &&
                     checklist.isChecked === true
                 )
                 .map((checklist) =>
@@ -570,7 +564,7 @@ export default TeamCheckPage = (props) => {
                         color={fileColor}
                         onValueChange={(newValue) =>
                           handleCheckboxChange(
-                            checklist.writer,
+                            checklist.email,
                             checklist.id,
                             newValue
                           )
