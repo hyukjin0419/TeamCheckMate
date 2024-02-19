@@ -6,7 +6,7 @@ import * as Haptics from "expo-haptics";
 import s from "../styles/css.js"
 import moment from 'moment';
 import Modal from "react-native-modal";
-import { addDoc, getDoc, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { addDoc, deleteDoc, getDoc, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default CategoryItem = (props) => {
@@ -200,6 +200,35 @@ export default CategoryItem = (props) => {
         console.error("Error updating documents: ", error);
       }
     };
+
+     //delete함수
+  const deleteTask = async () => {
+    console.log("[TeamcheckPage]: deleteTask 함수 실행");
+    //모달창 닫기
+    setTaskOptionModalVisible(false);
+    //마찬가지로 프론트 반영 후 백엔드 작업
+    try {
+      const updatedChecklists = checklists.filter(
+        (checklist) => checklist.id !== selectedChecklist.id
+      );
+      setChecklists(updatedChecklists);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      await deleteDoc(
+        doc(
+          db,
+          "user",
+          user.email,
+          "personalCheckList",
+          selectedChecklist.category,
+          "tasks",
+          selectedChecklist.id
+        )
+      );
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  };
 
     // //Show the check mark if all category is checked
     // const showCheck = async(list, category, index) => {
