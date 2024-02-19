@@ -201,6 +201,7 @@ export default AssignmentAddPage = () => {
             disabled={buttonDisabled}
             onPress={() => {
               addAssignment();
+              setButtonDisabled(true);
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           >
