@@ -23,8 +23,7 @@ export default WeeklyCalendar = ( props ) => {
     const [categoryList, setCategoryList] = useState([]);
     const [checkEvent, setCheckEvent] = useState(undefined);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [categoryCode, setCategoryCode] = useState([]);
-    const [load, setLoad] = useState(false);
+    
     const email = auth.currentUser.email;
       
     //   const handleCheckEvent = (event) => {
@@ -32,104 +31,69 @@ export default WeeklyCalendar = ( props ) => {
     //     console.log("asfasdfasdf",checkEvent);
     //   }
 
-      const getCategoryCode = async() => {
-        const userDocRef = doc(db, "user", email);
-        const userDoc = await getDoc(userDocRef)
-        if(userDoc.exists()){
-          const userCheckListRef = collection(userDocRef, "personalCheckList");
-          const categorySnapshot = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
-    
-          const categoryCode = categorySnapshot.docs.map((doc) => {
-            const data = doc.data();
-            const allCheckedConfirm = data.allCheckedConfirm;
-            const category = data.category;
-            const color = data.color;
-            const regDate = data.regDate;
-    
-            return {
-              id: doc.id,
-              allCheckedConfirm,
-              category,
-              color,
-              regDate,
-            }; 
-          });
-        //   const categoryGetCode = categoryCode.map((category) => category.id || null);
-          setCategoryCode(categoryCode);
-          setLoad(true);
-        }
-      };
+     
 
-      const showList = (list) => {
-        setCategoryList(list);
-      }
+     
+    //   const getCategoryList = async (selectedDate) => {
+    //     try {
+    //         const userDocRef = doc(db, "user", email);
+    //         const userCheckListRef = collection(userDocRef, "personalCheckList");
+    //         const querySnapshot1 = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
+    //         if (!querySnapshot1.empty) {
+    //             const list = [];
+    //             let temp = new Date(selectedDate).toLocaleDateString();
+    
+    //             for (const child1 of querySnapshot1.docs) {
+    //                 let compareDate = null;
+    //                 if (child1.data().allCheckedConfirm === true) {
+    //                     const userCategoryRef = doc(userCheckListRef, child1.id);
+    //                     const userTaskRef = collection(userCategoryRef, "tasks");
+    //                     const querySnapshot2 = await getDocs(query(userTaskRef));
+    
+    //                     if (!querySnapshot2.empty) {
+    //                         for (const child2 of querySnapshot2.docs) {
+    //                             const childModDate = child2.data().modDate.toDate();
+    
+    //                             if (!compareDate || childModDate > compareDate) {
+    //                                 compareDate = childModDate;
+    //                             }
+    
+    //                             const comp = compareDate.toLocaleDateString();
+    //                             if (comp >= temp) {
+    //                                 const existingIndex = list.findIndex(item => item.id === child1.id);
 
-      const getCategoryList = async (selectedDate) => {
-        try {
-            const userDocRef = doc(db, "user", email);
-            const userCheckListRef = collection(userDocRef, "personalCheckList");
-            const querySnapshot1 = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
-            if (!querySnapshot1.empty) {
-                const list = [];
-                let temp = new Date(selectedDate).toLocaleDateString();
-    
-                for (const child1 of querySnapshot1.docs) {
-                    let compareDate = null;
-                    if (child1.data().allCheckedConfirm === true) {
-                        const userCategoryRef = doc(userCheckListRef, child1.id);
-                        const userTaskRef = collection(userCategoryRef, "tasks");
-                        const querySnapshot2 = await getDocs(query(userTaskRef));
-    
-                        if (!querySnapshot2.empty) {
-                            for (const child2 of querySnapshot2.docs) {
-                                const childModDate = child2.data().modDate.toDate();
-    
-                                if (!compareDate || childModDate > compareDate) {
-                                    compareDate = childModDate;
-                                }
-    
-                                const comp = compareDate.toLocaleDateString();
-                                if (comp >= temp) {
-                                    const existingIndex = list.findIndex(item => item.id === child1.id);
+    //                             if (existingIndex === -1) {
+    //                                 list.push({
+    //                                     id: child1.id,
+    //                                     ...child1.data(),
+    //                                 });
+    //                             }
+    //                             }
+    //                         }
+    //                     }
+    //                 } else if (child1.data().allCheckedConfirm === false) {
+    //                     const existingIndex = list.findIndex(item => item.id === child1.id);
 
-                                if (existingIndex === -1) {
-                                    list.push({
-                                        id: child1.id,
-                                        ...child1.data(),
-                                    });
-                                }
-                                }
-                            }
-                        }
-                    } else if (child1.data().allCheckedConfirm === false) {
-                        const existingIndex = list.findIndex(item => item.id === child1.id);
-
-                                if (existingIndex === -1) {
-                                    list.push({
-                                        id: child1.id,
-                                        ...child1.data(),
-                                    });
-                                }
-                    }
-                }
+    //                             if (existingIndex === -1) {
+    //                                 list.push({
+    //                                     id: child1.id,
+    //                                     ...child1.data(),
+    //                                 });
+    //                             }
+    //                 }
+    //             }
     
-                setCategoryList(list);
-            } else {
-                return;
-            }
-        } catch (error) {
-            console.error("Error getting category: ", error);
-        }
-    };
+    //             setCategoryList(list);
+    //         } else {
+    //             return;
+    //         }
+    //     } catch (error) {
+    //         console.error("Error getting category: ", error);
+    //     }
+    // };
     
 
-      useFocusEffect( 
-        React.useCallback(() => {
-        //   getCategoryList(selectedDate);
-            setLoad(false);
-            getCategoryCode();
-        }, [])
-      );  
+       
     
     useEffect(() => { // only first mount
         // When this is set to true, display calendar
@@ -137,11 +101,9 @@ export default WeeklyCalendar = ( props ) => {
         //     await getCategoryList(selectedDate);
         // }
         // Create Weekdays
-        setLoad(false);
         createWeekdays(currDate);
         setCalendarReady(true);
         // fetchData();
-        getCategoryCode();
     }, [selectedDate])
 
     const toggleModal = () => {
@@ -425,14 +387,7 @@ export default WeeklyCalendar = ( props ) => {
                 </View>
                 {/* Go to CategoryItem.js and pass the categoryList value to it */}
             </View>
-           {load && 
-             <CategoryItem
-             // categoryList={categoryList}
-             // checkEvent={handleCheckEvent}
-             getCategoryList={showList}
-             categoryCode={categoryCode}
-         />
-           } 
+           
         </View>
     )
 
