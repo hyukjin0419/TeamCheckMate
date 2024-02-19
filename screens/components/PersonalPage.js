@@ -35,14 +35,50 @@ import CategoryItem from "./CategoryItem";
 const PersonalPage = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [categoryList, setCategoryList] = useState([]);
+  const [categoryCode, setCategoryCode] = useState([]);
+  const [load, setLoad] = useState(false);
   const email = auth.currentUser.email;
 
-  // Visibility of modal
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const toggleModal = () => {
-    // toggle the visibility of modal
-    setIsModalVisible(!isModalVisible);
+  const getCategoryCode = async() => {
+    const userDocRef = doc(db, "user", email);
+    const userDoc = await getDoc(userDocRef)
+    if(userDoc.exists()){
+      const userCheckListRef = collection(userDocRef, "personalCheckList");
+      const categorySnapshot = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
+
+      const categoryCode = categorySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        const allCheckedConfirm = data.allCheckedConfirm;
+        const category = data.category;
+        const color = data.color;
+        const regDate = data.regDate;
+
+        return {
+          id: doc.id,
+          allCheckedConfirm,
+          category,
+          color,
+          regDate,
+        }; 
+      });
+    //   const categoryGetCode = categoryCode.map((category) => category.id || null);
+      setCategoryCode(categoryCode);
+      setLoad(true);
+    }
   };
+
+  const showList = (list) => {
+    setCategoryList(list);
+  }
+
+  useFocusEffect( 
+    React.useCallback(() => {
+    //   getCategoryList(selectedDate);
+        setLoad(false);
+        getCategoryCode();
+    }, [])
+  ); 
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -67,6 +103,8 @@ const PersonalPage = () => {
       }
     };
     fetchUserData();
+    setLoad(false);
+    getCategoryCode();
   }, [userEmail]);
 
   return (
@@ -77,7 +115,14 @@ const PersonalPage = () => {
       </View> */}
       <Text style={styles.titleHeader}>{userName} 님 오늘도 파이팅!</Text>
       <WeeklyCalendar style={{marginBottom: "5%"}}/>
-
+      {load && 
+             <CategoryItem
+             // categoryList={categoryList}
+             // checkEvent={handleCheckEvent}
+             getCategoryList={showList}
+             categoryCode={categoryCode}
+         />
+           } 
       <PersonalPageBtn />
     </View>
   );
@@ -95,94 +140,5 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     fontFamily: "SUIT-Regular",
     fontSize: 20,
-  },
-  AddBtnContainer: {
-    alignItems: "flex-end",
-    paddingBottom: "2%",
-    paddingHorizontal: "5%",
-  },
-  addOrCloseBtn: {
-    width: 40,
-    height: 40,
-    marginRight: "2%",
-  },
-  modalView: {
-    flex: 1,
-    marginLeft: "15%",
-  },
-  twoBtnContainer: {
-    paddingHorizontal: "6%",
-    alignItems: "flex-end",
-    justifyContent: "center",
-  },
-  addClassBtn: {
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 24,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    marginBottom: 12,
-    marginTop: "2%",
-  },
-  joinClassBtn: {
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 24,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-  },
-  modalContent: {
-    backgroundColor: "white",
-    paddingTop: 12,
-    paddingHorizontal: 12,
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
-    minHeight: "30%", // This property determines the minimum height of the modal
-    paddingBottom: 20,
-  },
-  center: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  // color of bar on top of modal
-  barIcon: {
-    width: 60,
-    height: 5,
-    backgroundColor: "#bbb",
-    borderRadius: 3,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  text: {
-    color: "black",
-    fontSize: 17,
-    marginTop: "10%",
-  },
-  tbutton: {
-    borderRadius: 9,
-    alignItems: "center",
-    paddingVertical: "5%",
-    marginBottom: "3%",
-    backgroundColor: "#050026",
-    width: 170,
-    height: "90%",
-  },
-  sbutton: {
-    borderRadius: 9,
-    alignItems: "center",
-    paddingVertical: "5%",
-    marginBottom: "3%",
-    backgroundColor: "#EFEFEF",
-    width: 170,
-    height: "90%",
-  },
-  buttonText: {
-    fontSize: 17,
-    fontWeight: 400,
-    color: "white",
   },
 });

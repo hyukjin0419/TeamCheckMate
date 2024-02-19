@@ -5,18 +5,25 @@ import Checkbox from 'expo-checkbox';
 import * as Haptics from "expo-haptics";
 import s from "../styles/css.js"
 import moment from 'moment';
+import Modal from "react-native-modal";
 import { addDoc, getDoc, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 
 export default CategoryItem = (props) => {
+    // get categoryCode map and set it to categoryList to render categories
     const [categoryList, setCategoryList] = useState(props.categoryCode);
+    // variable to store tasks and render them
     const [checklists, setChecklists] = useState([]);
+    // text input for new tasks
     const [newTaskText, setNewTaskText] = useState("");
+    // to check current writing state of current task
     const [isWritingNewTask, setIsWritingNewTask] = useState({});
     const [checkColor, setCheckColor] = useState([]);
     const [checkMap, setCheckMap] = useState(undefined)
     const TextInputRef = useRef(null);
+    const [editTaskText, setEditTaskText] = useState("");
     const [categoryCode, setCategoryCode] = useState([]);
+    // get user information
     const user = auth.currentUser;
 
     const pressAddBtn = (category) => {
@@ -29,8 +36,11 @@ export default CategoryItem = (props) => {
       }));
     };
   
+    // when user wants to add new task
     const addNewTask = async(code, isSubmitedByEnter) => {
+      // if the task is not an empty string
       if (newTaskText.trim() !== "") {
+        // create new Checklist to render front end first
         const newChecklist = {
           category: code,
           isChecked: false,
@@ -39,8 +49,10 @@ export default CategoryItem = (props) => {
           modDate: new Date(),
         };
         
+        // Add the new checklist into checklists array
         setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
 
+        // add the information of new task into firebase
         const checkListDoc = addDoc(
           collection(
             db,
@@ -114,6 +126,74 @@ export default CategoryItem = (props) => {
         );
         await updateDoc(docRef, {
           isChecked: newValue,
+          modDate: new Date(),
+        });
+      } catch (error) {
+        console.error("Error updating documents: ", error);
+      }
+    };
+
+    // when user presses 수정 in modal
+    const pressEditBtn = () => {
+      // set visibility of modal to false
+      setTaskOptionModalVisible(false);
+
+      // set timer to update task after 4 milliseconds
+      setTimeout(() => {
+        readyToUpdateTask();
+      }, 400);
+    }
+
+    const readyToUpdateTask = () => {
+      const findCheckList = checklists.find(
+        // check to see if checklists contains information about the task we are about to edit
+        (checklist) => checklist.id === selectedChecklist.id
+      );
+
+      if (findCheckList) {
+
+        findCheckList.isadditing = true;
+
+        // set the text when user is editing to the current title before update
+        setEditTaskText(findCheckList.task);
+
+        const updatedChecklists = checklists.map((checklist) =>
+          checklist.id === findCheckList.id ? findCheckList : checklist
+        );
+        setChecklists(updatedChecklists);
+      }
+    };
+
+    const editTask = async () => {
+      console.log("[TeamcheckPage]: editTask 함수 실행");
+      // Update front end before adding to database for proper render
+      const foundChecklist = checklists.find(
+        (checklist) => checklist.id === selectedChecklist.id
+      );
+      if (foundChecklist) {
+        if (editTaskText.trim() !== "") {
+          foundChecklist.task = editTaskText;
+        }
+        foundChecklist.isadditing = false;
+        const updatedChecklists = checklists.map((checklist) =>
+          checklist.id === foundChecklist.id ? foundChecklist : checklist
+        );
+        setChecklists(updatedChecklists);
+        console.log(checklists);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+      try {
+        const taskDocRef = doc(
+          db,
+          "user",
+          user.email,
+          "personalCheckList",
+          selectedChecklist.category,
+          "tasks",
+          selectedChecklist.id
+        );
+        await updateDoc(taskDocRef, {
+          task: editTaskText,
           modDate: new Date(),
         });
       } catch (error) {
@@ -220,9 +300,7 @@ export default CategoryItem = (props) => {
           })
         })
       )
-      console.log("test", list);
       setChecklists(list);
-      console.log(checklists);
       // showCheck(categoryList, )
     }
 
@@ -236,6 +314,16 @@ export default CategoryItem = (props) => {
     // useEffect(() => {
     //   props.checkEvent(checkMap);
     // }, [checkMap]);
+
+    // visual state for modal
+    const [taskOptionModalVisible, setTaskOptionModalVisible] = useState(false);
+    // after user selects modal
+    const [selectedChecklist, setselectedChecklist] = useState({});
+
+    const handleTaskOptionPress = (checklist) => {
+      setTaskOptionModalVisible(!taskOptionModalVisible);
+      setselectedChecklist(checklist);
+    };
 
   return (
     <KeyboardAvoidingView 
@@ -270,7 +358,7 @@ export default CategoryItem = (props) => {
               {checklists
                 .filter((checklist) => checklist.category === item.id 
                 && checklist.isChecked === false)
-                .map((checklist, index) => (
+                .map((checklist, index) => checklist.isadditing ? (
                   <View key={index} style={styles.checkBoxContainer}>
                     <Checkbox
                       value={checklist.isChecked}
@@ -280,17 +368,53 @@ export default CategoryItem = (props) => {
                         handleCheckboxChange(checklist.category, checklist.id, newValue)
                       }
                     />
-                    <Text style={styles.checkBoxContent}>
-                      {checklist.task}
-                    </Text>
-                    <TouchableOpacity>
-                      <Image
+                    <TextInput
+                        style={{
+                          ...styles.checkBoxContentTextInput,
+                          borderBottomColor: item.color,
+                        }}
+                        value={editTaskText}
+                        autoFocus={true}
+                        returnKeyType="done"
+                        onChangeText={(text) => setEditTaskText(text)}
+                        onSubmitEditing={() => editTask()}
+                        onBlur={() => editTask()}
+                      />
+                      <View>
+                        <Image
                           source={require("../images/icons/three_dots.png")}
                           style={styles.threeDots}
-                      />
-                    </TouchableOpacity>
+                        />
+                      </View>
                   </View>
-                ))
+                ) : (
+                    <View key={checklist.id} style={styles.checkBoxContainer}>
+                      <Checkbox
+                        value={checklist.isChecked}
+                        style={styles.checkbox}
+                        color={item.color}
+                        onValueChange={(newValue) =>
+                          handleCheckboxChange(
+                            checklist.category,
+                            checklist.id,
+                            newValue
+                          )
+                        }
+                      />
+                      <Text style={styles.checkBoxContent}>
+                        {checklist.task}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => handleTaskOptionPress(checklist)}
+                      >
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )
+                )
               }
 
               {/* 입력창 생성 */}
@@ -322,7 +446,7 @@ export default CategoryItem = (props) => {
               {checklists
                 .filter((checklist) => checklist.category === item.id
                 && checklist.isChecked === true)
-                .map((checklist, index) => (
+                .map((checklist, index) => checklist.isadditing ? (
                   <View key={index} style={styles.checkBoxContainer}>
                     <Checkbox
                       value={checklist.isChecked}
@@ -332,50 +456,118 @@ export default CategoryItem = (props) => {
                         handleCheckboxChange(checklist.category, checklist.id, newValue)
                       }
                     />
+                     <TextInput
+                        style={{
+                          ...styles.checkBoxContentTextInput,
+                          borderBottomColor: item.color,
+                        }}
+                        value={editTaskText}
+                        autoFocus={true}
+                        returnKeyType="done"
+                        onChangeText={(text) => setEditTaskText(text)}
+                        onSubmitEditing={() => editTask()}
+                        onBlur={() => editTask()}
+                      />
+                      <View>
+                        <Image
+                          source={require("../images/icons/three_dots.png")}
+                          style={styles.threeDots}
+                        />
+                      </View>
+                  </View>
+                ) : (
+                  <View key={checklist.id} style={styles.checkBoxContainer}>
+                    <Checkbox
+                      value={checklist.isChecked}
+                      style={styles.checkbox}
+                      color={item.color}
+                      onValueChange={(newValue) =>
+                        handleCheckboxChange(
+                          checklist.category,
+                          checklist.id,
+                          newValue
+                        )
+                      }
+                    />
                     <Text style={styles.checkBoxContent}>
                       {checklist.task}
                     </Text>
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleTaskOptionPress(checklist)}
+                    >
                       <Image
-                          source={require("../images/icons/three_dots.png")}
-                          style={styles.threeDots}
+                        source={require("../images/icons/three_dots.png")}
+                        style={styles.threeDots}
                       />
                     </TouchableOpacity>
                   </View>
-                ))
+                )
+                )
               }
             </View>
           )}
         />
       </View>
+
+      <Modal
+        onBackButtonPress={handleTaskOptionPress}
+        onBackdropPress={handleTaskOptionPress}
+        isVisible={taskOptionModalVisible}
+        swipeDirection="down"
+        onSwipeComplete={handleTaskOptionPress}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        animationInTiming={200}
+        animationOutTiming={200}
+        backdropTransitionInTiming={200}
+        backdropTransitionOutTiming={0}
+        style={{ justifyContent: "flex-end", margin: 0 }}
+      >
+        {/* 과제 설정 모달창 */}
+        <View style={styles.modalView}>
+          {/* 모달창 내 아이템 (텍스트, 버튼 등) 컨테이너 */}
+          <View style={s.modalItemContainter}>
+            {/* 모달창 상단 회색 막대 */}
+            <View style={s.modalVector}></View>
+            {/* 모달창 상단 과제 이름 표시 */}
+            <Text style={s.modalTitle}>{selectedChecklist.task}</Text>
+            <View flex={1}></View>
+            {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
+            <View style={s.modalTeamBtnContainer}>
+              {/* 수정 버튼 */}
+              <TouchableOpacity
+                style={s.teamReviseBtn}
+                onPress={() => pressEditBtn()}
+              >
+                <Text style={s.teamReviseText}>수정</Text>
+              </TouchableOpacity>
+              {/* 삭제 버튼 */}
+              <TouchableOpacity
+                style={s.teamDeleteBtn}
+                onPress={() => deleteTask()}
+              >
+                {/* 터치 시 과제 삭제 */}
+                <Text style={s.teamDeleteText}>삭제</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: "70%",
+    height: "60%",
     backgroundColor: "white",
-    marginLeft: "4%",
-  },
-  addClassBtnText: {
-    fontFamily: "SUIT-Regular",
-    fontSize: 14,
-    paddingHorizontal: 1,
-    marginRight: 3,
+    paddingHorizontal: "5%",
   },
   checkText: {
     marginLeft: "3%",
     fontFamily: "SUIT-Regular",
     borderBottomWidth: 1,
     width: "60%"
-  },
-  optionSelect: {
-    marginRight: "6%",
-    fontSize: 18,
-    position: "absolute",
-    right: 0,
-    top: -7
   },
   checkContainer: {
     flex: 1,
@@ -447,5 +639,13 @@ const styles = StyleSheet.create({
   threeDots: {
     width: 17.5,
     height: 4,
+  },
+  modalView: {
+    backgroundColor: "white",
+    paddingTop: 12,
+    paddingHorizontal: 12,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    minHeight: 200, // This property determines the minimum height of the modal
   },
 });
