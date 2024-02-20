@@ -36,6 +36,7 @@ const PersonalPage = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [categoryList, setCategoryList] = useState([]);
+  const [teamCode, setTeamCode] = useState([]);
   const [categoryCode, setCategoryCode] = useState([]);
   const [load, setLoad] = useState(false);
   const email = auth.currentUser.email;
@@ -44,10 +45,35 @@ const PersonalPage = () => {
     const userDocRef = doc(db, "user", email);
     const userDoc = await getDoc(userDocRef)
     if(userDoc.exists()){
-      const userCheckListRef = collection(userDocRef, "personalCheckList");
-      const categorySnapshot = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
+      const teamCheckListRef = collection(userDocRef, "teamCheckList");
+      const categorySnapshot1 = await getDocs(query(teamCheckListRef, orderBy("regDate", "asc")));
+      const teamCodeList = [];
+      const teamCodeMap = categorySnapshot1.docs.map((doc) => {
+        const data = doc.data();
+        const category = data.category;
+        const color = data.color;
+        const regDate = data.regDate;
+        
 
-      const categoryCode = categorySnapshot.docs.map((doc) => {
+        return {
+          id: doc.data().category,
+          category,
+          color,
+          regDate,
+        }; 
+      });
+
+      teamCodeMap.forEach((item) => {
+        const existingItem = teamCodeList.find((i) => i.id === item.id);
+        if (!existingItem) {
+          teamCodeList.push(item);
+        }
+      });
+
+      const userCheckListRef = collection(userDocRef, "personalCheckList");
+      const categorySnapshot2 = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
+
+      const categoryCode = categorySnapshot2.docs.map((doc) => {
         const data = doc.data();
         const allCheckedConfirm = data.allCheckedConfirm;
         const category = data.category;
@@ -62,7 +88,8 @@ const PersonalPage = () => {
           regDate,
         }; 
       });
-    //   const categoryGetCode = categoryCode.map((category) => category.id || null);
+      
+      setTeamCode(teamCodeList);
       setCategoryCode(categoryCode);
       setLoad(true);
     }
@@ -121,6 +148,7 @@ const PersonalPage = () => {
              // checkEvent={handleCheckEvent}
              getCategoryList={showList}
              categoryCode={categoryCode}
+             teamCode={teamCode}
          />
            } 
       <PersonalPageBtn />
