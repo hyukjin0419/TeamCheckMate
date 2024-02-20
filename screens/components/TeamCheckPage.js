@@ -139,6 +139,8 @@ export default TeamCheckPage = (props) => {
         content: newTaskText,
         regDate: new Date(),
         modDate: new Date(),
+        teamCode: teamCode,
+        teamTitle: title,
       };
 
       //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
