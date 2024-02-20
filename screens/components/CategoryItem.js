@@ -22,8 +22,10 @@ export default CategoryItem = (props) => {
     const [checkColor, setCheckColor] = useState([]);
     const [checkMap, setCheckMap] = useState(undefined)
     const TextInputRef = useRef(null);
+    // edit task text string
     const [editTaskText, setEditTaskText] = useState("");
     const [categoryCode, setCategoryCode] = useState([]);
+    // combined list for both personal and team tasks
     const [combineList, setCombineList] = useState([...teamList, ...categoryList]);
     // get user information
     const user = auth.currentUser;
@@ -310,6 +312,7 @@ export default CategoryItem = (props) => {
     const fetchTaskData = async () => {
       const list = []
 
+      // First get information on tasks for team
       const querySnapshot1 = await getDocs(
         query(
           collection(
@@ -322,6 +325,7 @@ export default CategoryItem = (props) => {
         )
       );
 
+      // add the data into list
       if(!querySnapshot1.empty) {
         querySnapshot1.forEach((child) => {
           const data = { id: child.id, ...child.data() };
@@ -329,6 +333,7 @@ export default CategoryItem = (props) => {
         })
       }
       
+      // Get information for personal tasks
       await Promise.all(
         categoryList.map(async(code) => {
           const querySnapshot = await getDocs(
@@ -344,6 +349,7 @@ export default CategoryItem = (props) => {
               orderBy("regDate", "asc")
             )
           );
+          // add it to list
           querySnapshot.forEach((doc) => {
             const data = { id: doc.id, ...doc.data() };
             list.push(data);

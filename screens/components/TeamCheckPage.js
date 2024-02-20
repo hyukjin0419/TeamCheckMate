@@ -140,8 +140,8 @@ export default TeamCheckPage = (props) => {
         regDate: new Date(),
         modDate: new Date(),
         teamCode: teamCode,
-        category: title,
-        color: fileColor,
+        category: title, // changed name to category for code convenience in CategoryItem
+        color: fileColor, // added color to display same color on PersonalPage
       };
 
       //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
