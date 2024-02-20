@@ -12,6 +12,7 @@ import { useFocusEffect } from '@react-navigation/native';
 export default CategoryItem = (props) => {
     // get categoryCode map and set it to categoryList to render categories
     const [categoryList, setCategoryList] = useState(props.categoryCode);
+    const [teamList, setTeamList] = useState(props.teamCode);
     // variable to store tasks and render them
     const [checklists, setChecklists] = useState([]);
     // text input for new tasks
@@ -21,8 +22,11 @@ export default CategoryItem = (props) => {
     const [checkColor, setCheckColor] = useState([]);
     const [checkMap, setCheckMap] = useState(undefined)
     const TextInputRef = useRef(null);
+    // edit task text string
     const [editTaskText, setEditTaskText] = useState("");
     const [categoryCode, setCategoryCode] = useState([]);
+    // combined list for both personal and team tasks
+    const [combineList, setCombineList] = useState([...teamList, ...categoryList]);
     // get user information
     const user = auth.currentUser;
 
@@ -44,7 +48,7 @@ export default CategoryItem = (props) => {
         const newChecklist = {
           category: code,
           isChecked: false,
-          task: newTaskText,
+          content: newTaskText,
           regDate: new Date(),
           modDate: new Date(),
         };
@@ -155,7 +159,7 @@ export default CategoryItem = (props) => {
         findCheckList.isadditing = true;
 
         // set the text when user is editing to the current title before update
-        setEditTaskText(findCheckList.task);
+        setEditTaskText(findCheckList.content);
 
         const updatedChecklists = checklists.map((checklist) =>
           checklist.id === findCheckList.id ? findCheckList : checklist
@@ -172,7 +176,7 @@ export default CategoryItem = (props) => {
       );
       if (foundChecklist) {
         if (editTaskText.trim() !== "") {
-          foundChecklist.task = editTaskText;
+          foundChecklist.content = editTaskText;
         }
         foundChecklist.isadditing = false;
         const updatedChecklists = checklists.map((checklist) =>
@@ -193,7 +197,7 @@ export default CategoryItem = (props) => {
           selectedChecklist.id
         );
         await updateDoc(taskDocRef, {
-          task: editTaskText,
+          content: editTaskText,
           modDate: new Date(),
         });
       } catch (error) {
@@ -308,6 +312,28 @@ export default CategoryItem = (props) => {
     const fetchTaskData = async () => {
       const list = []
 
+      // First get information on tasks for team
+      const querySnapshot1 = await getDocs(
+        query(
+          collection(
+            db,
+            "user",
+            user.email,
+            "teamCheckList"
+          ),
+          orderBy("regDate", "asc")
+        )
+      );
+
+      // add the data into list
+      if(!querySnapshot1.empty) {
+        querySnapshot1.forEach((child) => {
+          const data = { id: child.id, ...child.data() };
+          list.push(data);
+        })
+      }
+      
+      // Get information for personal tasks
       await Promise.all(
         categoryList.map(async(code) => {
           const querySnapshot = await getDocs(
@@ -323,6 +349,7 @@ export default CategoryItem = (props) => {
               orderBy("regDate", "asc")
             )
           );
+          // add it to list
           querySnapshot.forEach((doc) => {
             const data = { id: doc.id, ...doc.data() };
             list.push(data);
@@ -362,7 +389,7 @@ export default CategoryItem = (props) => {
       {/* 체크리스트 구현 부분 */}
       <View style={styles.checkContainer}>
         <FlatList
-          data={categoryList}
+          data={combineList}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
@@ -431,7 +458,7 @@ export default CategoryItem = (props) => {
                         }
                       />
                       <Text style={styles.checkBoxContent}>
-                        {checklist.task}
+                        {checklist.content}
                       </Text>
                       <TouchableOpacity
                         onPress={() => handleTaskOptionPress(checklist)}
@@ -519,7 +546,7 @@ export default CategoryItem = (props) => {
                       }
                     />
                     <Text style={styles.checkBoxContent}>
-                      {checklist.task}
+                      {checklist.content}
                     </Text>
                     <TouchableOpacity
                       onPress={() => handleTaskOptionPress(checklist)}
@@ -559,7 +586,7 @@ export default CategoryItem = (props) => {
             {/* 모달창 상단 회색 막대 */}
             <View style={s.modalVector}></View>
             {/* 모달창 상단 과제 이름 표시 */}
-            <Text style={s.modalTitle}>{selectedChecklist.task}</Text>
+            <Text style={s.modalTitle}>{selectedChecklist.content}</Text>
             <View flex={1}></View>
             {/* 팀 수정, 팀 삭제 버튼 컨테이너 */}
             <View style={s.modalTeamBtnContainer}>

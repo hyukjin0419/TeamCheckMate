@@ -36,6 +36,7 @@ const PersonalPage = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [categoryList, setCategoryList] = useState([]);
+  const [teamCode, setTeamCode] = useState([]);
   const [categoryCode, setCategoryCode] = useState([]);
   const [load, setLoad] = useState(false);
   const email = auth.currentUser.email;
@@ -44,10 +45,44 @@ const PersonalPage = () => {
     const userDocRef = doc(db, "user", email);
     const userDoc = await getDoc(userDocRef)
     if(userDoc.exists()){
-      const userCheckListRef = collection(userDocRef, "personalCheckList");
-      const categorySnapshot = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
+      // first get information for teamCheckList
+      const teamCheckListRef = collection(userDocRef, "teamCheckList");
+      // order the tasks in date order
+      const categorySnapshot1 = await getDocs(query(teamCheckListRef, orderBy("regDate", "asc")));
+      const teamCodeList = [];
+      // iterate through each element in categorySnapshot1 map
+      const teamCodeMap = categorySnapshot1.docs.map((doc) => {
+        // set variables to save our data
+        const data = doc.data();
+        const category = data.category;
+        const color = data.color;
+        const regDate = data.regDate;
+        
 
-      const categoryCode = categorySnapshot.docs.map((doc) => {
+        return {
+          id: doc.data().category,
+          category,
+          color,
+          regDate,
+        }; 
+      });
+
+      // Check to see if team name already exists
+      // We only need to have one team name saved as a category
+      teamCodeMap.forEach((item) => {
+        const existingItem = teamCodeList.find((i) => i.id === item.id);
+        // if the team name dos not exist in list, then push it to teamCodeList
+        if (!existingItem) {
+          teamCodeList.push(item);
+        }
+      });
+
+      // then get information for personal categories
+      const userCheckListRef = collection(userDocRef, "personalCheckList");
+      const categorySnapshot2 = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
+
+      // iterate through categorySnapshot2 and save the value into categoryCode
+      const categoryCode = categorySnapshot2.docs.map((doc) => {
         const data = doc.data();
         const allCheckedConfirm = data.allCheckedConfirm;
         const category = data.category;
@@ -62,7 +97,8 @@ const PersonalPage = () => {
           regDate,
         }; 
       });
-    //   const categoryGetCode = categoryCode.map((category) => category.id || null);
+      
+      setTeamCode(teamCodeList);
       setCategoryCode(categoryCode);
       setLoad(true);
     }
@@ -121,6 +157,7 @@ const PersonalPage = () => {
              // checkEvent={handleCheckEvent}
              getCategoryList={showList}
              categoryCode={categoryCode}
+             teamCode={teamCode}
          />
            } 
       <PersonalPageBtn />
