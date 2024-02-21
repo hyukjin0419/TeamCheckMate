@@ -58,6 +58,7 @@ const PersonalPage = () => {
         const color = data.color;
         const regDate = data.regDate;
         const assignmentId = data.assignmentId;
+        const teamCode = data.teamCode
         
 
         return {
@@ -66,6 +67,7 @@ const PersonalPage = () => {
           color,
           regDate,
           assignmentId,
+          teamCode,
         }; 
       });
 
