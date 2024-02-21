@@ -82,7 +82,7 @@ export default CategoryItem = (props) => {
       await fetchTaskData();
     };
   
-    const handleCheckboxChange = async (category, id, newValue) => {
+    const handleCheckboxChange = async (checklist, category, id, newValue) => {
       // 마찬가지로 프론트 먼저 상태 업데이트 후 백엔드 반영
       //햅틱 추가
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -128,10 +128,43 @@ export default CategoryItem = (props) => {
           "tasks",
           id
         );
-        await updateDoc(docRef, {
-          isChecked: newValue,
-          modDate: new Date(),
-        });
+        const checkExistSnapshot = await getDoc(docRef);
+        if(checkExistSnapshot.exists()){
+          await updateDoc(docRef, {
+            isChecked: newValue,
+            modDate: new Date(),
+          });
+        } else {
+          const personalTeamDocRef = doc(
+            db,
+            "user",
+            user.email,
+            "teamCheckList",
+            id,
+          );
+
+          const teamDocRef = doc(
+            db,
+            "team",
+            checklist.teamCode,
+            "assignmentList",
+            checklist.assignmentId,
+            "memberEmail",
+            user.email,
+            "checkList",
+            id,
+          );
+
+          await updateDoc(personalTeamDocRef, {
+            isChecked: newValue,
+            modDate: new Date(),
+          });
+
+          await updateDoc(teamDocRef, {
+            isChecked: newValue,
+            modDate: new Date(),
+          });
+        }
       } catch (error) {
         console.error("Error updating documents: ", error);
       }
@@ -183,10 +216,10 @@ export default CategoryItem = (props) => {
           checklist.id === foundChecklist.id ? foundChecklist : checklist
         );
         setChecklists(updatedChecklists);
-        console.log(checklists);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
       try {
+        // path for personal task
         const taskDocRef = doc(
           db,
           "user",
@@ -196,10 +229,47 @@ export default CategoryItem = (props) => {
           "tasks",
           selectedChecklist.id
         );
-        await updateDoc(taskDocRef, {
-          content: editTaskText,
-          modDate: new Date(),
-        });
+        
+        // check to see if selected task is a personal one
+        const checkExistSnapshot = await getDoc(taskDocRef);
+        // if it is a personal task update it
+        if(checkExistSnapshot.exists()) {
+          await updateDoc(taskDocRef, {
+            content: editTaskText,
+            modDate: new Date(),
+          });
+        }
+        else { // if it is a team task, update on team page as well
+          const teamTaskDocRef = doc(
+            db,
+            "user",
+            user.email,
+            "teamCheckList",
+            selectedChecklist.id
+          );
+
+          const teamPageTaskDocRef = doc(
+            db,
+            "team",
+            selectedChecklist.teamCode,
+            "assignmentList",
+            selectedChecklist.assignmentId,
+            "memberEmail",
+            user.email,
+            "checkList",
+            selectedChecklist.id,
+          );
+
+          await updateDoc(teamTaskDocRef, {
+            content: editTaskText,
+            modDate: new Date(),
+          });
+
+          await updateDoc(teamPageTaskDocRef, {
+            content: editTaskText,
+            modDate: new Date(),
+          });
+        }
       } catch (error) {
         console.error("Error updating documents: ", error);
       }
@@ -217,18 +287,29 @@ export default CategoryItem = (props) => {
       );
       setChecklists(updatedChecklists);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const taskDocRef = doc(
+        db,
+        "user",
+        user.email,
+        "personalCheckList",
+        selectedChecklist.category,
+        "tasks",
+        selectedChecklist.id
+      );
 
-      await deleteDoc(
-        doc(
+      const checkExistSnapshot = await getDoc(taskDocRef);
+
+      if(checkExistSnapshot.exists()) {
+        await deleteDoc(doc);
+      } else {
+        await deleteDoc(
           db,
           "user",
           user.email,
-          "personalCheckList",
-          selectedChecklist.category,
-          "tasks",
-          selectedChecklist.id
+          "teamCheckList",
+          selectedChecklist.id,
         )
-      );
+      }
     } catch (error) {
       console.error("Error deleting document: ", error);
     }
@@ -374,11 +455,12 @@ export default CategoryItem = (props) => {
     // visual state for modal
     const [taskOptionModalVisible, setTaskOptionModalVisible] = useState(false);
     // after user selects modal
-    const [selectedChecklist, setselectedChecklist] = useState({});
+    const [selectedChecklist, setSelectedChecklist] = useState({});
 
     const handleTaskOptionPress = (checklist) => {
       setTaskOptionModalVisible(!taskOptionModalVisible);
-      setselectedChecklist(checklist);
+      setSelectedChecklist(checklist);
+      console.log(selectedChecklist);
     };
 
   return (
@@ -421,7 +503,7 @@ export default CategoryItem = (props) => {
                       style={styles.checkbox}
                       color={item.color}
                       onValueChange={(newValue) =>
-                        handleCheckboxChange(checklist.category, checklist.id, newValue)
+                        handleCheckboxChange(checklist, checklist.category, checklist.id, newValue)
                       }
                     />
                     <TextInput
@@ -451,6 +533,7 @@ export default CategoryItem = (props) => {
                         color={item.color}
                         onValueChange={(newValue) =>
                           handleCheckboxChange(
+                            checklist,
                             checklist.category,
                             checklist.id,
                             newValue
@@ -509,7 +592,7 @@ export default CategoryItem = (props) => {
                       style={styles.checkbox}
                       color={item.color}
                       onValueChange={(newValue) =>
-                        handleCheckboxChange(checklist.category, checklist.id, newValue)
+                        handleCheckboxChange(checklist, checklist.category, checklist.id, newValue)
                       }
                     />
                      <TextInput
@@ -539,6 +622,7 @@ export default CategoryItem = (props) => {
                       color={item.color}
                       onValueChange={(newValue) =>
                         handleCheckboxChange(
+                          checklist,
                           checklist.category,
                           checklist.id,
                           newValue
