@@ -91,7 +91,7 @@ export default CategoryAdd = () => {
 
         if(userDoc.exists()) {
             const personalCheckList = collection(userRef, "personalCheckList");
-            await setDoc(doc(personalCheckList, textInputValue), {
+            await setDoc(doc(personalCheckList), {
                 category: textInputValue,
                 color: selectedColor,
                 regDate: new Date(),

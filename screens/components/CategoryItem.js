@@ -30,23 +30,27 @@ export default CategoryItem = (props) => {
     // get user information
     const user = auth.currentUser;
 
-    const pressAddBtn = (category) => {
+    const pressAddBtn = async(id, teamCode) => {
       console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
-      //1. 멤버 이름을 parameter로 받는다.
-      //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
-      setIsWritingNewTask((prevIsWritingNewTask) => ({
-        ...prevIsWritingNewTask,
-        [category]: true,
-      }));
+      
+      // if teamCode does not exist meaning it is personal task
+      if(!teamCode) {
+        //1. 멤버 이름을 parameter로 받는다.
+        //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
+        setIsWritingNewTask((prevIsWritingNewTask) => ({
+          ...prevIsWritingNewTask,
+          [id]: true,
+        }));
+      }
     };
   
     // when user wants to add new task
-    const addNewTask = async(code, isSubmitedByEnter) => {
+    const addNewTask = async(id, isSubmitedByEnter) => {
       // if the task is not an empty string
       if (newTaskText.trim() !== "") {
         // create new Checklist to render front end first
         const newChecklist = {
-          category: code,
+          category: id,
           isChecked: false,
           content: newTaskText,
           regDate: new Date(),
@@ -63,21 +67,21 @@ export default CategoryItem = (props) => {
             "user",
             user.email,
             "personalCheckList",
-            code,
+            id,
             "tasks",
           ),
           newChecklist
         );
-  
+
         //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
         if (!isSubmitedByEnter) {
-          setIsWritingNewTask((prev) => ({ ...prev, [code]: false }));
+          setIsWritingNewTask((prev) => ({ ...prev, [id]: false }));
           // console.log(updatedIsWritingNewTask);
         }
         //textinput을 비운다.
         setNewTaskText("");
       } else {
-        setIsWritingNewTask((prev) => ({ ...prev, [code]: false }));
+        setIsWritingNewTask((prev) => ({ ...prev, [id]: false }));
       }
       await fetchTaskData();
     };
@@ -300,15 +304,16 @@ export default CategoryItem = (props) => {
       const checkExistSnapshot = await getDoc(taskDocRef);
 
       if(checkExistSnapshot.exists()) {
-        await deleteDoc(doc);
+        await deleteDoc(taskDocRef);
       } else {
-        await deleteDoc(
+        const teamtaskRef = doc(
           db,
           "user",
           user.email,
           "teamCheckList",
           selectedChecklist.id,
-        )
+        );
+        await deleteDoc(teamtaskRef);
       }
     } catch (error) {
       console.error("Error deleting document: ", error);
@@ -410,6 +415,7 @@ export default CategoryItem = (props) => {
       if(!querySnapshot1.empty) {
         querySnapshot1.forEach((child) => {
           const data = { id: child.id, ...child.data() };
+          console.log(data);
           list.push(data);
         })
       }
@@ -431,10 +437,12 @@ export default CategoryItem = (props) => {
             )
           );
           // add it to list
-          querySnapshot.forEach((doc) => {
-            const data = { id: doc.id, ...doc.data() };
-            list.push(data);
-          })
+          if(!querySnapshot.empty){
+            querySnapshot.forEach((doc) => {
+              const data = { id: doc.id, ...doc.data() };
+              list.push(data);
+            })
+          }
         })
       )
       setChecklists(list);
@@ -481,7 +489,7 @@ export default CategoryItem = (props) => {
                   ...styles.categoryContainer,
                   backgroundColor: item.color,
                 }}
-                onPress={() => pressAddBtn(item.id)}
+                onPress={() => pressAddBtn(item.id, item.teamCode)}
               >
                 <Text style={styles.categoryText}>{item.category}</Text>
                 <Image
@@ -557,7 +565,7 @@ export default CategoryItem = (props) => {
               }
 
               {/* 입력창 생성 */}
-              {isWritingNewTask[item.category] ? (
+              {isWritingNewTask[item.id] ? (
                 <KeyboardAvoidingView style={styles.checkBoxContainer}>
                   <Checkbox style={styles.checkbox} color={item.color} />
                   <TextInput
@@ -570,8 +578,8 @@ export default CategoryItem = (props) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.category, true)}
-                    onBlur={() => addNewTask(item.category, false)}
+                    onSubmitEditing={() => addNewTask(item.id, true)}
+                    onBlur={() => addNewTask(item.id, false)}
                     blurOnSubmit={false}
                   />
                   <TouchableOpacity>
