@@ -57,6 +57,7 @@ const PersonalPage = () => {
         const category = data.category;
         const color = data.color;
         const regDate = data.regDate;
+        const assignmentId = data.assignmentId;
         
 
         return {
@@ -64,6 +65,7 @@ const PersonalPage = () => {
           category,
           color,
           regDate,
+          assignmentId,
         }; 
       });
 

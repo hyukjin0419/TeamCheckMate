@@ -183,10 +183,10 @@ export default CategoryItem = (props) => {
           checklist.id === foundChecklist.id ? foundChecklist : checklist
         );
         setChecklists(updatedChecklists);
-        console.log(checklists);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
       try {
+        // path for personal task
         const taskDocRef = doc(
           db,
           "user",
@@ -196,10 +196,47 @@ export default CategoryItem = (props) => {
           "tasks",
           selectedChecklist.id
         );
-        await updateDoc(taskDocRef, {
-          content: editTaskText,
-          modDate: new Date(),
-        });
+        
+        // check to see if selected task is a personal one
+        const checkExistSnapshot = await getDoc(taskDocRef);
+        // if it is a personal task update it
+        if(checkExistSnapshot.exists()) {
+          await updateDoc(taskDocRef, {
+            content: editTaskText,
+            modDate: new Date(),
+          });
+        }
+        else { // if it is a team task, update on team page as well
+          const teamTaskDocRef = doc(
+            db,
+            "user",
+            user.email,
+            "teamCheckList",
+            selectedChecklist.id
+          );
+
+          const teamPageTaskDocRef = doc(
+            db,
+            "team",
+            selectedChecklist.teamCode,
+            "assignmentList",
+            selectedChecklist.assignmentId,
+            "memberEmail",
+            user.email,
+            "checkList",
+            selectedChecklist.id,
+          );
+
+          await updateDoc(teamTaskDocRef, {
+            content: editTaskText,
+            modDate: new Date(),
+          });
+
+          await updateDoc(teamPageTaskDocRef, {
+            content: editTaskText,
+            modDate: new Date(),
+          });
+        }
       } catch (error) {
         console.error("Error updating documents: ", error);
       }
@@ -217,18 +254,29 @@ export default CategoryItem = (props) => {
       );
       setChecklists(updatedChecklists);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const taskDocRef = doc(
+        db,
+        "user",
+        user.email,
+        "personalCheckList",
+        selectedChecklist.category,
+        "tasks",
+        selectedChecklist.id
+      );
 
-      await deleteDoc(
-        doc(
+      const checkExistSnapshot = await getDoc(taskDocRef);
+
+      if(checkExistSnapshot.exists()) {
+        await deleteDoc(doc);
+      } else {
+        await deleteDoc(
           db,
           "user",
           user.email,
-          "personalCheckList",
-          selectedChecklist.category,
-          "tasks",
-          selectedChecklist.id
+          "teamCheckList",
+          selectedChecklist.id,
         )
-      );
+      }
     } catch (error) {
       console.error("Error deleting document: ", error);
     }
@@ -374,11 +422,12 @@ export default CategoryItem = (props) => {
     // visual state for modal
     const [taskOptionModalVisible, setTaskOptionModalVisible] = useState(false);
     // after user selects modal
-    const [selectedChecklist, setselectedChecklist] = useState({});
+    const [selectedChecklist, setSelectedChecklist] = useState({});
 
     const handleTaskOptionPress = (checklist) => {
       setTaskOptionModalVisible(!taskOptionModalVisible);
-      setselectedChecklist(checklist);
+      setSelectedChecklist(checklist);
+      console.log(selectedChecklist);
     };
 
   return (
