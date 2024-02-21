@@ -14,14 +14,21 @@ import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/fires
 import { auth, db } from '../../../firebase';
 
 export default WeeklyCalendar = ( props ) => {
+    // current date variable
     const [currDate, setCurrDate] = useState(moment(props.selected).locale(props.locale))
+    // weekdays variable for setting weekdays
     const [weekdays, setWeekdays] = useState([])
+    // weekday labels (일, 월, 화...)
     const [weekdayLabels, setWeekdayLabels] = useState([])
+    // selected date for user selection
     const [selectedDate, setSelectedDate] = useState(currDate.clone())
+    // variable to refresh calendar
     const [isCalendarReady, setCalendarReady] = useState(false)
+    // date variable for today's date
     const [date, setDate] = useState(new Date());
     const [categoryList, setCategoryList] = useState([]);
     const [checkEvent, setCheckEvent] = useState(undefined);
+    // modal visibility variable
     const [isModalVisible, setIsModalVisible] = useState(false);
     
     const email = auth.currentUser.email;
@@ -159,22 +166,29 @@ export default WeeklyCalendar = ( props ) => {
 
     // if user presses on a day
     const onDayPress = (weekday, i) => {
+        // set selectedDate to the date user pressed
         setSelectedDate(weekday.clone());
         if (props.onDayPress !== undefined) props.onDayPress(weekday.clone(), i)
     }
 
+    // When user selects a date to change from modal
     const onChangeDate = ({type}, selectedDate) => {
+        // if user presses a date set new date to selected date
         if(type === "set") {
             setDate(selectedDate);
         } else {
+            // close modal
             toggleModal();
         }
     }
 
+    // when user presses confirm on modal
     const confirmDate = () => {
+        // set the current date to the selected date
         setCurrDate(moment(date).locale(props.locale));
+        // create the entire week to match the selected date
         createWeekdays(moment(date).locale(props.locale));
-        console.log(currDate);
+        // close modal
         toggleModal();
     }
     
@@ -197,6 +211,8 @@ export default WeeklyCalendar = ( props ) => {
                         <AntDesign name="right" size={20} color="black" />
                     </TouchableOpacity>
                 </View>
+
+                {/* Modal for selecting dates */}
                 <Modal
                     onBackdropPress={() => setIsModalVisible(false)}
                     isVisible={isModalVisible}
@@ -214,13 +230,16 @@ export default WeeklyCalendar = ( props ) => {
                         <View style={s.modalContent}>
                             <View style={s.center} >
                                 <View style={{flexDirection: "row", justifyContent: "space-between", width: "100%"}}>
+                                    {/* Cancel button */}
                                 <TouchableOpacity onPress={toggleModal}>
                                     <Text style={{color: "grey", fontSize: 16, marginLeft: "3%"}}>취소</Text>
                                 </TouchableOpacity>
-                                    <View style={s.barIcon}></View>
-                                    <TouchableOpacity onPress={confirmDate}>
-                                        <Text style={{color: "#007AFF", fontSize: 16, marginRight: "3%"}}>완료</Text>
-                                    </TouchableOpacity>
+                                {/* bar icon in the top middle of modal */}
+                                <View style={s.barIcon}></View>
+                                {/* Confirm button */}
+                                <TouchableOpacity onPress={confirmDate}>
+                                    <Text style={{color: "#007AFF", fontSize: 16, marginRight: "3%"}}>완료</Text>
+                                </TouchableOpacity>
                                 </View>
                                 {/* Choose date */}
                                 <DateTimePicker 
@@ -238,32 +257,42 @@ export default WeeklyCalendar = ( props ) => {
                 <View style={styles.week}>
                     {/* Days of the week label */}
                     <View style={styles.weekdayLabelContainer}>
+                        {/* 일요일 */}
                         <View style={styles.weekdayLabel}>
                             <Text style={[styles.weekdayLabelText, props.dayLabelStyle]}>{weekdays.length > 0 ? weekdayLabels[0] : ''}</Text>
                         </View>
+                        {/* 월요일 */}
                         <View style={styles.weekdayLabel}>
                             <Text style={[styles.weekdayLabelText, props.dayLabelStyle]}>{weekdays.length > 0 ? weekdayLabels[1] : ''}</Text>
                         </View>
+                        {/* 화요일 */}
                         <View style={styles.weekdayLabel}>
                             <Text style={[styles.weekdayLabelText, props.dayLabelStyle]}>{weekdays.length > 0 ? weekdayLabels[2] : ''}</Text>
                         </View>
+                        {/* 수요일 */}
                         <View style={styles.weekdayLabel}>
                             <Text style={[styles.weekdayLabelText, props.dayLabelStyle]}>{weekdays.length > 0 ? weekdayLabels[3] : ''}</Text>
                         </View>
+                        {/* 목요일 */}
                         <View style={styles.weekdayLabel}>
                             <Text style={[styles.weekdayLabelText, props.dayLabelStyle]}>{weekdays.length > 0 ? weekdayLabels[4] : ''}</Text>
                         </View>
+                        {/* 금요일 */}
                         <View style={styles.weekdayLabel}>
                             <Text style={[styles.weekdayLabelText, props.dayLabelStyle]}>{weekdays.length > 0 ? weekdayLabels[5] : ''}</Text>
                         </View>
+                        {/* 토요일 */}
                         <View style={styles.weekdayLabel}>
                             <Text style={[styles.weekdayLabelText, props.dayLabelStyle]}>{weekdays.length > 0 ? weekdayLabels[6] : ''}</Text>
                         </View>
                     </View>
-                    {/* Days of the week day numbers */}
+                    {/* Container for the dates under the Week labels */}
                     <View style={styles.weekdayNumberContainer}>
+                        {/* Sunday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[0], 0)}>
+                            {/* if the date selected is a Sunday, have the black circle background, else no background */}
                             <View style={isCalendarReady && isSelectedDate(weekdays[0]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
+                                {/* if the date selected is a Sunday, set text color to weekDayNumberTextToday (white), else props.themeColor (black) */}
                                 <Text style={isCalendarReady && isSelectedDate(weekdays[0]) ? styles.weekDayNumberTextToday : { color: props.themeColor, fontSize: 17, fontFamily: "SUIT-Medium", }}>
                                     {isCalendarReady ? weekdays[0].date() : ''}
                                 </Text>
@@ -280,8 +309,11 @@ export default WeeklyCalendar = ( props ) => {
                             )} */}
                             {/* Visuals for adding checks in weekly schedule */}
                         </TouchableOpacity>
+                        {/* Monday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[1], 1)} >
+                            {/* if the date selected is a Monday, have the black circle background, else no background */}
                             <View style={isCalendarReady && isSelectedDate(weekdays[1]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
+                                {/* if the date selected is a Monday, set text color to weekDayNumberTextToday (white), else props.themeColor (black) */}
                                 <Text style={isCalendarReady && isSelectedDate(weekdays[1]) ? styles.weekDayNumberTextToday : { color: props.themeColor, fontSize: 17, fontFamily: "SUIT-Medium" }}>
                                     {isCalendarReady ? weekdays[1].date() : ''}
                                 </Text>
@@ -297,8 +329,11 @@ export default WeeklyCalendar = ( props ) => {
                                 </View>
                             )} */}
                         </TouchableOpacity>
+                        {/* Tuesday date number */}
                         <TouchableOpacity style={styles.weekDayNumber}onPress={onDayPress.bind(this, weekdays[2], 2)}>
+                            {/* if the date selected is a Tuesday, have the black circle background, else no background */}
                             <View style={isCalendarReady && isSelectedDate(weekdays[2]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
+                                {/* if the date selected is a Tuesday, set text color to weekDayNumberTextToday (white), else props.themeColor (black) */}
                                 <Text style={isCalendarReady && isSelectedDate(weekdays[2]) ? styles.weekDayNumberTextToday : { color: props.themeColor, fontSize: 17, fontFamily: "SUIT-Medium" }}>
                                     {isCalendarReady ? weekdays[2].date() : ''}
                                 </Text>
@@ -314,8 +349,11 @@ export default WeeklyCalendar = ( props ) => {
                                 </View>
                             )} */}
                         </TouchableOpacity>
+                        {/* Wednesday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[3], 3)}>
+                            {/* if the date selected is a Wednesday, have the black circle background, else no background */}
                             <View style={isCalendarReady && isSelectedDate(weekdays[3]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
+                                {/* if the date selected is a Wednesday, set text color to weekDayNumberTextToday (white), else props.themeColor (black) */}
                                 <Text style={isCalendarReady && isSelectedDate(weekdays[3]) ? styles.weekDayNumberTextToday : { color: props.themeColor, fontSize: 17, fontFamily: "SUIT-Medium" }}>
                                     {isCalendarReady ? weekdays[3].date() : ''}
                                 </Text>
@@ -331,8 +369,11 @@ export default WeeklyCalendar = ( props ) => {
                                 </View>
                             )} */}
                         </TouchableOpacity>
+                        {/* Thursday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[4], 4)}>
+                            {/* if the date selected is a Thursday, have the black circle background, else no background */}
                             <View style={isCalendarReady && isSelectedDate(weekdays[4]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
+                                {/* if the date selected is a Thursday, set text color to weekDayNumberTextToday (white), else props.themeColor (black) */}
                                 <Text style={isCalendarReady && isSelectedDate(weekdays[4]) ? styles.weekDayNumberTextToday : { color: props.themeColor, fontSize: 17, fontFamily: "SUIT-Medium" }}>
                                     {isCalendarReady ? weekdays[4].date() : ''}
                                 </Text>
@@ -348,8 +389,11 @@ export default WeeklyCalendar = ( props ) => {
                             )} */}
                                                         
                         </TouchableOpacity>
+                        {/* Friday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[5], 5)}>
+                            {/* if the date selected is a Friday, have the black circle background, else no background */}
                             <View style={isCalendarReady && isSelectedDate(weekdays[5]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
+                                {/* if the date selected is a Friday, set text color to weekDayNumberTextToday (white), else props.themeColor (black) */}
                                 <Text style={isCalendarReady && isSelectedDate(weekdays[5]) ? styles.weekDayNumberTextToday : { color: props.themeColor, fontSize: 17, fontFamily: "SUIT-Medium" }}>
                                     {isCalendarReady ? weekdays[5].date() : ''}
                                 </Text>
@@ -366,8 +410,11 @@ export default WeeklyCalendar = ( props ) => {
                                 </View>
                             )} */}
                         </TouchableOpacity>
+                        {/* Saturday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[6], 6)}>
+                            {/* if the date selected is a Saturday, have the black circle background, else no background */}
                             <View style={isCalendarReady && isSelectedDate(weekdays[6]) ? [styles.weekDayNumberCircle, { backgroundColor: props.themeColor }] : { } }>
+                                {/* if the date selected is a Saturday, set text color to weekDayNumberTextToday (white), else props.themeColor (black) */}
                                 <Text style={isCalendarReady && isSelectedDate(weekdays[6]) ? styles.weekDayNumberTextToday : { color: props.themeColor, fontSize: 17, fontFamily: "SUIT-Medium" }}>
                                     {isCalendarReady ? weekdays[6].date() : ''}
                                 </Text>
@@ -394,6 +441,8 @@ export default WeeklyCalendar = ( props ) => {
 };
 
 // propTypes define expected types for each prop WeeklyCalendar will use
+// helps catches bugs early
+// ensures variables receive correct type
 WeeklyCalendar.propTypes = {
     /** initially selected day */
     // any means it can be any type
