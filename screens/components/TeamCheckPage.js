@@ -780,6 +780,7 @@ const styles = StyleSheet.create({
     fontFamily: "SUIT-Medium",
     fontSize: 12,
     //backgroundColor: "yellow",
+    marginLeft: "2%",
     padding: 10,
     paddingLeft: 7,
     paddingRight: 6,
@@ -808,7 +809,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "SUIT-Regular",
     fontSize: 14,
-    marginLeft: 14,
+    marginLeft: "4%",
+    marginRight: "7%",
   },
   checkBoxContentTextInput: {
     flex: 1,
