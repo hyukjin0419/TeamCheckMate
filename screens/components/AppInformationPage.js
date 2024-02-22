@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     height: 60,
     width: "95%",
     alignItems: "center",
-    borderBottomWidth: 1.5,
+    borderBottomWidth: 1,
     borderColor: color.deactivated,
     flexDirection: "row",
     justifyContent: "space-between",

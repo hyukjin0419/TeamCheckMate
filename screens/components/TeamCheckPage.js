@@ -415,16 +415,16 @@ export default TeamCheckPage = (props) => {
         style={styles.assignmentTitleContainer}
         source={require("../images/AssignmentContainer.png")}
       >
-        <TouchableOpacity style={styles.assignmentTitleInfoContainer}>
+        <View style={styles.assignmentTitleInfoContainer}>
           <Text style={styles.dueDateText}>{dueDate}</Text>
           <Text style={styles.assignmentTitleText}>{assignmentName}</Text>
-        </TouchableOpacity>
+        </View>
       </ImageBackground>
       {/* 팀원 목록 부분 */}
 
       <View style={styles.teamMembersNamesArrayContainer}>
         {/* Display the 팀메이트 */}
-        <TouchableOpacity
+        <View
           style={{
             ...styles.teamMateContainer,
             backgroundColor: fileColor,
@@ -433,7 +433,7 @@ export default TeamCheckPage = (props) => {
           }}
         >
           <Text style={{ ...styles.teamMateText }}>팀 메이트</Text>
-        </TouchableOpacity>
+        </View>
 
         <FlatList
           keyboardShouldPersistTaps="always"
@@ -544,20 +544,27 @@ export default TeamCheckPage = (props) => {
               {isWritingNewTask[item.email] ? (
                 <KeyboardAvoidingView style={styles.checkBoxContainer}>
                   <Checkbox style={styles.checkbox} color={fileColor} />
-                  <TextInput
-                    placeholder="할 일 추가..."
+                  <View
                     style={{
-                      ...styles.checkBoxContentTextInput,
-                      borderBottomColor: fileColor,
+                      ...styles.colorTextInputContainer,
+                      borderColor: fileColor,
                     }}
-                    value={newTaskText}
-                    autoFocus={true}
-                    returnKeyType="done"
-                    onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.email, true)}
-                    onBlur={() => addNewTask(item.email, false)}
-                    blurOnSubmit={false}
-                  />
+                  >
+                    <TextInput
+                      placeholder="할 일 추가..."
+                      style={{
+                        ...styles.checkBoxContentTextInput,
+                        borderBottomColor: fileColor,
+                      }}
+                      value={newTaskText}
+                      autoFocus={true}
+                      returnKeyType="done"
+                      onChangeText={(text) => setNewTaskText(text)}
+                      onSubmitEditing={() => addNewTask(item.email, true)}
+                      onBlur={() => addNewTask(item.email, false)}
+                      blurOnSubmit={false}
+                    />
+                  </View>
                   <TouchableOpacity>
                     <Image
                       source={require("../images/icons/three_dots.png")}
@@ -757,7 +764,7 @@ const styles = StyleSheet.create({
   },
   memberNameContainerTwo: {
     flex: 1,
-    // backgroundColor: "green",
+    //backgroundColor: "green",
     flexDirection: "row",
     borderRadius: 200,
     borderWidth: 1,
@@ -768,7 +775,7 @@ const styles = StyleSheet.create({
   memberNameTextTwo: {
     fontFamily: "SUIT-Medium",
     fontSize: 12,
-    // backgroundColor: "yellow",
+    //backgroundColor: "yellow",
     padding: 10,
     paddingLeft: 7,
     paddingRight: 6,
@@ -776,17 +783,16 @@ const styles = StyleSheet.create({
   taskAddBtn: {
     width: 18,
     height: 18,
-    // backgroundColor: "blue",
+    //backgroundColor: "blue",
     marginRight: 8,
   },
   // ----------------------------체크 하나-----------------------
   checkBoxContainer: {
-    flex: 0.9,
     width: "90%",
     display: "flex",
     flexDirection: "row",
-    // backgroundColor: "violet",
-    marginBottom: "7%",
+    //backgroundColor: "violet",
+    marginBottom: "6%",
     alignSelf: "center",
   },
   checkbox: {
@@ -799,26 +805,26 @@ const styles = StyleSheet.create({
     fontFamily: "SUIT-Regular",
     fontSize: 14,
     marginLeft: 14,
-    // backgroundColor: "green",
-    borderBottomColor: "green",
   },
   checkBoxContentTextInput: {
     flex: 1,
     fontFamily: "SUIT-Regular",
     fontSize: 14,
-    marginLeft: 14,
-    marginRight: 14,
-    borderBottomWidth: 1, // 테두리 두께
-  },
-
-  checklistTextInput: {
-    fontFamily: "SUIT-Regular",
-    fontSize: 14,
-    marginLeft: 14,
+    marginBottom: "2%",
   },
   threeDots: {
     width: 17.5,
     height: 4,
+    marginLeft: 5,
+    marginTop: 6,
+  },
+  colorTextInputContainer: {
+    flexDirection: "row",
+    //backgroundColor: "blue",
+    borderBottomWidth: 1.5,
+    marginBottom: "2%",
+    marginLeft: "4%",
+    width: "84%",
   },
   modalView: {
     backgroundColor: "white",
