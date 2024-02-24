@@ -32,13 +32,14 @@ import PersonalPageBtn from "./PersonalPageFolder/PersonalPageBtn";
 import WeeklyCalendar from "./PersonalPageFolder/WeeklyCalendar";
 import CategoryItem from "./CategoryItem";
 
-const PersonalPage = () => {
+export default PersonalPage = () => {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
-  const [categoryList, setCategoryList] = useState([]);
+  const [checkMap, setCheckMap] = useState(new Map());
   const [teamCode, setTeamCode] = useState([]);
   const [categoryCode, setCategoryCode] = useState([]);
   const [load, setLoad] = useState(false);
+  const [sendData, setSendData] = useState(false);
   const email = auth.currentUser.email;
 
   const getCategoryCode = async() => {
@@ -108,9 +109,11 @@ const PersonalPage = () => {
     }
   };
 
-  const showList = (list) => {
-    setCategoryList(list);
-  }
+  const showList = (map) => {
+    setCheckMap(map);
+    setSendData(true);
+  };
+  
 
   useFocusEffect( 
     React.useCallback(() => {
@@ -144,8 +147,10 @@ const PersonalPage = () => {
     };
     fetchUserData();
     setLoad(false);
+    setSendData(false);
     getCategoryCode();
   }, [userEmail]);
+
 
   return (
     <View style={styles.container}>
@@ -154,12 +159,12 @@ const PersonalPage = () => {
         <PersonalPageBtn />
       </View> */}
       <Text style={styles.titleHeader}>{userName} 님 오늘도 파이팅!</Text>
-      <WeeklyCalendar style={{marginBottom: "5%"}}/>
+      <WeeklyCalendar checkMap={sendData ? checkMap : new Map()} style={{marginBottom: "5%"}}/>
       {load && 
              <CategoryItem
              // categoryList={categoryList}
              // checkEvent={handleCheckEvent}
-             getCategoryList={showList}
+             getCheckMap={showList}
              categoryCode={categoryCode}
              teamCode={teamCode}
          />
@@ -169,7 +174,7 @@ const PersonalPage = () => {
   );
 };
 
-export default PersonalPage;
+
 
 const styles = StyleSheet.create({
   container: {

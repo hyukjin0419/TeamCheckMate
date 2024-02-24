@@ -8,12 +8,9 @@ import { AntDesign } from "@expo/vector-icons";
 import Modal from "react-native-modal"
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Entypo } from '@expo/vector-icons';
-import { useFocusEffect } from "@react-navigation/native";
-import CategoryItem from '../CategoryItem';
-import { collection, doc, getDoc, getDocs, orderBy, query } from 'firebase/firestore';
 import { auth, db } from '../../../firebase';
 
-export default WeeklyCalendar = ( props ) => {
+export default WeeklyCalendar = ({ checkMap, ...props }) => {
     // current date variable
     const [currDate, setCurrDate] = useState(moment(props.selected).locale(props.locale))
     // weekdays variable for setting weekdays
@@ -27,91 +24,20 @@ export default WeeklyCalendar = ( props ) => {
     // date variable for today's date
     const [date, setDate] = useState(new Date());
     const [categoryList, setCategoryList] = useState([]);
-    const [checkEvent, setCheckEvent] = useState(undefined);
+    // console.log("atasetae", checkMap);
     // modal visibility variable
     const [isModalVisible, setIsModalVisible] = useState(false);
     
+    
     const email = auth.currentUser.email;
       
-    //   const handleCheckEvent = (event) => {
-    //     setCheckEvent(event);
-    //     console.log("asfasdfasdf",checkEvent);
-    //   }
 
-     
-
-     
-    //   const getCategoryList = async (selectedDate) => {
-    //     try {
-    //         const userDocRef = doc(db, "user", email);
-    //         const userCheckListRef = collection(userDocRef, "personalCheckList");
-    //         const querySnapshot1 = await getDocs(query(userCheckListRef, orderBy("regDate", "asc")));
-    //         if (!querySnapshot1.empty) {
-    //             const list = [];
-    //             let temp = new Date(selectedDate).toLocaleDateString();
-    
-    //             for (const child1 of querySnapshot1.docs) {
-    //                 let compareDate = null;
-    //                 if (child1.data().allCheckedConfirm === true) {
-    //                     const userCategoryRef = doc(userCheckListRef, child1.id);
-    //                     const userTaskRef = collection(userCategoryRef, "tasks");
-    //                     const querySnapshot2 = await getDocs(query(userTaskRef));
-    
-    //                     if (!querySnapshot2.empty) {
-    //                         for (const child2 of querySnapshot2.docs) {
-    //                             const childModDate = child2.data().modDate.toDate();
-    
-    //                             if (!compareDate || childModDate > compareDate) {
-    //                                 compareDate = childModDate;
-    //                             }
-    
-    //                             const comp = compareDate.toLocaleDateString();
-    //                             if (comp >= temp) {
-    //                                 const existingIndex = list.findIndex(item => item.id === child1.id);
-
-    //                             if (existingIndex === -1) {
-    //                                 list.push({
-    //                                     id: child1.id,
-    //                                     ...child1.data(),
-    //                                 });
-    //                             }
-    //                             }
-    //                         }
-    //                     }
-    //                 } else if (child1.data().allCheckedConfirm === false) {
-    //                     const existingIndex = list.findIndex(item => item.id === child1.id);
-
-    //                             if (existingIndex === -1) {
-    //                                 list.push({
-    //                                     id: child1.id,
-    //                                     ...child1.data(),
-    //                                 });
-    //                             }
-    //                 }
-    //             }
-    
-    //             setCategoryList(list);
-    //         } else {
-    //             return;
-    //         }
-    //     } catch (error) {
-    //         console.error("Error getting category: ", error);
-    //     }
-    // };
-    
-
-       
-    
     useEffect(() => { // only first mount
-        // When this is set to true, display calendar
-        // const fetchData = async() => {
-        //     await getCategoryList(selectedDate);
-        // }
         // Create Weekdays
         createWeekdays(currDate);
+        // When this is set to true, display calendar
         setCalendarReady(true);
-        // fetchData();
-    }, [selectedDate])
+    }, [selectedDate, checkMap])
 
     const toggleModal = () => {
         // toggle the visibility of modal
@@ -298,15 +224,15 @@ export default WeeklyCalendar = ( props ) => {
                                 </Text>
                             </View>
                          
-                            {/* {isCalendarReady && checkEvent && checkEvent.get(weekdays[0].format('YYYY-MM-DD').toString()) !== undefined && (
-                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkEvent.get(weekdays[0].format('YYYY-MM-DD').toString()).map(item => (
-                                        <View key={item.id}>
-                                            <Entypo name="check" size={13} color={item.checkColor} />
+                            {isCalendarReady && checkMap && checkMap.get(weekdays[0].format('YYYY-MM-DD').toString()) !== undefined && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
+                                    {checkMap.get(weekdays[0].format('YYYY-MM-DD').toString()).map((item, index) => (
+                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
+                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
                                         </View>
                                     ))}
                                 </View>
-                            )} */}
+                            )}
                             {/* Visuals for adding checks in weekly schedule */}
                         </TouchableOpacity>
                         {/* Monday date number */}
@@ -319,15 +245,15 @@ export default WeeklyCalendar = ( props ) => {
                                 </Text>
                             </View>
    
-                            {/* {isCalendarReady && checkEvent && checkEvent.get(weekdays[1].format('YYYY-MM-DD').toString()) !== undefined && (
-                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkEvent.get(weekdays[1].format('YYYY-MM-DD').toString()).map(item => (
-                                        <View key={item.id}>
-                                            <Entypo name="check" size={13} color={item.checkColor} />
+                            {isCalendarReady && checkMap && checkMap.get(weekdays[1].format('YYYY-MM-DD').toString()) !== undefined && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
+                                    {checkMap.get(weekdays[1].format('YYYY-MM-DD').toString()).map((item, index) => (
+                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
+                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
                                         </View>
                                     ))}
                                 </View>
-                            )} */}
+                            )}
                         </TouchableOpacity>
                         {/* Tuesday date number */}
                         <TouchableOpacity style={styles.weekDayNumber}onPress={onDayPress.bind(this, weekdays[2], 2)}>
@@ -339,15 +265,15 @@ export default WeeklyCalendar = ( props ) => {
                                 </Text>
                             </View>
                             
-                            {/* {isCalendarReady && checkEvent && checkEvent.get(weekdays[2].format('YYYY-MM-DD').toString()) !== undefined && (
-                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkEvent.get(weekdays[2].format('YYYY-MM-DD').toString()).map(item => (
-                                        <View key={item.id}>
-                                            <Entypo name="check" size={13} color={item.checkColor} />
+                            {isCalendarReady && checkMap && checkMap.get(weekdays[2].format('YYYY-MM-DD').toString()) !== undefined && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
+                                    {checkMap.get(weekdays[2].format('YYYY-MM-DD').toString()).map((item, index) => (
+                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
+                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
                                         </View>
                                     ))}
                                 </View>
-                            )} */}
+                            )}
                         </TouchableOpacity>
                         {/* Wednesday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[3], 3)}>
@@ -359,15 +285,15 @@ export default WeeklyCalendar = ( props ) => {
                                 </Text>
                             </View>
                            
-                            {/* {isCalendarReady && checkEvent && checkEvent.get(weekdays[3].format('YYYY-MM-DD').toString()) !== undefined && (
-                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkEvent.get(weekdays[3].format('YYYY-MM-DD').toString()).map(item => (
-                                        <View key={item.id}>
-                                            <Entypo name="check" size={13} color={item.checkColor} />
+                            {isCalendarReady && checkMap && checkMap.get(weekdays[3].format('YYYY-MM-DD').toString()) !== undefined && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
+                                    {checkMap.get(weekdays[3].format('YYYY-MM-DD').toString()).map((item, index) => (
+                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
+                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
                                         </View>
                                     ))}
                                 </View>
-                            )} */}
+                            )}
                         </TouchableOpacity>
                         {/* Thursday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[4], 4)}>
@@ -378,15 +304,15 @@ export default WeeklyCalendar = ( props ) => {
                                     {isCalendarReady ? weekdays[4].date() : ''}
                                 </Text>
                             </View>
-                            {/* {isCalendarReady && checkEvent && checkEvent.get(weekdays[4].format('YYYY-MM-DD').toString()) !== undefined && (
-                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkEvent.get(weekdays[4].format('YYYY-MM-DD').toString()).map(item => (
-                                        <View key={item.id}>
-                                            <Entypo name="check" size={13} color={item.checkColor} />
+                            {isCalendarReady && checkMap && checkMap.get(weekdays[4].format('YYYY-MM-DD').toString()) !== undefined && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
+                                    {checkMap.get(weekdays[4].format('YYYY-MM-DD').toString()).map((item, index) => (
+                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
+                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
                                         </View>
                                     ))}
                                 </View>
-                            )} */}
+                            )}
                                                         
                         </TouchableOpacity>
                         {/* Friday date number */}
@@ -399,16 +325,15 @@ export default WeeklyCalendar = ( props ) => {
                                 </Text>
                             </View>
                             
-                            {/* {isCalendarReady && checkEvent && checkEvent.get(weekdays[5].format('YYYY-MM-DD').toString()) !== undefined && (
-                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkEvent.get(weekdays[5].format('YYYY-MM-DD').toString()).map(item => (
-                                        <View key={item.id}>
-                                            <Entypo name="check" size={13} color={item.checkColor} />
-                                            <Text>{item.id}</Text>
+                            {isCalendarReady && checkMap && checkMap.get(weekdays[5].format('YYYY-MM-DD').toString()) !== undefined && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
+                                    {checkMap.get(weekdays[5].format('YYYY-MM-DD').toString()).map((item, index) => (
+                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
+                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
                                         </View>
                                     ))}
                                 </View>
-                            )} */}
+                            )}
                         </TouchableOpacity>
                         {/* Saturday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[6], 6)}>
@@ -420,15 +345,15 @@ export default WeeklyCalendar = ( props ) => {
                                 </Text>
                             </View>
                            
-                            {/* {isCalendarReady && checkEvent && checkEvent.get(weekdays[6].format('YYYY-MM-DD').toString()) !== undefined && (
-                                <View style={{ position: "absolute", flexDirection: "row", top: "100%" }}>
-                                    {checkEvent.get(weekdays[6].format('YYYY-MM-DD').toString()).map(item => (
-                                        <View key={item.id}>
-                                            <Entypo name="check" size={13} color={item.checkColor} />
+                            {isCalendarReady && checkMap && checkMap.get(weekdays[6].format('YYYY-MM-DD').toString()) !== undefined && (
+                                <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
+                                    {checkMap.get(weekdays[6].format('YYYY-MM-DD').toString()).map((item, index) => (
+                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
+                                            <View style={{width: 5, height: 6, borderRadius: 30/2, backgroundColor: item.color}} />
                                         </View>
                                     ))}
                                 </View>
-                            )} */}
+                            )}
                         </TouchableOpacity>
                     </View>
                 </View>
