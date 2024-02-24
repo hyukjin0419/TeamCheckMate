@@ -9,7 +9,7 @@ import Modal from "react-native-modal";
 import { addDoc, deleteDoc, getDoc, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
 
-export default CategoryItem = (props) => {
+export default CategoryItem = ({getCheckMap, ...props}) => {
     // get categoryCode map and set it to categoryList to render categories
     const [categoryList, setCategoryList] = useState(props.categoryCode);
     const [teamList, setTeamList] = useState(props.teamCode);
@@ -45,13 +45,14 @@ export default CategoryItem = (props) => {
     };
   
     // when user wants to add new task
-    const addNewTask = async(id, isSubmitedByEnter) => {
+    const addNewTask = async(id, color, isSubmitedByEnter) => {
       // if the task is not an empty string
       if (newTaskText.trim() !== "") {
         // create new Checklist to render front end first
         const newChecklist = {
           category: id,
           isChecked: false,
+          color: color,
           content: newTaskText,
           regDate: new Date(),
           modDate: new Date(),
@@ -120,6 +121,8 @@ export default CategoryItem = (props) => {
   
       //업데이트 된 체크리스트를 프론트에 반영
       setChecklists(updatedChecklists);
+      createCheckMap(updatedChecklists);
+          
   
       //업데이트 된 체크리스트를 firestorage에 반영 -> 백엔드에서는 체크리스트가 객체배열로 되어있지 않기 때문에, 그냥 해당 문서를 참조해서 값을 바꾼다
       try {
@@ -319,81 +322,6 @@ export default CategoryItem = (props) => {
       console.error("Error deleting document: ", error);
     }
   };
-
-    // //Show the check mark if all category is checked
-    // const showCheck = async(list, category, index) => {
-    //   const updateList = [...list];
-    //   // Get the specific category
-    //   const checklistToUpdate = updateList.find(
-    //     (checklist) => checklist.category === category && checklist.index === index
-    //   );
-    //   try {
-    //     const userRef = doc(db, "user", user.email);
-    //     const userCheckListRef = collection(userRef, "personalCheckList");
-    //     const userCategoryRef = doc(userCheckListRef, checklistToUpdate.category);
-    //     const userTaskRef = collection(userCategoryRef, "tasks");
-
-    //     const checkColorList = [...checkColor];
-    //     const querySnapshot = await getDocs(userTaskRef);
-    //       if(!querySnapshot.empty) {
-    //         for (const child of querySnapshot.docs) {
-    //           const childModDate = child.data().modDate.toDate();
-
-    //           if(child.data().isChecked) {
-    //             // get the color of the category
-    //             const colorData = await getDoc(userCategoryRef);
-    //             if (colorData.exists()) {
-    //               // add the color and set id to id of category
-    //               const colorAdd = {
-    //                 id: child.id,
-    //                 checkColor: colorData.data().color,
-    //                 regDate: childModDate,
-    //               };
-              
-    //               // Check if id is already in the array
-    //               const index = checkColorList.findIndex(item => item.id === colorAdd.id);
-
-    //               if (index !== -1) {
-    //                 // Update existing entry
-    //                 if (checkColorList[index].checkColor !== colorAdd.checkColor) {
-    //                   // Update existing entry with the new color
-    //                   const updatedCheckColorList = [...checkColorList];
-    //                   updatedCheckColorList[index] = colorAdd;
-    //                   setCheckColor(updatedCheckColorList);
-    //                 }
-    //               } else {
-    //                 // Add a new entry
-    //                 const updatedCheckColorList = [...checkColorList, colorAdd];
-    //                 setCheckColor(updatedCheckColorList);
-    //               }
-    //             }
-    //           } 
-    //           // if not all checkboxes are checked, remove the category info from array
-    //           else {
-    //             if (checkColorList.some(item => item.id === child.id)) {
-    //               const updatedCheckColorList = checkColorList.filter(item => item.id !== child.id);
-    //               setCheckColor(updatedCheckColorList);
-    //             }
-    //           } 
-    //         }
-    //       }
-    //       let dateMap = new Map()
-    //       // add all the dates of tasks being checked into new map
-    //       for (let i = 0; i < checkColor.length; i++) {
-    //           let checkedDate = moment(checkColor[i].regDate).format('YYYY-MM-DD').toString()
-    //           if (dateMap.has(checkedDate)) {
-    //               let checkArr = dateMap.get(checkedDate)
-    //               checkArr.push(checkColor[i])
-    //               dateMap.set(checkedDate, checkArr) 
-    //           } else {
-    //               dateMap.set(checkedDate, [checkColor[i]])
-    //           }
-    //       } 
-    //       setCheckMap(dateMap);  
-    //   } catch (e) {
-    //     console.log(e.message);
-    //   }
-    // };
     
     const fetchTaskData = async () => {
       const list = []
@@ -415,7 +343,8 @@ export default CategoryItem = (props) => {
       if(!querySnapshot1.empty) {
         querySnapshot1.forEach((child) => {
           const data = { id: child.id, ...child.data() };
-          console.log(data);
+          data.regDate = child.data().regDate.toDate();
+          data.modDate = child.data().modDate.toDate();
           list.push(data);
         })
       }
@@ -440,21 +369,41 @@ export default CategoryItem = (props) => {
           if(!querySnapshot.empty){
             querySnapshot.forEach((doc) => {
               const data = { id: doc.id, ...doc.data() };
+              data.regDate = doc.data().regDate.toDate();
+              data.modDate = doc.data().modDate.toDate();
               list.push(data);
             })
           }
         })
       )
       setChecklists(list);
-      // showCheck(categoryList, )
+      createCheckMap(list);
+    }
+
+    // Function to pass data to display dots
+    const createCheckMap = (checklists) => {
+      let dateMap = new Map()
+      // add all the dates of tasks being checked into new map
+      for (let i = 0; i < checklists.length; i++) {
+        if(checklists[i].isChecked) {
+          let checkedDate = moment(checklists[i].modDate).format('YYYY-MM-DD').toString();
+          if (dateMap.has(checkedDate)) {
+              let checkArr = dateMap.get(checkedDate)
+              checkArr.push(checklists[i])
+              dateMap.set(checkedDate, checkArr) 
+          } else {
+              dateMap.set(checkedDate, [checklists[i]])
+          }
+        }
+      }
+      getCheckMap(dateMap);
     }
 
     useEffect(() => {
       // setCategoryList(props.categoryCode);
       // Load all tasks inside categories that are saved in firebase
       fetchTaskData();
-      props.getCategoryList(categoryList)
-    }, [props.categoryList]);
+    }, []);
 
     // useEffect(() => {
     //   props.checkEvent(checkMap);
@@ -468,7 +417,6 @@ export default CategoryItem = (props) => {
     const handleTaskOptionPress = (checklist) => {
       setTaskOptionModalVisible(!taskOptionModalVisible);
       setSelectedChecklist(checklist);
-      console.log(selectedChecklist);
     };
 
   return (
@@ -578,8 +526,8 @@ export default CategoryItem = (props) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.id, true)}
-                    onBlur={() => addNewTask(item.id, false)}
+                    onSubmitEditing={() => addNewTask(item.id, item.color, true)}
+                    onBlur={() => addNewTask(item.id, item.color, false)}
                     blurOnSubmit={false}
                   />
                   <TouchableOpacity>
