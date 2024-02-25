@@ -19,14 +19,12 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     const [newTaskText, setNewTaskText] = useState("");
     // to check current writing state of current task
     const [isWritingNewTask, setIsWritingNewTask] = useState({});
-    const [checkColor, setCheckColor] = useState([]);
-    const [checkMap, setCheckMap] = useState(undefined)
-    const TextInputRef = useRef(null);
     // edit task text string
     const [editTaskText, setEditTaskText] = useState("");
-    const [categoryCode, setCategoryCode] = useState([]);
     // combined list for both personal and team tasks
     const [combineList, setCombineList] = useState([...teamList, ...categoryList]);
+    const [date, setDate] = useState(props.sendDate);
+    let selectedDateCompare = "";
     // get user information
     const user = auth.currentUser;
 
@@ -324,7 +322,8 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
   };
     
     const fetchTaskData = async () => {
-      const list = []
+      const list = [];
+      const tempList = []
 
       // First get information on tasks for team
       const querySnapshot1 = await getDocs(
@@ -345,7 +344,21 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
           const data = { id: child.id, ...child.data() };
           data.regDate = child.data().regDate.toDate();
           data.modDate = child.data().modDate.toDate();
-          list.push(data);
+          // temporary variable to get modDate
+          const getDate = child.data().modDate.toDate();
+          // change to mm/dd/yyyy format for modDate for easier comparison
+          const compareDate = getDate.toLocaleDateString();
+          // if user selected date is less than or equal to data's last modified date
+          if(compareDate >= selectedDateCompare) {
+            // add to list
+            list.push(data);
+          }
+          // if modDate is less than selected date but it is not checked
+          else if(compareDate <= selectedDateCompare && !data.isChecked) {
+            list.push(data);
+          }
+          // temporary list to show dots
+          tempList.push(data);
         })
       }
       
@@ -371,13 +384,27 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
               const data = { id: doc.id, ...doc.data() };
               data.regDate = doc.data().regDate.toDate();
               data.modDate = doc.data().modDate.toDate();
-              list.push(data);
+              // temporary variable to get modDate
+              const getDate = doc.data().modDate.toDate();
+              // change to mm/dd/yyyy format for modDate for easier comparison
+              const compareDate = getDate.toLocaleDateString();
+              // if user selected date is less than or equal to data's last modified date
+              if(compareDate >= selectedDateCompare) {
+                // add to list
+                list.push(data);
+              }
+              // if modDate is less than selected date but it is not checked
+              else if(compareDate <= selectedDateCompare && !data.isChecked) {
+                list.push(data);
+              }
+              // temporary list to show dots
+              tempList.push(data);
             })
           }
         })
       )
       setChecklists(list);
-      createCheckMap(list);
+      createCheckMap(tempList);
     }
 
     // Function to pass data to display dots
@@ -402,8 +429,10 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     useEffect(() => {
       // setCategoryList(props.categoryCode);
       // Load all tasks inside categories that are saved in firebase
+      setDate(props.sendDate);
+      selectedDateCompare = new Date(date).toLocaleDateString();
       fetchTaskData();
-    }, []);
+    }, [props.sendDate, date]);
 
     // useEffect(() => {
     //   props.checkEvent(checkMap);
