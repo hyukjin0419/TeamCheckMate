@@ -10,7 +10,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Entypo } from '@expo/vector-icons';
 import { auth, db } from '../../../firebase';
 
-export default WeeklyCalendar = ({ checkMap, ...props }) => {
+export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
     // current date variable
     const [currDate, setCurrDate] = useState(moment(props.selected).locale(props.locale))
     // weekdays variable for setting weekdays
@@ -37,7 +37,7 @@ export default WeeklyCalendar = ({ checkMap, ...props }) => {
         createWeekdays(currDate);
         // When this is set to true, display calendar
         setCalendarReady(true);
-    }, [selectedDate, checkMap])
+    }, [])
 
     const toggleModal = () => {
         // toggle the visibility of modal
@@ -93,6 +93,7 @@ export default WeeklyCalendar = ({ checkMap, ...props }) => {
     // if user presses on a day
     const onDayPress = (weekday, i) => {
         // set selectedDate to the date user pressed
+        getSelectedDate(weekday.clone());
         setSelectedDate(weekday.clone());
         if (props.onDayPress !== undefined) props.onDayPress(weekday.clone(), i)
     }

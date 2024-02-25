@@ -39,7 +39,9 @@ export default PersonalPage = () => {
   const [teamCode, setTeamCode] = useState([]);
   const [categoryCode, setCategoryCode] = useState([]);
   const [load, setLoad] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [sendData, setSendData] = useState(false);
+  const [sendDateConfirm, setSendDateConfirm] = useState(false);
   const email = auth.currentUser.email;
 
   const getCategoryCode = async() => {
@@ -148,6 +150,7 @@ export default PersonalPage = () => {
     fetchUserData();
     setLoad(false);
     setSendData(false);
+    setSendDateConfirm(false);
     getCategoryCode();
   }, [userEmail]);
 
@@ -159,7 +162,11 @@ export default PersonalPage = () => {
         <PersonalPageBtn />
       </View> */}
       <Text style={styles.titleHeader}>{userName} 님 오늘도 파이팅!</Text>
-      <WeeklyCalendar checkMap={sendData ? checkMap : new Map()} style={{marginBottom: "5%"}}/>
+      <WeeklyCalendar 
+        getSelectedDate={(date) => setSelectedDate(date)}
+        checkMap={sendData ? checkMap : new Map()} 
+        style={{marginBottom: "5%"}}
+      />
       {load && 
              <CategoryItem
              // categoryList={categoryList}
@@ -167,6 +174,7 @@ export default PersonalPage = () => {
              getCheckMap={showList}
              categoryCode={categoryCode}
              teamCode={teamCode}
+             sendDate={selectedDate}
          />
            } 
       <PersonalPageBtn />
