@@ -24,6 +24,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     // combined list for both personal and team tasks
     const [combineList, setCombineList] = useState([...teamList, ...categoryList]);
     const [date, setDate] = useState(props.sendDate);
+    const [load, setLoad] = useState(true);
     let selectedDateCompare = "";
     // get user information
     const user = auth.currentUser;
@@ -57,6 +58,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
         };
         
         // Add the new checklist into checklists array
+        setLoad(false);
         setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
 
         // add the information of new task into firebase
@@ -321,90 +323,93 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     }
   };
     
-    const fetchTaskData = async () => {
-      const list = [];
-      const tempList = []
+    const fetchTaskData = async (value) => {
+      if(value) {
+        const list = [];
+        const tempList = []
 
-      // First get information on tasks for team
-      const querySnapshot1 = await getDocs(
-        query(
-          collection(
-            db,
-            "user",
-            user.email,
-            "teamCheckList"
-          ),
-          orderBy("regDate", "asc")
+        // First get information on tasks for team
+        const querySnapshot1 = await getDocs(
+          query(
+            collection(
+              db,
+              "user",
+              user.email,
+              "teamCheckList"
+            ),
+            orderBy("regDate", "asc")
+          )
+        );
+
+        // add the data into list
+        if(!querySnapshot1.empty) {
+          querySnapshot1.forEach((child) => {
+            const data = { id: child.id, ...child.data() };
+            data.regDate = child.data().regDate.toDate();
+            data.modDate = child.data().modDate.toDate();
+            // temporary variable to get modDate
+            const getDate = child.data().modDate.toDate();
+            // change to mm/dd/yyyy format for modDate for easier comparison
+            const compareDate = getDate.toLocaleDateString();
+            // if user selected date is less than or equal to data's last modified date
+            if(compareDate >= selectedDateCompare) {
+              // add to list
+              list.push(data);
+            }
+            // if modDate is less than selected date but it is not checked
+            else if(compareDate <= selectedDateCompare && !data.isChecked) {
+              list.push(data);
+            }
+            // temporary list to show dots
+            tempList.push(data);
+          })
+        }
+        
+        // Get information for personal tasks
+        await Promise.all(
+          categoryList.map(async(code) => {
+            const querySnapshot = await getDocs(
+              query(
+                collection(
+                  db,
+                  "user",
+                  user.email,
+                  "personalCheckList",
+                  code.id,
+                  "tasks"
+                ),
+                orderBy("regDate", "asc")
+              )
+            );
+            // add it to list
+            if(!querySnapshot.empty){
+              querySnapshot.forEach((doc) => {
+                const data = { id: doc.id, ...doc.data() };
+                data.regDate = doc.data().regDate.toDate();
+                data.modDate = doc.data().modDate.toDate();
+                // temporary variable to get modDate
+                const getDate = doc.data().modDate.toDate();
+                // change to mm/dd/yyyy format for modDate for easier comparison
+                const compareDate = getDate.toLocaleDateString();
+                // if user selected date is less than or equal to data's last modified date
+                if(compareDate >= selectedDateCompare) {
+                  // add to list
+                  list.push(data);
+                }
+                // if modDate is less than selected date but it is not checked
+                else if(compareDate <= selectedDateCompare && !data.isChecked) {
+                  list.push(data);
+                }
+                // temporary list to show dots
+                tempList.push(data);
+              })
+            }
+          })
         )
-      );
-
-      // add the data into list
-      if(!querySnapshot1.empty) {
-        querySnapshot1.forEach((child) => {
-          const data = { id: child.id, ...child.data() };
-          data.regDate = child.data().regDate.toDate();
-          data.modDate = child.data().modDate.toDate();
-          // temporary variable to get modDate
-          const getDate = child.data().modDate.toDate();
-          // change to mm/dd/yyyy format for modDate for easier comparison
-          const compareDate = getDate.toLocaleDateString();
-          // if user selected date is less than or equal to data's last modified date
-          if(compareDate >= selectedDateCompare) {
-            // add to list
-            list.push(data);
-          }
-          // if modDate is less than selected date but it is not checked
-          else if(compareDate <= selectedDateCompare && !data.isChecked) {
-            list.push(data);
-          }
-          // temporary list to show dots
-          tempList.push(data);
-        })
+        setChecklists(list);
+        console.log(checklists);
+        createCheckMap(tempList);
       }
-      
-      // Get information for personal tasks
-      await Promise.all(
-        categoryList.map(async(code) => {
-          const querySnapshot = await getDocs(
-            query(
-              collection(
-                db,
-                "user",
-                user.email,
-                "personalCheckList",
-                code.id,
-                "tasks"
-              ),
-              orderBy("regDate", "asc")
-            )
-          );
-          // add it to list
-          if(!querySnapshot.empty){
-            querySnapshot.forEach((doc) => {
-              const data = { id: doc.id, ...doc.data() };
-              data.regDate = doc.data().regDate.toDate();
-              data.modDate = doc.data().modDate.toDate();
-              // temporary variable to get modDate
-              const getDate = doc.data().modDate.toDate();
-              // change to mm/dd/yyyy format for modDate for easier comparison
-              const compareDate = getDate.toLocaleDateString();
-              // if user selected date is less than or equal to data's last modified date
-              if(compareDate >= selectedDateCompare) {
-                // add to list
-                list.push(data);
-              }
-              // if modDate is less than selected date but it is not checked
-              else if(compareDate <= selectedDateCompare && !data.isChecked) {
-                list.push(data);
-              }
-              // temporary list to show dots
-              tempList.push(data);
-            })
-          }
-        })
-      )
-      setChecklists(list);
-      createCheckMap(tempList);
     }
 
     // Function to pass data to display dots
@@ -431,7 +436,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
       // Load all tasks inside categories that are saved in firebase
       setDate(props.sendDate);
       selectedDateCompare = new Date(date).toLocaleDateString();
-      fetchTaskData();
+      fetchTaskData(load);
     }, [props.sendDate, date]);
 
     // useEffect(() => {
