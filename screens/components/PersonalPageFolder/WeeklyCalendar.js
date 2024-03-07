@@ -27,6 +27,14 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
     // console.log("atasetae", checkMap);
     // modal visibility variable
     const [isModalVisible, setIsModalVisible] = useState(false);
+    let rows0 = -1;
+    let rows1 = -1;
+    let rows2 = -1;
+    let rows3 = -1;
+    let rows4 = -1;
+    let rows5 = -1;
+    let rows6 = -1;
+
     
     
     const email = auth.currentUser.email;
@@ -227,14 +235,25 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
                          
                             {isCalendarReady && checkMap && checkMap.get(weekdays[0].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
-                                    {checkMap.get(weekdays[0].format('YYYY-MM-DD').toString()).map((item, index) => (
-                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
-                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
-                                        </View>
-                                    ))}
+                                    {checkMap.get(weekdays[0].format('YYYY-MM-DD').toString()).map((item, index) => {
+                                        // this is to simplify calculation by having starting index be set to 1
+                                        let count = index + 1;
+                                        // this goes for every 5 dots. Once it reaches 5, reset numb back to 1
+                                        let numb = 1 + (count - 1) % 5;
+                                        // This is the calculation for even disbribution for the dots
+                                        let marginLeft = numb <= 5 ? (count <=5 ? (count%6 === 0 ? 0 : 3) : ((count-1)%5 === 0 ? 3 : 11 + 8*(numb-2))) : 0;
+                                        // Increment row value by one after every 5th dot
+                                        if((count-1)%5 === 0) {
+                                            rows0 = rows0 + 1;
+                                        }
+                                        return (
+                                            <View key={item.id} style={{ marginLeft: marginLeft, position: count <= 5 ? "relative" : "absolute", top: count <= 5 ? 0 : 8 * rows0 }}>
+                                                <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
+                                            </View>
+                                        )
+                                    })}
                                 </View>
                             )}
-                            {/* Visuals for adding checks in weekly schedule */}
                         </TouchableOpacity>
                         {/* Monday date number */}
                         <TouchableOpacity style={styles.weekDayNumber} onPress={onDayPress.bind(this, weekdays[1], 1)} >
@@ -248,11 +267,23 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
    
                             {isCalendarReady && checkMap && checkMap.get(weekdays[1].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
-                                    {checkMap.get(weekdays[1].format('YYYY-MM-DD').toString()).map((item, index) => (
-                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
-                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
-                                        </View>
-                                    ))}
+                                    {checkMap.get(weekdays[1].format('YYYY-MM-DD').toString()).map((item, index) => {
+                                        // this is to simplify calculation by having starting index be set to 1
+                                        let count = index + 1;
+                                        // this goes for every 5 dots. Once it reaches 5, reset numb back to 1
+                                        let numb = 1 + (count - 1) % 5;
+                                        // This is the calculation for even disbribution for the dots
+                                        let marginLeft = numb <= 5 ? (count <=5 ? (count%6 === 0 ? 0 : 3) : ((count-1)%5 === 0 ? 3 : 11 + 8*(numb-2))) : 0;
+                                        // Increment row value by one after every 5th dot
+                                        if((count-1)%5 === 0) {
+                                            rows1 = rows1 + 1;
+                                        }
+                                        return (
+                                            <View key={item.id} style={{ marginLeft: marginLeft, position: count <= 5 ? "relative" : "absolute", top: count <= 5 ? 0 : 8 * rows1 }}>
+                                                <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
+                                            </View>
+                                        )
+                                    })}
                                 </View>
                             )}
                         </TouchableOpacity>
@@ -268,11 +299,23 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
                             
                             {isCalendarReady && checkMap && checkMap.get(weekdays[2].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
-                                    {checkMap.get(weekdays[2].format('YYYY-MM-DD').toString()).map((item, index) => (
-                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
-                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
-                                        </View>
-                                    ))}
+                                    {checkMap.get(weekdays[2].format('YYYY-MM-DD').toString()).map((item, index) => {
+                                        // this is to simplify calculation by having starting index be set to 1
+                                        let count = index + 1;
+                                        // this goes for every 5 dots. Once it reaches 5, reset numb back to 1
+                                        let numb = 1 + (count - 1) % 5;
+                                        // This is the calculation for even disbribution for the dots
+                                        let marginLeft = numb <= 5 ? (count <=5 ? (count%6 === 0 ? 0 : 3) : ((count-1)%5 === 0 ? 3 : 11 + 8*(numb-2))) : 0;
+                                        // Increment row value by one after every 5th dot
+                                        if((count-1)%5 === 0) {
+                                            rows2 = rows2 + 1;
+                                        }
+                                        return (
+                                            <View key={item.id} style={{ marginLeft: marginLeft, position: count <= 5 ? "relative" : "absolute", top: count <= 5 ? 0 : 8 * rows2 }}>
+                                                <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
+                                            </View>
+                                        )
+                                    })}
                                 </View>
                             )}
                         </TouchableOpacity>
@@ -288,11 +331,23 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
                            
                             {isCalendarReady && checkMap && checkMap.get(weekdays[3].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
-                                    {checkMap.get(weekdays[3].format('YYYY-MM-DD').toString()).map((item, index) => (
-                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
-                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
-                                        </View>
-                                    ))}
+                                    {checkMap.get(weekdays[3].format('YYYY-MM-DD').toString()).map((item, index) => {
+                                        // this is to simplify calculation by having starting index be set to 1
+                                        let count = index + 1;
+                                        // this goes for every 5 dots. Once it reaches 5, reset numb back to 1
+                                        let numb = 1 + (count - 1) % 5;
+                                        // This is the calculation for even disbribution for the dots
+                                        let marginLeft = numb <= 5 ? (count <=5 ? (count%6 === 0 ? 0 : 3) : ((count-1)%5 === 0 ? 3 : 11 + 8*(numb-2))) : 0;
+                                        // Increment row value by one after every 5th dot
+                                        if((count-1)%5 === 0) {
+                                            rows3 = rows3 + 1;
+                                        }
+                                        return (
+                                            <View key={item.id} style={{ marginLeft: marginLeft, position: count <= 5 ? "relative" : "absolute", top: count <= 5 ? 0 : 8 * rows3 }}>
+                                                <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
+                                            </View>
+                                        )
+                                    })}
                                 </View>
                             )}
                         </TouchableOpacity>
@@ -307,11 +362,23 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
                             </View>
                             {isCalendarReady && checkMap && checkMap.get(weekdays[4].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
-                                    {checkMap.get(weekdays[4].format('YYYY-MM-DD').toString()).map((item, index) => (
-                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
-                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
-                                        </View>
-                                    ))}
+                                    {checkMap.get(weekdays[4].format('YYYY-MM-DD').toString()).map((item, index) => {
+                                        // this is to simplify calculation by having starting index be set to 1
+                                        let count = index + 1;
+                                        // this goes for every 5 dots. Once it reaches 5, reset numb back to 1
+                                        let numb = 1 + (count - 1) % 5;
+                                        // This is the calculation for even disbribution for the dots
+                                        let marginLeft = numb <= 5 ? (count <=5 ? (count%6 === 0 ? 0 : 3) : ((count-1)%5 === 0 ? 3 : 11 + 8*(numb-2))) : 0;
+                                        // Increment row value by one after every 5th dot
+                                        if((count-1)%5 === 0) {
+                                            rows4 = rows4 + 1;
+                                        }
+                                        return (
+                                            <View key={item.id} style={{ marginLeft: marginLeft, position: count <= 5 ? "relative" : "absolute", top: count <= 5 ? 0 : 8 * rows4 }}>
+                                                <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
+                                            </View>
+                                        )
+                                    })}
                                 </View>
                             )}
                                                         
@@ -328,11 +395,23 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
                             
                             {isCalendarReady && checkMap && checkMap.get(weekdays[5].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
-                                    {checkMap.get(weekdays[5].format('YYYY-MM-DD').toString()).map((item, index) => (
-                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
-                                            <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
-                                        </View>
-                                    ))}
+                                    {checkMap.get(weekdays[5].format('YYYY-MM-DD').toString()).map((item, index) => {
+                                        // this is to simplify calculation by having starting index be set to 1
+                                        let count = index + 1;
+                                        // this goes for every 5 dots. Once it reaches 5, reset numb back to 1
+                                        let numb = 1 + (count - 1) % 5;
+                                        // This is the calculation for even disbribution for the dots
+                                        let marginLeft = numb <= 5 ? (count <=5 ? (count%6 === 0 ? 0 : 3) : ((count-1)%5 === 0 ? 3 : 11 + 8*(numb-2))) : 0;
+                                        // Increment row value by one after every 5th dot
+                                        if((count-1)%5 === 0) {
+                                            rows5 = rows5 + 1;
+                                        }
+                                        return (
+                                            <View key={item.id} style={{ marginLeft: marginLeft, position: count <= 5 ? "relative" : "absolute", top: count <= 5 ? 0 : 8 * rows5 }}>
+                                                <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
+                                            </View>
+                                        )
+                                    })}
                                 </View>
                             )}
                         </TouchableOpacity>
@@ -348,17 +427,28 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
                            
                             {isCalendarReady && checkMap && checkMap.get(weekdays[6].format('YYYY-MM-DD').toString()) !== undefined && (
                                 <View style={{ position: "absolute", flexDirection: "row", top: "120%" }}>
-                                    {checkMap.get(weekdays[6].format('YYYY-MM-DD').toString()).map((item, index) => (
-                                        <View key={item.id} style={{ marginLeft: index === 0 ? 0 : 3 }}>
-                                            <View style={{width: 5, height: 6, borderRadius: 30/2, backgroundColor: item.color}} />
-                                        </View>
-                                    ))}
+                                    {checkMap.get(weekdays[6].format('YYYY-MM-DD').toString()).map((item, index) => {
+                                        // this is to simplify calculation by having starting index be set to 1
+                                        let count = index + 1;
+                                        // this goes for every 5 dots. Once it reaches 5, reset numb back to 1
+                                        let numb = 1 + (count - 1) % 5;
+                                        // This is the calculation for even disbribution for the dots
+                                        let marginLeft = numb <= 5 ? (count <=5 ? (count%6 === 0 ? 0 : 3) : ((count-1)%5 === 0 ? 3 : 11 + 8*(numb-2))) : 0;
+                                        // Increment row value by one after every 5th dot
+                                        if((count-1)%5 === 0) {
+                                            rows6 = rows6 + 1;
+                                        }
+                                        return (
+                                            <View key={item.id} style={{ marginLeft: marginLeft, position: count <= 5 ? "relative" : "absolute", top: count <= 5 ? 0 : 8 * rows6 }}>
+                                                <View style={{width: 5, height: 5, borderRadius: 30/2, backgroundColor: item.color}} />
+                                            </View>
+                                        )
+                                    })}
                                 </View>
                             )}
                         </TouchableOpacity>
                     </View>
                 </View>
-                {/* Go to CategoryItem.js and pass the categoryList value to it */}
             </View>
            
         </View>
