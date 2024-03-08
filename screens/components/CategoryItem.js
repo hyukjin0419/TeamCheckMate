@@ -30,50 +30,89 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     // get user information
     const user = auth.currentUser;
 
-    const pressAddBtn = async(id, teamCode) => {
+    const pressAddBtn = async(id) => {
       console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
-      
       // if teamCode does not exist meaning it is personal task
-      if(!teamCode) {
-        //1. 멤버 이름을 parameter로 받는다.
-        //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
-        setIsWritingNewTask((prevIsWritingNewTask) => ({
-          ...prevIsWritingNewTask,
-          [id]: true,
-        }));
-      }
+      //1. 멤버 이름을 parameter로 받는다.
+      //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
+      setIsWritingNewTask((prevIsWritingNewTask) => ({
+        ...prevIsWritingNewTask,
+        [id]: true,
+      }));
     };
   
     // when user wants to add new task
-    const addNewTask = async(id, color, isSubmitedByEnter) => {
+    const addNewTask = async(id, color, assignmentId, teamCode, isSubmitedByEnter) => {
       // if the task is not an empty string
+      let newChecklist = {}
       if (newTaskText.trim() !== "") {
         // create new Checklist to render front end first
-        const newChecklist = {
-          category: id,
-          isChecked: false,
-          color: color,
-          content: newTaskText,
-          regDate: new Date(),
-          modDate: new Date(),
-        };
+        if(!assignmentId) {
+          newChecklist = {
+            category: id,
+            isChecked: false,
+            color: color,
+            content: newTaskText,
+            regDate: new Date(),
+            modDate: new Date(),
+          };
+        }
+        else {
+          newChecklist = {
+            assignmentId: assignmentId,
+            category: id,
+            color: color,
+            content: newTaskText,
+            email: user.email,
+            isChecked: false,
+            modDate: new Date(),
+            regDate: new Date(),
+            teamCode: teamCode,
+          }
+        }
         
         // Add the new checklist into checklists array
         setLoad(false);
         setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
 
         // add the information of new task into firebase
-        const checkListDoc = addDoc(
-          collection(
+        if(!assignmentId) {
+          const checkListDoc = addDoc(
+            collection(
+              db,
+              "user",
+              user.email,
+              "personalCheckList",
+              id,
+              "tasks",
+            ),
+            newChecklist
+          );
+        }
+        else {
+          const checkListTeamDoc = collection(
+            db,
+            "team",
+            teamCode,
+            "assignmentList",
+            assignmentId,
+            "memberEmail",
+            user.email,
+            "checkList",
+          )
+          
+          const teamCheckLists = await addDoc(checkListTeamDoc, newChecklist);
+
+          const checkListDoc = doc(
             db,
             "user",
             user.email,
-            "personalCheckList",
-            id,
-            "tasks",
-          ),
-          newChecklist
-        );
+            "teamCheckList",
+            teamCheckLists.id,
+          )
+
+          const teamCheck = await setDoc(checkListDoc, newChecklist);
+        }
 
         //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
         if (!isSubmitedByEnter) {
@@ -480,7 +519,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
                   ...styles.categoryContainer,
                   backgroundColor: item.color,
                 }}
-                onPress={() => pressAddBtn(item.id, item.teamCode)}
+                onPress={() => pressAddBtn(item.id)}
               >
                 <Text style={styles.categoryText}>{item.category}</Text>
                 <Image
@@ -569,8 +608,8 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.id, item.color, true)}
-                    onBlur={() => addNewTask(item.id, item.color, false)}
+                    onSubmitEditing={() => addNewTask(item.id, item.color, item.assignmentId, item.teamCode, true)}
+                    onBlur={() => addNewTask(item.id, item.color, item.assignmentId, item.teamCode, false)}
                     blurOnSubmit={false}
                   />
                   <TouchableOpacity>
