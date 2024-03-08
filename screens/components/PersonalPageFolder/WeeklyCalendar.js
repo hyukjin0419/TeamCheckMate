@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, ScrollView, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, FlatList } from 'react-native';
+import { Text, View, ScrollView, TouchableOpacity, StyleSheet, Image, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import moment from 'moment/min/moment-with-locales';
 import { displayTitleByLocale } from './src/Locale';
@@ -139,11 +139,23 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
                     
                     {/* Moving to previous dates */}
                     <TouchableOpacity style={{...styles.arrowButton, position: "absolute", right: "10%"}} onPress={clickLastWeekHandler}>
-                        <AntDesign name="left" size={20} color="black" />
+                        <Image
+                            style={{
+                            width: 8,
+                            height: 14,
+                            }}
+                            source={require("../../images/backBtn.png")}
+                        />
                     </TouchableOpacity>
                     {/* Moving to future dates */}
                     <TouchableOpacity style={{...styles.arrowButton, position: "absolute", right: 0}} onPress={clickNextWeekHandler}>
-                        <AntDesign name="right" size={20} color="black" />
+                        <Image
+                            style={{
+                            width: 8,
+                            height: 14,
+                            }}
+                            source={require("../../images/frontBtn.png")}
+                        />
                     </TouchableOpacity>
                 </View>
 
@@ -164,16 +176,16 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
                         {/*백그라운드 터치시 모달창 사라지게 하는 함수를 호출*/}
                         <View style={s.modalContent}>
                             <View style={s.center} >
-                                <View style={{flexDirection: "row", justifyContent: "space-between", width: "100%"}}>
+                                <View style={{flexDirection: "row", justifyContent: "space-between", width: "90%"}}>
                                     {/* Cancel button */}
                                 <TouchableOpacity onPress={toggleModal}>
-                                    <Text style={{color: "grey", fontSize: 16, marginLeft: "3%"}}>취소</Text>
+                                    <Text style={{color: "grey", fontSize: 20, marginLeft: "3%", fontFamily: "SUIT-Medium"}}>취소</Text>
                                 </TouchableOpacity>
                                 {/* bar icon in the top middle of modal */}
                                 <View style={s.barIcon}></View>
                                 {/* Confirm button */}
                                 <TouchableOpacity onPress={confirmDate}>
-                                    <Text style={{color: "#007AFF", fontSize: 16, marginRight: "3%"}}>완료</Text>
+                                    <Text style={{color: "#007AFF", fontSize: 20, marginRight: "3%", fontFamily: "SUIT-Medium"}}>완료</Text>
                                 </TouchableOpacity>
                                 </View>
                                 {/* Choose date */}
