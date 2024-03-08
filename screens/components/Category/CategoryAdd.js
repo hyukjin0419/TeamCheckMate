@@ -119,7 +119,13 @@ export default CategoryAdd = () => {
                 navigation.goBack();
               }}
             >
-              <AntDesign name="left" size={20} color="black" />
+              <Image
+                style={{
+                width: 9,
+                height: 15,
+                }}
+                source={require("../../images/backBtn.png")}
+            />
             </TouchableOpacity>
           </View>
 
@@ -145,7 +151,7 @@ export default CategoryAdd = () => {
             borderColor: colorConfirmed,
           }}
         >
-          <View flex={1}>
+          <View style={{marginTop: "3%"}} flex={1}>
             <TextInput
               placeholder="카테고리 이름"
               value={textInputValue}

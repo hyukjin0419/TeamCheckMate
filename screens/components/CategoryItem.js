@@ -25,6 +25,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     const [combineList, setCombineList] = useState([...teamList, ...categoryList]);
     const [date, setDate] = useState(props.sendDate);
     const [load, setLoad] = useState(true);
+    const[allList, setAllList] = useState([]);
     let selectedDateCompare = "";
     // get user information
     const user = auth.currentUser;
@@ -101,6 +102,12 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
           ? { ...checklist, isChecked: newValue, modDate: new Date() }
           : checklist
       );
+      // Update the selected task in allList list 
+      const updatedCheckLists = allList.map((checklist) =>
+        checklist.category === category && checklist.id === id
+          ? { ...checklist, isChecked: newValue, modDate: new Date() }
+          : checklist
+      );
   
       //체크여부에 따라 정렬은 바꾼다.
       //반환 값이 음수일 경우 a가 앞에 위치
@@ -121,7 +128,9 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
   
       //업데이트 된 체크리스트를 프론트에 반영
       setChecklists(updatedChecklists);
-      createCheckMap(updatedChecklists);
+      // update new values into setAllList
+      setAllList(updatedCheckLists);
+      createCheckMap(updatedCheckLists);
           
   
       //업데이트 된 체크리스트를 firestorage에 반영 -> 백엔드에서는 체크리스트가 객체배열로 되어있지 않기 때문에, 그냥 해당 문서를 참조해서 값을 바꾼다
@@ -407,7 +416,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
           })
         )
         setChecklists(list);
-        console.log(checklists);
+        setAllList(tempList);
         createCheckMap(tempList);
       }
     }

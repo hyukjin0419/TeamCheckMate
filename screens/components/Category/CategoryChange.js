@@ -183,7 +183,13 @@ export default CategoryChange = ({ route }) => {
                 navigation.goBack();
               }}
             >
-              <AntDesign name="left" size={20} color="black" />
+              <Image
+                style={{
+                width: 9,
+                height: 15,
+                }}
+                source={require("../../images/backBtn.png")}
+            />
             </TouchableOpacity>
           </View>
 
