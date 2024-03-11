@@ -397,15 +397,15 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
             data.modDate = child.data().modDate.toDate();
             // temporary variable to get modDate
             const getDate = child.data().modDate.toDate();
-            // change to mm/dd/yyyy format for modDate for easier comparison
-            const compareDate = getDate.toLocaleDateString();
+            // change to yyyy-mm-dd format for modDate for easier comparison
+            const compareDate = getDate.toISOString().split('T')[0];
             // if user selected date is less than or equal to data's last modified date
             if(compareDate >= selectedDateCompare) {
               // add to list
               list.push(data);
             }
-            // if modDate is less than selected date but it is not checked
-            else if(compareDate <= selectedDateCompare && !data.isChecked) {
+            // if task is not checked, add to list
+            else if(!data.isChecked) {
               list.push(data);
             }
             // temporary list to show dots
@@ -437,15 +437,17 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
                 data.modDate = doc.data().modDate.toDate();
                 // temporary variable to get modDate
                 const getDate = doc.data().modDate.toDate();
-                // change to mm/dd/yyyy format for modDate for easier comparison
-                const compareDate = getDate.toLocaleDateString();
+                // change to yyyy-mm-dd format for modDate for easier comparison
+                const compareDate = getDate.toISOString().split('T')[0];
                 // if user selected date is less than or equal to data's last modified date
-                if(compareDate >= selectedDateCompare) {
-                  // add to list
-                  list.push(data);
+                if(data.isChecked) {
+                  if(compareDate >= selectedDateCompare) {
+                    // add to list
+                    list.push(data);
+                  }
                 }
-                // if modDate is less than selected date but it is not checked
-                else if(compareDate <= selectedDateCompare && !data.isChecked) {
+                // if task is not checked
+                else if(data.isChecked === false) {
                   list.push(data);
                 }
                 // temporary list to show dots
@@ -483,7 +485,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
       // setCategoryList(props.categoryCode);
       // Load all tasks inside categories that are saved in firebase
       setDate(props.sendDate);
-      selectedDateCompare = new Date(date).toLocaleDateString();
+      selectedDateCompare = date.toISOString().split('T')[0];
       fetchTaskData(load);
     }, [props.sendDate, date]);
 
