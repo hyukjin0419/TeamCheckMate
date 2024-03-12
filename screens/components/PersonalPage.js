@@ -41,7 +41,6 @@ export default PersonalPage = () => {
   const [load, setLoad] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [sendData, setSendData] = useState(false);
-  const [sendDateConfirm, setSendDateConfirm] = useState(false);
   const email = auth.currentUser.email;
 
   const getCategoryCode = async() => {
@@ -150,18 +149,13 @@ export default PersonalPage = () => {
     fetchUserData();
     setLoad(false);
     setSendData(false);
-    setSendDateConfirm(false);
     getCategoryCode();
   }, [userEmail]);
 
 
   return (
     <View style={styles.container}>
-      {/* <View style={{marginTop: 18, flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-        <Text style={{marginTop: 100, marginLeft: 20, fontSize: 20}}>{userName} 님 환영합니다</Text>
-        <PersonalPageBtn />
-      </View> */}
-      <Text style={styles.titleHeader}>{userName} 님 오늘도 파이팅!</Text>
+      <Text style={styles.titleHeader}>{userName} 님,{"\n"}오늘도 파이팅!</Text>
       <WeeklyCalendar 
         getSelectedDate={(date) => setSelectedDate(date)}
         checkMap={sendData ? checkMap : new Map()} 
@@ -169,8 +163,6 @@ export default PersonalPage = () => {
       />
       {load && 
              <CategoryItem
-             // categoryList={categoryList}
-             // checkEvent={handleCheckEvent}
              getCheckMap={showList}
              categoryCode={categoryCode}
              teamCode={teamCode}
@@ -181,8 +173,6 @@ export default PersonalPage = () => {
     </View>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   container: {
