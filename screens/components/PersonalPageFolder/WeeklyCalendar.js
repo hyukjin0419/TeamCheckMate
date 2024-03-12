@@ -100,7 +100,9 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
     }
 
     const isTodayDate = date => {
-        return (todayDate.getFullYear() === date.year() && todayDate.getMonth() === date.month() && todayDate.getDate() === date.date());
+        if(date != undefined) {
+            return (todayDate.getFullYear() === date.year() && todayDate.getMonth() === date.month() && todayDate.getDate() === date.date());    
+        }
     }
 
     // if user presses on a day
