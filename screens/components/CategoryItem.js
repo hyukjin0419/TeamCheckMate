@@ -489,9 +489,6 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
       fetchTaskData(load);
     }, [props.sendDate, date]);
 
-    // useEffect(() => {
-    //   props.checkEvent(checkMap);
-    // }, [checkMap]);
 
     // visual state for modal
     const [taskOptionModalVisible, setTaskOptionModalVisible] = useState(false);
@@ -739,7 +736,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
 
 const styles = StyleSheet.create({
   container: {
-    height: "60%",
+    height: "55%",
     backgroundColor: "white",
     paddingHorizontal: "5%",
   },

@@ -23,11 +23,12 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
     const [isCalendarReady, setCalendarReady] = useState(false)
     // date variable for today's date
     const [date, setDate] = useState(new Date());
-    const [categoryList, setCategoryList] = useState([]);
-    // console.log("atasetae", checkMap);
     // modal visibility variable
     const [isModalVisible, setIsModalVisible] = useState(false);
+    // variable for today's date
     const todayDate = new Date();
+
+    // variables for dot rows for each date
     let rows0 = -1;
     let rows1 = -1;
     let rows2 = -1;
@@ -35,11 +36,6 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
     let rows4 = -1;
     let rows5 = -1;
     let rows6 = -1;
-
-    
-    
-    const email = auth.currentUser.email;
-      
 
     useEffect(() => { // only first mount
         // Create Weekdays
@@ -99,6 +95,7 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
         return (selectedDate.year() === date.year() && selectedDate.month() === date.month() && selectedDate.date() === date.date())
     }
 
+    // See if the current weekday is today's date
     const isTodayDate = date => {
         if(date != undefined) {
             return (todayDate.getFullYear() === date.year() && todayDate.getMonth() === date.month() && todayDate.getDate() === date.date());    
@@ -130,6 +127,10 @@ export default WeeklyCalendar = ({ getSelectedDate, checkMap, ...props }) => {
         setCurrDate(moment(date).locale(props.locale));
         // create the entire week to match the selected date
         createWeekdays(moment(date).locale(props.locale));
+        // set selectedDate to chosen date
+        setSelectedDate(moment(date).locale(props.locale));
+        // pass the chosen date onto PersonalPage
+        getSelectedDate(moment(date).locale(props.locale))
         // close modal
         toggleModal();
     }
