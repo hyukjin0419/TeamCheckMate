@@ -7,7 +7,6 @@ import s from "../styles/css.js"
 import moment from 'moment';
 import Modal from "react-native-modal";
 import { addDoc, deleteDoc, getDoc, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { useFocusEffect } from '@react-navigation/native';
 
 export default CategoryItem = ({getCheckMap, ...props}) => {
     // get categoryCode map and set it to categoryList to render categories
@@ -75,6 +74,14 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
         setLoad(false);
         setChecklists((prevChecklists) => [...prevChecklists, newChecklist]);
 
+        //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
+        if (!isSubmitedByEnter) {
+          setIsWritingNewTask((prev) => ({ ...prev, [id]: false }));
+          // console.log(updatedIsWritingNewTask);
+        }
+        //textinput을 비운다.
+        setNewTaskText("");
+
         // add the information of new task into firebase
         if(!assignmentId) {
           const checkListDoc = addDoc(
@@ -114,13 +121,6 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
           const teamCheck = await setDoc(checkListDoc, newChecklist);
         }
 
-        //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
-        if (!isSubmitedByEnter) {
-          setIsWritingNewTask((prev) => ({ ...prev, [id]: false }));
-          // console.log(updatedIsWritingNewTask);
-        }
-        //textinput을 비운다.
-        setNewTaskText("");
       } else {
         setIsWritingNewTask((prev) => ({ ...prev, [id]: false }));
       }
