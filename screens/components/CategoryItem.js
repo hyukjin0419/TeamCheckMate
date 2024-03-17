@@ -327,7 +327,20 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
           "teamCheckList",
           selectedChecklist.id,
         );
+
+        const teamRef = doc(
+          db,
+          "team",
+          selectedChecklist.teamCode,
+          "assignmentList",
+          selectedChecklist.assignmentId,
+          "memberEmail",
+          user.email,
+          "checkList",
+          selectedChecklist.id,
+        )
         await deleteDoc(teamtaskRef);
+        await deleteDoc(teamRef);
       }
     } catch (error) {
       console.error("Error deleting document: ", error);
