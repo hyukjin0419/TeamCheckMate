@@ -1,4 +1,4 @@
-import { View, Text , StyleSheet, TouchableOpacity, Image, TextInput, FlatList, KeyboardAvoidingView } from 'react-native'
+import { View, Text , StyleSheet, TouchableOpacity, Image, TextInput, FlatList, KeyboardAvoidingView, Alert } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { auth, collection, db, doc, setDoc, updateDoc, listCollections } from '../../firebase';
 import Checkbox from 'expo-checkbox';
@@ -29,19 +29,24 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     // get user information
     const user = auth.currentUser;
 
-    const pressAddBtn = async(id) => {
+    const pressAddBtn = async(id, assignmentId) => {
       console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
       // if teamCode does not exist meaning it is personal task
       //1. 멤버 이름을 parameter로 받는다.
       //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
-      setIsWritingNewTask((prevIsWritingNewTask) => ({
-        ...prevIsWritingNewTask,
-        [id]: true,
-      }));
+      if(!assignmentId) {
+        setIsWritingNewTask((prevIsWritingNewTask) => ({
+          ...prevIsWritingNewTask,
+          [id]: true,
+        }));
+      }
+      else {
+        Alert.alert("개인화면에서 팀 타스크 추가 할 수 없습니다")
+      }
     };
   
     // when user wants to add new task
-    const addNewTask = async(id, color, assignmentId, teamCode, isSubmitedByEnter) => {
+    const addNewTask = async(id, color, isSubmitedByEnter) => {
       // if the task is not an empty string
       let newChecklist = {}
       if (newTaskText.trim() !== "") {
@@ -518,7 +523,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
                   ...styles.categoryContainer,
                   backgroundColor: item.color,
                 }}
-                onPress={() => pressAddBtn(item.id)}
+                onPress={() => pressAddBtn(item.id, item.assignmentId)}
               >
                 <Text style={styles.categoryText}>{item.category}</Text>
                 <Image
@@ -607,8 +612,8 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.id, item.color, item.assignmentId, item.teamCode, true)}
-                    onBlur={() => addNewTask(item.id, item.color, item.assignmentId, item.teamCode, false)}
+                    onSubmitEditing={() => addNewTask(item.id, item.color, true)}
+                    onBlur={() => addNewTask(item.id, item.color, false)}
                     blurOnSubmit={false}
                   />
                   <TouchableOpacity>
