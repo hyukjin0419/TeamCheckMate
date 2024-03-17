@@ -26,29 +26,24 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     const [load, setLoad] = useState(true);
     const[allList, setAllList] = useState([]);
     let selectedDateCompare = "";
-    const [compareDate, setCompareDate] = useState("");
     // get user information
     const user = auth.currentUser;
     // today's date
-    const today = new Date();
-    const todayDate = today.toISOString().split('T')[0];
 
     const pressAddBtn = async(id, assignmentId) => {
-      if(compareDate === todayDate) {
-        console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
-        // if teamCode does not exist meaning it is personal task
-        //1. 멤버 이름을 parameter로 받는다.
-        //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
-        if(!assignmentId) {
-          setIsWritingNewTask((prevIsWritingNewTask) => ({
-            ...prevIsWritingNewTask,
-            [id]: true,
-          }));
-        }
-        else {
-          Alert.alert("개인화면에서 팀 타스크 추가 할 수 없습니다")
-        }
-      } 
+      console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
+      // if teamCode does not exist meaning it is personal task
+      //1. 멤버 이름을 parameter로 받는다.
+      //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
+      if(!assignmentId) {
+        setIsWritingNewTask((prevIsWritingNewTask) => ({
+          ...prevIsWritingNewTask,
+          [id]: true,
+        }));
+      }
+      else {
+        Alert.alert("개인화면에서 팀 타스크 추가 할 수 없습니다")
+      }
     };
   
     // when user wants to add new task
@@ -454,7 +449,6 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
       // Load all tasks inside categories that are saved in firebase
       setDate(props.sendDate);
       selectedDateCompare = date.toISOString().split('T')[0];
-      setCompareDate(date.toISOString().split('T')[0]);
       fetchTaskData(load);
     }, [props.sendDate, date]);
 
