@@ -255,7 +255,6 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
         if(checkExistSnapshot.exists()) {
           await updateDoc(taskDocRef, {
             content: editTaskText,
-            modDate: new Date(),
           });
         }
         else { // if it is a team task, update on team page as well
@@ -281,12 +280,10 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
 
           await updateDoc(teamTaskDocRef, {
             content: editTaskText,
-            modDate: new Date(),
           });
 
           await updateDoc(teamPageTaskDocRef, {
             content: editTaskText,
-            modDate: new Date(),
           });
         }
       } catch (error) {
