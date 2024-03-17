@@ -48,32 +48,16 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     // when user wants to add new task
     const addNewTask = async(id, color, isSubmitedByEnter) => {
       // if the task is not an empty string
-      let newChecklist = {}
       if (newTaskText.trim() !== "") {
         // create new Checklist to render front end first
-        if(!assignmentId) {
-          newChecklist = {
-            category: id,
-            isChecked: false,
-            color: color,
-            content: newTaskText,
-            regDate: new Date(),
-            modDate: new Date(),
-          };
-        }
-        else {
-          newChecklist = {
-            assignmentId: assignmentId,
-            category: id,
-            color: color,
-            content: newTaskText,
-            email: user.email,
-            isChecked: false,
-            modDate: new Date(),
-            regDate: new Date(),
-            teamCode: teamCode,
-          }
-        }
+        const newChecklist = {
+          category: id,
+          isChecked: false,
+          color: color,
+          content: newTaskText,
+          regDate: new Date(),
+          modDate: new Date(),
+        };
         
         // Add the new checklist into checklists array
         setLoad(false);
@@ -88,44 +72,17 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
         setNewTaskText("");
 
         // add the information of new task into firebase
-        if(!assignmentId) {
-          const checkListDoc = addDoc(
-            collection(
-              db,
-              "user",
-              user.email,
-              "personalCheckList",
-              id,
-              "tasks",
-            ),
-            newChecklist
-          );
-        }
-        else {
-          const checkListTeamDoc = collection(
-            db,
-            "team",
-            teamCode,
-            "assignmentList",
-            assignmentId,
-            "memberEmail",
-            user.email,
-            "checkList",
-          )
-          
-          const teamCheckLists = await addDoc(checkListTeamDoc, newChecklist);
-
-          const checkListDoc = doc(
+        const checkListDoc = addDoc(
+          collection(
             db,
             "user",
             user.email,
-            "teamCheckList",
-            teamCheckLists.id,
-          )
-
-          const teamCheck = await setDoc(checkListDoc, newChecklist);
-        }
-
+            "personalCheckList",
+            id,
+            "tasks",
+          ),
+          newChecklist
+        );
       } else {
         setIsWritingNewTask((prev) => ({ ...prev, [id]: false }));
       }
