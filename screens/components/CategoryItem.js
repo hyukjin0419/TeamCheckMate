@@ -1,4 +1,4 @@
-import { View, Text , StyleSheet, TouchableOpacity, Image, TextInput, FlatList, KeyboardAvoidingView } from 'react-native'
+import { View, Text , StyleSheet, TouchableOpacity, Image, TextInput, FlatList, KeyboardAvoidingView, Alert } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { auth, collection, db, doc, setDoc, updateDoc, listCollections } from '../../firebase';
 import Checkbox from 'expo-checkbox';
@@ -29,46 +29,35 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     // get user information
     const user = auth.currentUser;
 
-    const pressAddBtn = async(id) => {
+    const pressAddBtn = async(id, assignmentId) => {
       console.log("[TeamcheckPage]: pressAddBtn 함수 실행");
       // if teamCode does not exist meaning it is personal task
       //1. 멤버 이름을 parameter로 받는다.
       //2. 이전 상태(prevIsWritingNewTask)를 받아 해당 상태를 변경한 새로운 객체를 반환한다. 이 과정에서 memberName이라는 키를 사용하여 해당 키의 값을 true로 설정하여 상태를 업데이트한다.
-      setIsWritingNewTask((prevIsWritingNewTask) => ({
-        ...prevIsWritingNewTask,
-        [id]: true,
-      }));
+      if(!assignmentId) {
+        setIsWritingNewTask((prevIsWritingNewTask) => ({
+          ...prevIsWritingNewTask,
+          [id]: true,
+        }));
+      }
+      else {
+        Alert.alert("개인화면에서 팀 타스크 추가 할 수 없습니다")
+      }
     };
   
     // when user wants to add new task
-    const addNewTask = async(id, color, assignmentId, teamCode, isSubmitedByEnter) => {
+    const addNewTask = async(id, color, isSubmitedByEnter) => {
       // if the task is not an empty string
-      let newChecklist = {}
       if (newTaskText.trim() !== "") {
         // create new Checklist to render front end first
-        if(!assignmentId) {
-          newChecklist = {
-            category: id,
-            isChecked: false,
-            color: color,
-            content: newTaskText,
-            regDate: new Date(),
-            modDate: new Date(),
-          };
-        }
-        else {
-          newChecklist = {
-            assignmentId: assignmentId,
-            category: id,
-            color: color,
-            content: newTaskText,
-            email: user.email,
-            isChecked: false,
-            modDate: new Date(),
-            regDate: new Date(),
-            teamCode: teamCode,
-          }
-        }
+        const newChecklist = {
+          category: id,
+          isChecked: false,
+          color: color,
+          content: newTaskText,
+          regDate: new Date(),
+          modDate: new Date(),
+        };
         
         // Add the new checklist into checklists array
         setLoad(false);
@@ -83,44 +72,17 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
         setNewTaskText("");
 
         // add the information of new task into firebase
-        if(!assignmentId) {
-          const checkListDoc = addDoc(
-            collection(
-              db,
-              "user",
-              user.email,
-              "personalCheckList",
-              id,
-              "tasks",
-            ),
-            newChecklist
-          );
-        }
-        else {
-          const checkListTeamDoc = collection(
-            db,
-            "team",
-            teamCode,
-            "assignmentList",
-            assignmentId,
-            "memberEmail",
-            user.email,
-            "checkList",
-          )
-          
-          const teamCheckLists = await addDoc(checkListTeamDoc, newChecklist);
-
-          const checkListDoc = doc(
+        const checkListDoc = addDoc(
+          collection(
             db,
             "user",
             user.email,
-            "teamCheckList",
-            teamCheckLists.id,
-          )
-
-          const teamCheck = await setDoc(checkListDoc, newChecklist);
-        }
-
+            "personalCheckList",
+            id,
+            "tasks",
+          ),
+          newChecklist
+        );
       } else {
         setIsWritingNewTask((prev) => ({ ...prev, [id]: false }));
       }
@@ -518,7 +480,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
                   ...styles.categoryContainer,
                   backgroundColor: item.color,
                 }}
-                onPress={() => pressAddBtn(item.id)}
+                onPress={() => pressAddBtn(item.id, item.assignmentId)}
               >
                 <Text style={styles.categoryText}>{item.category}</Text>
                 <Image
@@ -607,8 +569,8 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
                     autoFocus={true}
                     returnKeyType="done"
                     onChangeText={(text) => setNewTaskText(text)}
-                    onSubmitEditing={() => addNewTask(item.id, item.color, item.assignmentId, item.teamCode, true)}
-                    onBlur={() => addNewTask(item.id, item.color, item.assignmentId, item.teamCode, false)}
+                    onSubmitEditing={() => addNewTask(item.id, item.color, true)}
+                    onBlur={() => addNewTask(item.id, item.color, false)}
                     blurOnSubmit={false}
                   />
                   <TouchableOpacity>
