@@ -26,6 +26,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
     const [load, setLoad] = useState(true);
     const[allList, setAllList] = useState([]);
     let selectedDateCompare = "";
+    let selectDate = "";
     // get user information
     const user = auth.currentUser;
     // today's date
@@ -67,7 +68,6 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
         //만약 사용자가 엔터로 입력했을 시, 다음 항목을 계속 작성할 수 있게 설정하는 조건문
         if (!isSubmitedByEnter) {
           setIsWritingNewTask((prev) => ({ ...prev, [id]: false }));
-          // console.log(updatedIsWritingNewTask);
         }
         //textinput을 비운다.
         setNewTaskText("");
@@ -94,6 +94,8 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
       // 마찬가지로 프론트 먼저 상태 업데이트 후 백엔드 반영
       //햅틱 추가
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      const updateDate = date.toDate();
   
       //파라미터로 작성자와, 체크리스트 id(from firebase), 그리고 newValue (checkbox에서 제공)을 받는다
       //전체 객체 배열인 checklists를 순회하며 작성자와 id가 같으면
@@ -101,13 +103,13 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
       //아니면 기존 객체를 updateChecklist에 넣는다
       const updatedChecklists = checklists.map((checklist) =>
         checklist.category === category && checklist.id === id
-          ? { ...checklist, isChecked: newValue, modDate: new Date() }
+          ? { ...checklist, isChecked: newValue, modDate: updateDate }
           : checklist
       );
       // Update the selected task in allList list 
       const updatedCheckLists = allList.map((checklist) =>
         checklist.category === category && checklist.id === id
-          ? { ...checklist, isChecked: newValue, modDate: new Date() }
+          ? { ...checklist, isChecked: newValue, modDate: updateDate }
           : checklist
       );
   
@@ -133,7 +135,6 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
       // update new values into setAllList
       setAllList(updatedCheckLists);
       createCheckMap(updatedCheckLists);
-          
   
       //업데이트 된 체크리스트를 firestorage에 반영 -> 백엔드에서는 체크리스트가 객체배열로 되어있지 않기 때문에, 그냥 해당 문서를 참조해서 값을 바꾼다
       try {
@@ -150,7 +151,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
         if(checkExistSnapshot.exists()){
           await updateDoc(docRef, {
             isChecked: newValue,
-            modDate: new Date(),
+            modDate: updateDate,
           });
         } else {
           const personalTeamDocRef = doc(
@@ -175,12 +176,12 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
 
           await updateDoc(personalTeamDocRef, {
             isChecked: newValue,
-            modDate: new Date(),
+            modDate: updateDate,
           });
 
           await updateDoc(teamDocRef, {
             isChecked: newValue,
-            modDate: new Date(),
+            modDate: updateDate,
           });
         }
       } catch (error) {
@@ -254,7 +255,6 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
         if(checkExistSnapshot.exists()) {
           await updateDoc(taskDocRef, {
             content: editTaskText,
-            modDate: new Date(),
           });
         }
         else { // if it is a team task, update on team page as well
@@ -280,12 +280,10 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
 
           await updateDoc(teamTaskDocRef, {
             content: editTaskText,
-            modDate: new Date(),
           });
 
           await updateDoc(teamPageTaskDocRef, {
             content: editTaskText,
-            modDate: new Date(),
           });
         }
       } catch (error) {
