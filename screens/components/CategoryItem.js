@@ -43,7 +43,7 @@ export default CategoryItem = ({getCheckMap, ...props}) => {
         }));
       }
       else {
-        Alert.alert("개인화면에서 팀 타스크 추가 할 수 없습니다")
+        Alert.alert("개인화면에서 팀 테스크 추가 할 수 없습니다")
       }
     };
   
