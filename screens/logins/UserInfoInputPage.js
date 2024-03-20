@@ -176,10 +176,6 @@ export default function UserInfoInputPage({ route }) {
         >
           <Text style={{ ...s.buttonText, color: "white" }}>확인</Text>
         </TouchableOpacity>
-        {/*가입하기 버튼*/}
-        <TouchableOpacity onPress={skipInput} style={s.subButton}>
-          <Text style={s.subButtonText}>건너뛰기</Text>
-        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );

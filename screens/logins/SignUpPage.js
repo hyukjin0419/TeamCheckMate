@@ -77,28 +77,34 @@ export default function SignInPage({ route }) {
 
   //회원가입 관련 함수
   const handleSignUp = () => {
+    const user = auth.currentUser;
     if (isButtonClicked) {
       return;
     }
     setIsButtonClicked(true);
     createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredentials) => {
-        const user = userCredentials.user;
-        await sendEmailVerification(user).then(async () => {
-          Alert.alert("인증 이메일이 전송되었습니다");
-          console.log("Registered with: " + user.email);
-          route.params?.handleSignUp(false);
-        });
-      })
-      .catch((error) => {
-        if (error.code === "auth/email-already-in-use") {
-          Alert.alert("이 계정은 이미 존재합니다");
-          setIsButtonClicked(false);
-        } else {
-          Alert.alert("이메일과 비밀번호 입력해 주세요");
-          setIsButtonClicked(false);
-        }
+    .then(async (userCredentials) => {
+      const user = userCredentials.user;
+      await sendEmailVerification(user).then(async () => {
+        Alert.alert("인증 이메일이 전송되었습니다");
+        console.log("Registered with: " + user.email);
+        route.params?.handleSignUp(false);
       });
+    })
+    .catch((error) => {
+      if (error.code === "auth/email-already-in-use" && user.emailVerified) {
+        Alert.alert("이 계정은 이미 존재합니다");
+        setIsButtonClicked(false);
+      }
+      else if (error.code === "auth/email-already-in-use" && !user.emailVerified) {
+        Alert.alert("인증 되지 않은 이메일 입니다.");
+      } 
+      else {
+        console.log(error.code)
+        Alert.alert("이메일과 비밀번호 입력해 주세요");
+        setIsButtonClicked(false);
+      }
+    });
   };
 
   const goingBack = () => {
